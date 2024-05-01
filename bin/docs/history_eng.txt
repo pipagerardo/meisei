@@ -1,0 +1,215 @@
+This list is ordered chronologically, so if you want to see the newest changes,
+you'll have to scroll alllllll the way down.
+
+
+18-08-07: 1.0
+Everything's new (started development on 29-01-05)
+Based on Sega Li, my NES emulator, with some additional features like netplay,
+savestates/movies, and realtime reverse. Core is pretty complete and accurate.
+
+01-09-07: 1.0.1
+- various small changes
+- timing: increased maximum Z80 overclock percentage from 400% to 9999%,
+  increased maximum speed up factor from 5 to 10
+- fixed D3D mirror mode not working properly with the Arkanoid pad
+- fixed dialog comboboxes having a height of 0 on some computers
+- gfx: made DirectX 9 optional, so it won't refuse to run with older versions
+  anymore (D3D9.DLL error), the current minimum requirement is DirectX 7
+
+12-02-08: 1.0.2
+I haven't been working on meisei for a few months, so I decided to release the
+latest build. Development will continue, some day.
+
+- added basic SCC deform register emulation
+
+
+01-03-08: 1.1
+- gfx: fixed DDraw renderer border refresh bug
+- input: corrected keyboard matrix quirk
+- changed power-on timing, to prevent "A Life M36 Planet" from locking up
+- added movie time code view option on play/record (hh:mm:ss;ff)
+- VDP: you can now disable/enable sprite and tile layers
+- VDP: added unlimited sprites option. This eliminates sprite flickering on
+  most games, without affecting core accuracy: collision and overflow bits
+  still work the same. Games that use overflow as a trick to hide sprite
+  lines, like Athletic Land when falling into the water, will show glitches.
+- sound: added "triple buffering" to prevent overflows on longer frames
+- timing: speed up setting is now in percentage instead of integer multiply
+- timing: added slowdown feature, working similar to speed up (default: F10)
+- gfx: auto save palette didn't work
+- input: added "invert" function for axes
+- input: limited the speed of DInput reads, instead of always at every vblank.
+  It sometimes returned wrong values in fast forward mode.
+- timing: added direct control over frame speed/reverse with an analogue axis,
+  by default mouse Y axis while holding F10 + F12. I call it DJ scratching,
+  since it kind of resembles that.
+- mappers: added AMD flash memory emulation, and Matra's INK mapper. One INK
+  cartridge died in the process (no, not inkjet), curses were heard as far
+  away as planet Gradius.
+- fixed crash when opening an SCC game by drag-dropping, while that same SCC
+  game was already running
+
+02-03-08: 1.1.1
+- mappers: AMD flash erase sector/chip command didn't work properly
+- changed default video format to PAL, per default C-BIOS region code
+- gfx: fullscreen setting is now saved, so it's possible to start meisei in
+  full screen
+
+29-03-08: 1.1.2
+- fixed movie timecode setting always saving as "no"
+- added support for movie subtitles, it's even possible to create things like:
+  http://www.youtube.com/watch?v=VW4BR4Yy4m4
+- mappers: traded meisei SRAM support for a nice picture of Audrey Tautou from
+  AuroraMSX. Added ASCII 8 + SRAM, ASCII 16 + SRAM, Koei, Konami Game Master 2,
+  Manuel Mega Flash ROM SCC, and Panasonic PAC mapper types.
+- PSG: fixed noise period of 0 being able to go negative
+- Z80: IRQ timing was 1 cycle off
+
+
+31-08-08: 1.2
+meisei's website moved to http://hap.samor.nl/
+
+- input: fixed keyboard matrix ghosting on more than 2 rows
+- input: fixed DirectInput lag
+- fixed possible memory leak with on-screen messages
+- moved enable/disable on-screen messages to the GUI menu (previously, it was
+  just in the .ini file)
+- mappers: added Korean bootleg multicarts: 80-in-1, 90-in-1, and 126-in-1
+- mappers: bought and reverse engineered Cross Blaim and Harry Fox mappers,
+  their emulation should be almost completely accurate now
+- mappers: added Konami Sound Cartridge, SCC-I with 128KB RAM
+- mappers: fixed stupid crash when loading savestates with SRAM mappers
+- mappers: added preliminary support for Zemina ZMB hardware
+- PSG: added emulation of pin 6/7 mask quirk
+- input: added Konami HyperShot controller emulation
+- input: added Torikeshi/Jikkou keys, available on some Panasonic MSXes
+- input: added support for Sony's hardware pause key
+- mappers: fixed SCC power-on state, the music in Nerlaska's Monster Hunter
+  was broken
+- gfx: fixed a few NTSC renderer bugs and made S-Video the default video
+  signal, if it's too slow for you, change it to RGB
+- added a powerful tile viewer, with support for loading/saving tables or SCx
+  files, and a built-in editor similar to Wolf's Polka
+- added a sprite viewer, with similar features to the tile viewer, like changing
+  the Indian's expression to http://hap.samor.nl/meisei_archive/magdance.gif
+- added custom savestate/movie slot, allowing any filename instead of the
+  numbered defaults
+- added support for saving screenshots
+- PSG: added support for AY8910 (only configurable in the .ini file for now)
+- added a PSG logger, allowing you to to log raw, MIDI, or YM files. YM files can
+  be played back, on eg. Ay_Emul ( http://bulba.untergrund.net/emulator_e.htm ).
+  http://hap.samor.nl/meisei_archive/Infinite%20-%20Universe%20Unknown.zip , and
+  http://hap.samor.nl/meisei_archive/Konami%20-%20Usas.zip for example.
+- PSG: added output viewer, with currently played notes on a piano bar
+- PSG: added support for substituting simple waveforms with the default
+  squarewaves, including many presets by Wolf, and a wave editor
+- gfx: made the palette editor easier to use, and included a few more presets
+- included yet another game by Infinite, Montana John and the Templar's Treasure
+
+03-09-08: 1.2.1
+Regarding movies, this version is fully compatible with 1.2.
+
+- fixed meisei crashing on Windows Vista when closing any of the tool windows
+
+21-10-08: 1.2.2
+- tile and sprite viewer can be resized
+- added support for fMSX CAS images (tapes), including the ability to save
+  separate blocks, and import common MSX files normally meant for MSX disks.
+  Be aware that you'll need an official BIOS ROM to be able to play tape games.
+- PSG: moved chip type configuration to the GUI
+- VDP: added chip type configuration: TMS9118, TMS9129, TMS9918A, and TMS9929A
+  (TMSxx18 is NTSC/J, can also be TMSxx28. TMSxx29 is PAL)
+- VDP: enabled 4KB mode address bus mangling for TMS99xxA
+- VDP: added M3 sprite cloning quirk
+- fixed tile viewer screen loader BLOAD header detection
+
+23-11-08: 1.2.3
+- added setting to overrule checksum when loading states or movies, handy if
+  you're ROM hacking and made savestates on an earlier hack revision
+- Z80: fixed a couple of undocumented details not caught by test programs
+- input: added PC keyboard LED flags for trigger rules
+- input: you can now grab the mouse pointer (Ctrl+Shift+M), making games like
+  Arkanoid easier to control
+- input: fixed Sony pause key conflict with default pause shortcut
+- added support for Sony's Magic Key dongle, a simple cheat device that can be
+  used with Gall Force (and a couple of MSX2 games)
+
+
+28-05-09: 1.3
+- VDP: corrected vblank interrupt timing, it was 1 scanline too early
+- VDP: improved render timing, updating the surface at the start of hblank
+  instead of at the start of the active scanline
+- VDP: fixed screen 0 text colour 0 always being black
+- Z80: if ld a,i/r is interrupted, the p/v flag is reset, thanks GuyveR800
+- VDP: fixed a few small bugs with mode 3 sprite cloning
+- VDP: fixed screen 0 border size
+- VDP: corrected emulation of bogus mode 1+2(+3)
+- Z80: made trace logger more user friendly, it's disabled by default though
+- mappers: fixed Irem TAM-S1 (R-Type) mapper range
+- mappers: added ROM mirroring quirk to Konami types
+- mappers: common MegaROMs are autodected by finding mapper register writes,
+  inspired from Marat's fMSX
+- mappers: removed Zemina ZMB type, no dumps exist in order to test it
+- mappers: added optional extra settings per type, instead of all mapper types
+  being identified and auto-configured with a single id
+- mappers: Konami Sound Cartridge can now be configured as Snatcher/SD Snatcher
+  type, or a modified board with 128KB RAM
+- mappers: merged simple no-mapper types into a single one, and made the page
+  layout configurable, it's even possible to create a hybrid ROM/RAM board
+- mappers: rewrote ASCII MegaROM emulation, with support for about 30 official
+  boards, and any custom configuration, props to http://gigamix.jp/rom/ . Also
+  thanks to OeiOeiVogeltje, Quibus, BiFiMSX, Haohmaru for testing their carts.
+  You can help too: http://tsk-tsk.net/crap/ascii_range_todo.txt
+- internal RAM size and primary slot can now be configured
+- mappers: added Al-Alamiah Al-Qur'an type properly (protected/encrypted)
+- added lumi noise simulation, for an answer to "wtf is a lumi noise?" watch
+  http://www.youtube.com/watch?v=rGA_fVegAb4
+- VDP: corrected interrupt request/acknowledge timing due to a small delay
+  between that and accessing a VDP register
+- VDP: added vblank interrupt/flag suppression quirk when reading the status
+  register at the same time the vblank bit gets set
+- VDP: added Toshiba T6950/T7937A model
+- added a firmware downloader, for indirectly obtaining essentials, such as
+  BIOS files, this will also check for meisei updates
+
+09-02-10: 1.3.1
+My website, which happens to be meisei's home too (whoa), was relocated again,
+this time to http://tsk-tsk.net/ . Let's hope it stays there.
+The biggest changes in this release are MSX mouse support, requested by Trilobyte,
+and trackball support, surprisingly supported in more games than I expected,
+like Eddy II, Fruit Search, Hole in One(+Pro), Space Trouble, Super Billiards.
+
+- added support for 1/2/4KB RAM, MSXtra works now
+- if you're too lazy to type a boot command (eg. bload"cas:",r), you can now
+  paste it by pressing Shift+Ctrl+V
+- added MSX mouse and trackball controllers, remember that you can press
+  Shift+Ctrl+M to grab the PC mouse cursor
+
+09-01-11: 1.3.2
+It's been nearly a year since the last update, coding time was mostly spent
+on another project, and MAME. meisei hasn't stood still though; whenever I
+noticed a small glitch or annoyance, it was fixed rightaway. This accumulation
+of minor fixes and improvements makes it worthwile to do an intermediate
+release, so here we go, version++.
+
+If you (dear reader) were expecting a list of changes, please read this:
+- banana
+- pineapple
+- onions
+- Audrey Tautou
+
+20-04-2024: 1.3.3
+- Compiled with GCC 13.2.0 (MSYS2)
+- Fixed hundreds of compiler warnings.
+- Fixed pointers of different sizes 32/64 bits
+- Source code organization.
+- Updated to 64-bit UCRT version
+- Update zlib to version 1.3
+- C-Bios update to version 0.29
+- Bios changed to bios folder
+- Changed documents to docs folder
+- Translated into Spanish from Spain
+- Updates disabled (They do not work)
+- Disabled "kailleraclient.dll" (Possible Trojan)
+- Conveniently compile with BAT files
+- Code::Blocks Projects

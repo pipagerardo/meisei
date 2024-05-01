@@ -1,0 +1,263 @@
+meisei 1.3.2 is a free and open-source MSX emulator for Microsoft Windows
+(C) 2005-2011 hap, http://tsk-tsk.net/
+(C) 2024 Modified by PipaGerardo, pipagerardo@gmail.com
+
+ti_ntsc 0.1.0 (C) 2005-2007 Shay Green, http://www.slack.net/~ant/
+zlib 1.2.3 (C) 1995-2005 Jean-loup Gailly and Mark Adler, http://www.zlib.net/
+unzip 1.01e (C) 1998-2005 Gilles Vollant, http://www.winimage.com/zLibDll/minizip.html
+UI shared with Sega Li, (C) 2005-2011 hap, http://tsk-tsk.net/
+Vincent DSK2ROM, https://github.com/joyrex2001/dsk2rom
+
+Z80 emulation mostly based on Zilog's official documentation, and "undocumented"
+documentation by Sean Young and Jan Wilmans. TMS9xxx(/A) emulation based on TI's
+datasheets and (expired) patents, documentation by Sean Young, and my own research.
+YM2149 emulation based on AY-3-8910 datasheet, and detailed information from the
+MAME team. Mappers and SCC emulation mostly based on information by Sean Young.
+
+Compiled with GCC 13.2.0 using MSYS2, https://www.msys2.org/
+Code::Blocks IDE, https://www.codeblocks.org/
+
+Executable bundled with Kaillera client 0.9 modified by ? (C) 2001-2003 Christophe
+Thibault, http://www.kaillera.com/, C-BIOS 0.29 (C) 2002-2018 C-BIOS team,
+http://cbios.sourceforge.net/, Montana John and the Templar's Treasure (C) 2008
+Infinite, and Universe: Unknown (C) 2005 Infinite, http://www.infinitemsx.org/
+
+Also thanks to: ARTRAG, BiFiMSX, blargg, Boo-boo, Dave, Disch, dvik, GuyveR800,
+Karl, MAME team, Martin Freij, Martin Korth, NewRisingSun, OeiOeiVogeltje,
+openMSX team, Quibus, Quietust, Samor, Vampier, Wolf, wouter.
+
+MSX is a trademark of MSX LC, the holding company of MSX Association.
+
+meisei may be freely distributed, not for commercial purposes.
+The source code can be obtained from my homepage. If you want to reuse anything,
+go ahead, as long as you credit me, and your project is open source too.
+
+meisei doesn't have any official forum, but you may discuss it on the MRC
+( http://www.msx.org/ ) emulation subforum.
+
+== Hello? ==
+
+Least but not last, meisei is an MSX emulator, it does not emulate the MSX2.
+The MSX was a Japanese 8-bit home computer standard that sadly failed success
+outside Japan and scattered regions throughout the world, including the tiny
+country I live in. To anyone that never heard of the MSX, the MSX hardware is
+very similar to that of Coleco's ColecoVision. If you've never heard of the
+ColecoVision either, just look it up on Wikipedia then. Ok, now that most
+readers got stuck on Wikipedia, let's continue with the details.
+
+== Tails? ==
+
+I'll explain some details that aren't very straightforward.
+
+* Opening a game/program
+Before starting, you might want to download several MSX1 BIOS ROMs for better
+compatibility, the internal firmware downloader can be used for this too.
+C-BIOS is alright, but it won't start disks, tapes, or BASIC ROMs, and may
+cause older savestates to fail due to meisei including the latest C-BIOS
+version after it's updated. In order to boot disks, Vincent van Dam's DSK2ROM
+needs to be placed into the executable folder. As a side effect, disks are
+write-protected. I'll add real diskdrive emulation later.
+
+Optional sound samples (gamename.zip with numbered .wav samples), currently
+only used by Playball, and IPS patches (gamename.zip/ips) will be loaded
+automagically. Hold Shift while loading a file from the media dialog to skip
+automatic soft patching.
+
+MSX ROMs are headerless, so it's up to you to pick the mapper type. meisei
+makes it a bit easier by having an internal database with some GoodMSX ROMs,
+and autodetection for common ROMs. It's also possible to specify the mapper
+type inside the ROM filename, case insensitive, like "gamename{type}.rom",
+detailed information for that can be found in the source (mapper.c maptype,
+mapper_autodetect_cart, and optionally mapper_table.h).
+
+Mapeador	Long name
+------------------------------------------
+{Qur'an}	"Al-Alamiah Al-Qur'an"
+{ASCII}		"ASCII MegaROM"
+{BTL80}		"Bootleg 80-in-1"
+{BTL90}		"Bootleg 90-in-1"
+{BTL126}	"Bootleg 126-in-1"
+{CBlaim}	"dB-Soft Cross Blaim"
+{TAM-S1}	"Irem TAM-S1"
+{GM2}		"Konami Game Master 2"
+{SCC}		"Konami SCC"
+{SCC-I}		"Konami Sound Cartridge"
+{KSyn}		"Konami Synthesizer"
+{VRC}		"Konami VRC"
+{INK}		"Matra INK"
+{HFox}		"MicroCabin Harry Fox"
+{NM}		"No mapper"
+{PAC}		"Panasoft PAC"
+{MFRSCC}	"Pazos Mega Flash ROM SCC"	
+{Playball}	"Sony Playball"
+{DSK2ROM}	"Vincent DSK2ROM"
+
+Most commonly, MSX tape dumps are of the fMSX CAS format, which is currently
+the only supported tape format in meisei. After inserting a tape, the selected
+block denotes the tape position. Right-click on a block for a number of options.
+For obvious reasons, the tape is only writable on user-inserted free blocks.
+
+Tape loading commands from BASIC differ per block type:
+BASIC:	CLOAD (after loading, press F5 to run)
+binary:	BLOAD"CAS:",R
+ASCII:	RUN"CAS:"
+	LOAD"CAS:",R
+
+* Netplay (Disabled due to possible Trojan)
+meisei uses Kaillera, a closed source netplay solution with an external DLL
+and separate server software. If you don't trust this, you can rename or
+remove kailleraclient.dll, or just never start netplay. To start netplay,
+pick a server and join it, then create a game or join an existing one. Make
+sure that you and the other player use the exact same MSX state (game filename,
+BIOS checksum, cartridge checksums, mapper types, CPU speed, video format).
+Kaillera settings are saved into kaillera.ini in your Windows folder.
+
+If you want to run your own server, or play on a LAN, get the official server
+software from http://www.kaillera.com/, or EmuLinker from http://www.emulinker.org/
+
+* Reverse/Savestates/Movies
+Reverse emulation (default key: F11) is a useful feature that allows you to
+rewind to correct mistakes, or watch an instant replay. It's also pretty funny
+if you combine it with Slowdown or Speed Up (default keys: F10,F12). To continue
+after reverse, press any MSX key/button. If you're using a joypad, I suggest you
+to map reverse to the left shoulder button, and speed up to the right one.
+In pause state, reverse and speed up allow you to step through emulation frame
+by frame. Reverse uses a lot of resources though, so if you're not using it,
+disable it.
+
+Savestates and movies work similar to other emulators, with numbered file slots
+for quick loading/saving, and one custom slot. One temporary memory slot is
+included, that won't save to a file. Movie recording can be combined with
+reverse, to allow perfect looking playback, or so-called tool assisted speedruns.
+You can continue a movie recording by pressing record during movie playback,
+it will continue from that point, not from the end. Savestates will be compatible
+with future versions of meisei, movies will not.
+
+meisei supports subtitles on movies with an external text file in the States
+folder. If the movie file is called gamename.m0, the subtitles file should be
+named gamename.m0.txt. You'll have to create and edit the file yourself, an
+example, with added information, is shown underneath:
+
+meisei movie subtitles
+
+; This is a comment, they are not allowed inside subtitles.
+; The 1st line "meisei movie subtitles" is required, it's the file header.
+
+00:01:08;00
+After 1 min 8 secs I lose a life already!
+
+00:03:34;00
+WOW! Look at this nutter,
+he looks like Chewbacca,
+dipped in peanut butter.
+
+; Placing <id,cc,yy> in front of a subtitle, each 2 digits long, where
+; id=unique subtitle id, cc=colour, and yy=y axis location, allows for more
+; control. But that's a bit advanced, unless you understand the internal
+; message system in meisei.
+00:04:00;00
+<01,06,00>green :D
+<02,03,04>red, and 4 spaces under green
+
+* Video
+Doubleclick on the main window to switch to/from full screen. If meisei is
+running too slow, set the video signal to RGB.
+
+The only other detail I want to point out is that a TMS9918A palette can be
+simulated by using the TMS9129 preset, rotating the hue 15 degrees to the
+right, combining it with a Japanese tv decoder, and preferably a composite
+video signal.
+
+* Controls
+meisei uses powerful input trigger rules to customise controls, eg. by default
+you can toggle between keyboard and keyboard-joystick (up down left right Z X)
+with Scroll Lock, with rapid fire buttons by holding shift. These, along with
+some other settings that aren't in the GUI, can be edited in the .ini file
+generated by meisei on exit.
+
++ Default commonly used controls:
+F6/F7:.....	Change Savestate/Movie slot
+F8:........	Save State
+F9:........	Load State
+F10 (hold):	Slowdown
+F11 (hold):	Reverse
+F12 (hold):	Fast forward
+
++ Default controls for MSX keys unavailable on PC keyboards:
+Graph:......	Left Alt
+Code:.......	Right Alt
+Stop:.......	Page Up
+Select:.....	End
+Accent Mark:	Page Down
+
+I'll quickly mention the included games' controls too. For more information
+about these games, check their documentation on the archive on my homepage.
+- Montana John and the Templar's Treasure: 
+	up/down/left/right/SPACE, F1 for menu.
+- Universe: Unknown: 
+	up/down/left/right/SPACE, N+up/down to select weapon.
+
+== Advanced ==
+
+The advanced features are intended for people who know a bit more about (MSX)
+computers rather than just using the software, hence I'm not going to explain
+their concepts. Most of it is still pretty straightforward though.
+
+* Tile/Sprite Viewer
+
+Right-click on the pattern area to enter a popup menu, the tile/sprite editor
+can be reached from there. Inside the editor, use the mouse to edit in Polka
+fashion. Drag with the left mouse button while holding shift, and undo/redo
+with Ctrl+Z/Y. Uncommonly used controls, optionally in combination with Shift
+where applicable, are [E]rase, [H]orizontal flip, [V]ertical flip, [I]nvert,
+[R]otate (sprite editor only), and [C]hange view colour (sprite editor only).
+
+Saved pattern- and screen files are mostly compatible with eachother.
+
+* PSG Toy
+
+If you encounter problems with MIDI logging due to a game having its notes on
+edges of the default tuned cents, adjust the cents offset by right-clicking
+on the piano.
+
+The channel waveforms feature doesn't sacrifice emulation accuracy, just audio
+output accuracy. Use the mouse buttons to draw waves. Mind that due to tone+noise
+handling, the left side of the waveform is prefered to be positive, and the right
+side negative. To preview(listen) a channel, left click on the piano or press P.
+Copy/paste to other channels with Ctrl+C/V.
+
+== Newest Changes ==
+
+Refer to history_eng.txt for the complete list.
+
+INTERESTING WEBSITES:
+=====================
+
+MSX Bios Required:
+	https://download.file-hunter.com/System%20ROMs/machines/
+	http://fms.komkon.org/fMSX/#Downloads
+
+Vincent DSK2ROM, required to load Floppy Disks:
+	https://github.com/joyrex2001/dsk2rom
+
+Images MSX1 ROM Cartridges:
+	https://download.file-hunter.com/Games/MSX1/ROM/
+
+CAS images of MSX1 tapes:
+	https://download.file-hunter.com/Games/MSX1/CAS/
+	https://computeremuzone.com/msx/
+
+MSX1 Floppy Disk DSK Images:
+	https://download.file-hunter.com/Games/MSX1/DSK/
+
+TSX images of MSX1 tapes:
+	https://tsx.eslamejor.com/
+
+MSX CAS, DSK and ROM images:
+	http://msxcas.webcindario.com/
+
+MSX covers:
+	https://computeremuzone.com/msx/extras/caratulas
+
+Maps and Solutions for games:
+	http://msxsolutions.msxblue.com/index-2.html

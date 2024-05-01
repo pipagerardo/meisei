@@ -1,0 +1,288 @@
+meisei 1.3.3 es un emulador de MSX gratuito y de código abierto para Microsoft Windows.
+(C) 2005-2011 hap, http://tsk-tsk.net/
+(C) 2024 Modificado por PipaGerardo, pipagerardo@gmail.com
+
+ti_ntsc 0.1.0 (C) 2005-2007 Shay Green, http://www.slack.net/~ant/
+zlib 1.2.3 (C) 1995-2005 Jean-loup Gailly y Mark Adler, http://www.zlib.net/
+unzip 1.01e (C) 1998-2005 Gilles Vollant, http://www.winimage.com/zLibDll/minizip.html
+UI compartida con Sega Li, (C) 2005-2011 hap, http://tsk-tsk.net/
+Vincent DSK2ROM, https://github.com/joyrex2001/dsk2rom
+
+La emulación Z80 se basa principalmente en la documentación oficial de Zilog y en la 
+documentación "no documentada" de Sean Young y Jan Wilmans. La emulación TMS9xxx(/A) 
+se basa en las hojas de datos y patentes (caducadas) de TI, la documentación de 
+Sean Young y mi propia investigación. La emulación YM2149 se basa en la hoja de datos
+AY-3-8910 e información detallada del equipo de MAME. La emulación de mapeadores y 
+SCC se basa principalmente en la información de Sean Young.
+
+Compilado con GCC 13.2.0 usando MSYS2, https://www.msys2.org/
+Code::Blocks IDE, https://www.codeblocks.org/
+
+Ejecutable incluido con el cliente Kaillera 0.9 modificado por ? (C) 2001-2003 
+Christophe Thibault, http://www.kaillera.com/, C-BIOS 0.29 (C) 2002-2018 Equipo C-BIOS,
+http://cbios.sourceforge.net/, Montana John y el Tesoro del Templario (C) 2008
+Infinito y Universo: Desconocido (C) 2005 Infinito, http://www.infinitemsx.org/
+
+También gracias a: ARTRAG, BiFiMSX, blargg, Boo-boo, Dave, Disch, dvik, GuyveR800,
+Karl, equipo MAME, Martin Freij, Martin Korth, NewRisingSun, OeiOeiVogeltje,
+Equipo openMSX, Quibus, Quietust, Samor, Vampier, Wolf, wouter.
+
+MSX es una marca registrada de MSX LC, la compañía holding de MSX Association.
+
+meisei puede ser distribuido libremente, pero no con fines comerciales.
+El código fuente se puede obtener desde mi página de inicio. Si quieres 
+reutilizar algo, adelante, siempre y cuando me des crédito, y tu proyecto 
+también sea de código abierto.
+
+meisei no tiene un foro oficial, pero puedes discutirlo en el subforo de 
+emulación de MRC ( http://www.msx.org/ ).
+
+== ¿Hola? ==
+
+Por último, pero no menos importante, meisei es un emulador de MSX, no emula el MSX2.
+El MSX fue un estándar de computadora doméstica de 8 bits japonés que, lamentablemente, 
+no tuvo éxito fuera de Japón y en regiones dispersas en todo el mundo, incluido el 
+pequeño país en el que vivo. Para cualquiera que nunca haya oído hablar del MSX, 
+el hardware del MSX es muy similar al de ColecoVision de Coleco. Si tampoco has oído
+hablar de ColecoVision, simplemente búscalo en Wikipedia. Ok, ahora que la mayoría 
+de los lectores se quedaron atascados en la Wikipedia, continuemos con los detalles.
+
+== ¿Colas? ==
+
+Explicaré algunos detalles que no son muy claros.
+
+* Abriendo un juego/programa
+Antes de todo, es posible que desees descargar varias ROMs BIOS de MSX1 para
+una mejor compatibilidad, el descargador de firmware interno también puede ser 
+utilizado para esto. C-BIOS está bien, pero no iniciará discos, cintas o ROMs 
+BASIC, y puede causar que los savestates antiguos fallen debido a que meisei 
+incluye la última versión de C-BIOS después de su actualización. Para arrancar 
+discos, DSK2ROM de Vincent van Dam necesita ser colocado en la carpeta ejecutable. 
+Como efecto secundario, los discos están protegidos contra escritura. 
+Añadiré la emulación de la unidad de disco real más tarde.
+
+Las muestras de sonido opcionales (gamename.zip con muestras .wav numeradas), 
+actualmente sólo utilizadas por Playball, y los parches IPS (gamename.zip/ips) 
+se cargarán automáticamente. Mantén presionada la tecla Shift mientras cargas 
+un archivo desde el diálogo de medios para omitir el parcheado suave automático.
+
+Las ROMs de MSX no tienen encabezado, por lo que depende de ti elegir el tipo 
+de mapeador. Meisei lo hace un poco más fácil al tener una base de datos interna 
+con algunas ROMs GoodMSX, y autodetección para ROMs comunes. También es posible 
+especificar el tipo de mapeador dentro del nombre del archivo ROM, insensible a 
+mayúsculas y minúsculas, como "nombre_juego{mapper}.rom", se puede encontrar 
+información detallada sobre esto en la fuente (mapper.c maptype, 
+mapper_autodetect_cart, y opcionalmente mapper_table.h).
+
+Mapeador	Nombre largo
+------------------------------------------
+{Qur'an}  	"Al-Alamiah Al-Qur'an"
+{ASCII}		"ASCII MegaROM"
+{BTL80}		"Bootleg 80-in-1"
+{BTL90}		"Bootleg 90-in-1"
+{BTL126}  	"Bootleg 126-in-1"
+{CBlaim}   	"dB-Soft Cross Blaim"
+{TAM-S1}  	"Irem TAM-S1"
+{GM2}		"Konami Game Master 2"
+{SCC}		"Konami SCC"
+{SCC-I}		"Konami Sound Cartridge"
+{KSyn}		"Konami Synthesizer"
+{VRC}		"Konami VRC"
+{INK}		"Matra INK"
+{HFox}		"MicroCabin Harry Fox"
+{NM}		"No mapper"
+{PAC}		"Panasoft PAC"
+{MFRSCC}	"Pazos Mega Flash ROM SCC"	
+{Playball}  	"Sony Playball"
+{DSK2ROM}	"Vincent DSK2ROM"
+
+Lo más común es que los volcados de cinta MSX sean del formato fMSX CAS, que 
+actualmente es el único formato de cinta soportado en meisei. Después de insertar 
+una cinta, el bloque seleccionado denota la posición de la cinta. Haz clic con el 
+botón derecho en un bloque para obtener una serie de opciones. Por razones obvias,
+la cinta solo es escribible en bloques libres insertados por el usuario.
+
+Los comandos de carga de cinta desde BASIC difieren por tipo de bloque:
+BASIC:		CLOAD (después de cargar, presiona F5 para ejecutar)
+binario:     	BLOAD"CAS:",R
+ASCII:		RUN"CAS:"
+		LOAD"CAS:",R
+
+* Juego en red (Desactivado por posible Troyano)
+meisei utiliza Kaillera, una solución de juego en red de código cerrado con una
+DLL externa y software de servidor separado. Si no confías en esto, puedes 
+renombrar o eliminar kailleraclient.dll, o simplemente nunca iniciar el juego 
+en red. Para iniciar el juego en red, elige un servidor y únete a él, luego crea
+un juego o únete a uno existente. Asegúrate de que tú y el otro jugador usen el 
+mismo estado de MSX (nombre del archivo del juego, suma de comprobación de la 
+BIOS, sumas de comprobación del cartucho, tipos de mapeador, velocidad de la CPU,
+formato de video). Los ajustes de Kaillera se guardan en kaillera.ini en tu 
+carpeta de Windows.
+
+Si quieres ejecutar tu propio servidor, o jugar en una LAN, obtén el software 
+oficial del servidor de la página web de Kaillera, o EmuLinker de su página 
+web correspondiente.
+
+* Retroceso/Guardado de estados/Películas
+La emulación inversa (tecla por defecto: F11) es una característica útil que te 
+permite retroceder para corregir errores, o ver una repetición instantánea. 
+También es bastante divertido si lo combinas con la desaceleración o aceleración 
+(teclas por defecto: F10,F12). Para continuar después del retroceso, presiona 
+cualquier tecla/botón de MSX. Si estás usando un joypad, te sugiero que mapees 
+el retroceso al botón del hombro izquierdo, y la aceleración al derecho.
+En estado de pausa, el retroceso y la aceleración te permiten avanzar a través 
+de la emulación cuadro por cuadro. Sin embargo, el retroceso utiliza muchos 
+recursos, así que si no lo estás utilizando, desactívalo.
+
+Los estados guardados y las películas funcionan de manera similar a otros emuladores,
+con ranuras de archivo numeradas para una carga/guardado rápido, y una ranura 
+personalizada. Se incluye una ranura de memoria temporal que no se guardará en un
+archivo. La grabación de películas se puede combinar con el retroceso, para permitir 
+una reproducción de aspecto perfecto, o las llamadas carreras de velocidad asistidas
+por herramientas. Puedes continuar una grabación de película presionando el botón de
+grabación durante la reproducción de la película, continuará desde ese punto, no 
+desde el final. Los estados guardados serán compatibles con futuras versiones de 
+meisei, las películas no lo serán.
+
+meisei soporta subtítulos en películas con un archivo de texto externo en la 
+carpeta de Estados. Si el archivo de la película se llama gamename.m0, el 
+archivo de subtítulos debería llamarse gamename.m0.txt. Tendrás que crear y 
+editar el archivo tú mismo, a continuación se muestra un ejemplo, con 
+información añadida:
+
+meisei subtítulos de película
+
+; Este es un comentario, no están permitidos dentro de los subtítulos.
+; La primera línea "subtítulos de películas meisei" es obligatoria, 
+; es el encabezado del archivo.
+
+00:01:08;00
+¡Después de 1 minuto y 8 segundos ya pierdo una vida!
+
+00:03:34;00
+¡GUAU! Mira este loco,
+se parece a Chewbacca,
+bañado en mantequilla de maní.
+
+; Colocar <id,cc,yy> delante de un subtítulo, cada uno de 2 dígitos, donde
+; id=id de subtítulo único, cc=color y yy=ubicación del eje y, permite más
+; control. Pero eso es un poco avanzado, a menos que comprendas el interior.
+; sistema de mensajes en meisei.
+00:04:00;00
+<01,06,00>verde :D
+<02,03,04>rojo y 4 espacios debajo del verde
+
+* Video
+Haz doble clic en la ventana principal para cambiar a pantalla completa o 
+salir de ella. Si meisei está funcionando demasiado lento, configura la 
+señal de video a RGB.
+
+El único otro detalle que quiero señalar es que se puede simular una paleta 
+TMS9918A utilizando el preajuste TMS9129, rotando el tono 15 grados a la 
+derecha, combinándolo con un decodificador de televisión japonés, y 
+preferiblemente una señal de video compuesta.
+
+* Controles
+meisei utiliza potentes reglas de disparo de entrada para personalizar los 
+controles, por ejemplo, por defecto puedes alternar entre el teclado y el 
+joystick del teclado (arriba abajo izquierda derecha Z X) con Scroll Lock, con
+botones de fuego rápido manteniendo presionado shift. Estos, junto con algunas
+otras configuraciones que no están en la GUI, pueden ser editados en el archivo
+.ini generado por meisei al salir.
+
++ Controles predeterminados de uso común:
+F6/F7:.........	Cambiar estado de guardado/ranura de película
+F8:............	Guardar estado
+F9:............	Estado de carga
+F10 (mantener):	Desaceleración
+F11 (mantener):	Marcha atrás
+F12 (mantener):	Avance rápido
+
++ Controles predeterminados para teclas MSX no disponibles en teclados de PC:
+Graph:.........	Alt Izquierdo
+Code:..........	Alt Derecho
+Stop:..........	Avpág (Page Up)
+Select:........	Fin   (End)
+Accent Mark:...	Repág (Page Down)
+
+Mencionaré rápidamente también los controles de los juegos incluidos. Para más
+información sobre estos juegos, consulta su documentación en el archivo de mi 
+página de inicio.
+- Montana John y el Tesoro del Templario:
+	arriba/abajo/izquierda/derecha/ESPACIO, F1 para el menú.
+- Universo: Desconocido: 
+	arriba/abajo/izquierda/derecha/ESPACIO, N+arriba/abajo selección arma.
+
+== Avanzado ==
+
+Las características avanzadas están destinadas para personas que conocen un poco
+más acerca de las computadoras (MSX) en lugar de solo usar el software, por lo
+tanto, no voy a explicar sus conceptos. Sin embargo, la mayoría de ellas son 
+bastante sencillas.
+
+* Visor de Mosaicos/Sprites
+
+Haz clic con el botón derecho en el área de patrones para entrar en un menú 
+emergente, desde allí se puede acceder al editor de mosaicos/sprites. Dentro del
+editor, usa el ratón para editar al estilo Polka. Arrastra con el botón 
+izquierdo del ratón mientras mantienes pulsado shift, y deshacer/rehacer con 
+Ctrl+Z/Y. Los controles poco utilizados, opcionalmente en combinación con Shift
+donde sea aplicable, son [E]rase (borrar), [H]orizontal flip (volteo horizontal),
+[V]ertical flip (volteo vertical), [I]nvert (invertir), [R]otate (rotar, solo en
+ el editor de sprites), y [C]hange view colour (cambiar color de vista, solo en 
+el editor de sprites).
+
+Los archivos de patrones y pantallas guardados son en su mayoría compatibles
+entre sí.
+
+* PSG Toy
+
+Si encuentras problemas con el registro MIDI debido a que un juego tiene sus 
+notas en los bordes de los centavos afinados por defecto, ajusta el 
+desplazamiento de los centavos haciendo clic con el botón derecho en el piano.
+
+La característica de formas de onda de canal no sacrifica la precisión de la 
+emulación, solo la precisión de la salida de audio. Usa los botones del ratón 
+para dibujar ondas. Ten en cuenta que debido al manejo de tono+ruido, se prefiere
+que el lado izquierdo de la forma de onda sea positivo, y el lado derecho
+negativo. Para previsualizar (escuchar) un canal, haz clic con el botón izquierdo
+en el piano o presiona P. Copia/pega a otros canales con Ctrl+C/V.
+
+== Cambios Recientes ==
+
+Para ver la lista completa de cambios recientes, por favor consulta el archivo 
+"history_esp.txt". Este archivo debería estar incluido en la carpeta de instalación 
+de meisei.
+
+WEBS INTERESANTES:
+==================
+
+Bios de MSX Requeridas:
+	https://download.file-hunter.com/System%20ROMs/machines/
+	http://fms.komkon.org/fMSX/#Downloads
+
+Vincent DSK2ROM, necesario para cargar Disquetes:
+	https://github.com/joyrex2001/dsk2rom
+
+Imágenes Cartuchos ROM de MSX1:
+	https://download.file-hunter.com/Games/MSX1/ROM/
+
+Imágenes CAS de cintas MSX1:
+	https://download.file-hunter.com/Games/MSX1/CAS/
+	https://computeremuzone.com/msx/
+
+Imágenes DSK de Disquetes MSX1:
+	https://download.file-hunter.com/Games/MSX1/DSK/
+
+Imágenes TSX de cintas MSX1:
+	https://tsx.eslamejor.com/
+
+Imágenes CAS, DSK y ROM de MSX:
+	http://msxcas.webcindario.com/
+
+Carátulas de MSX:
+	https://computeremuzone.com/msx/extras/caratulas
+
+Mapas y Soluciones para los juegos:
+	http://msxsolutions.msxblue.com/index-2.html
+
