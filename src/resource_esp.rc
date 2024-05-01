@@ -1,0 +1,1125 @@
+/******************************************************************************
+ *                                                                            *
+ *                           "resource_esp.h"                                 *
+ *                                                                            *
+ *      Archivos de Recursos:                                                 *
+ *      ---------------------                                                 *
+ *         icon.ico                                                           *
+ *         icon_blocky.ico                                                    *
+ *         icon_doc.ico                                                       *
+ *         meisei.manifest                                                    *
+ *         p_315-5124.pal                                                     *
+ *         p_v9938.pal                                                        *
+ *         p_tms9129.pal                                                      *
+ *         p_konami.pal                                                       *
+ *         p_vampier.pal                                                      *
+ *         p_wolf.pal                                                         *
+ *         pause.raw                                                          *
+ *         bm_tick_vertical.bmp                                               *
+ *         bm_tick_vertical_wide.bmp                                          *
+ *         bm_tick_horizontal.bmp                                             *
+ *         bm_tick_horizontal_wide.bmp                                        *
+ *         psg_presets.bin                                                    *
+ *                                                                            *
+ ******************************************************************************/
+
+#include "resource.h"
+
+#include <windows.h>
+
+#define FROM_RESOURCE_RC
+#include "version.h"
+#undef FROM_RESOURCE_RC
+
+// icons
+ID_ICON        ICON DISCARDABLE					"icon.ico"			// 3 icons: Compile (Zanac), from meisei and edited a bit
+ID_ICON_BLOCKY ICON DISCARDABLE					"icon_blocky.ico"
+ID_ICON_DOC    ICON DISCARDABLE					"icon_doc.ico"		// for meisei documents (eg. .rom files)
+
+// palettes
+ID_PAL_TMS9129 RCDATA DISCARDABLE				"p_tms9129.pal"
+ID_PAL_V9938   RCDATA DISCARDABLE				"p_v9938.pal"
+ID_PAL_SMS     RCDATA DISCARDABLE				"p_315-5124.pal"	// Sega 315-5124 VDP (Sega Master System)
+ID_PAL_KONAMI  RCDATA DISCARDABLE				"p_konami.pal"		// ripped from Sega Saturn Konami Antiques MSX Collection Ultra Pack
+ID_PAL_VAMPIER RCDATA DISCARDABLE				"p_vampier.pal"		// by Vampier, intended for Konami games
+ID_PAL_WOLF    RCDATA DISCARDABLE				"p_wolf.pal"		// warm colours, by Wolf
+
+ID_PSG_PRESETS  RCDATA DISCARDABLE				"psg_presets.bin"	// psg custom wave presets by Wolf (compressed)
+ID_SAMPLE_PAUSE RCDATA DISCARDABLE				"pause.raw"			// Konami pause sound, covered by me :p
+
+// bitmaps
+ID_BITMAP_TICKV  BITMAP DISCARDABLE				"bm_tick_vertical.bmp"
+ID_BITMAP_TICKVW BITMAP DISCARDABLE				"bm_tick_vertical_wide.bmp"
+ID_BITMAP_TICKH  BITMAP DISCARDABLE				"bm_tick_horizontal.bmp"
+ID_BITMAP_TICKHW BITMAP DISCARDABLE				"bm_tick_horizontal_wide.bmp"
+
+
+// main menu
+ID_MENU MENUEX DISCARDABLE
+
+// "&File"      "&Edit"     "&View"   "&Advanced"     "&Help"
+// "&Archivo"   "&Editar"   "&Vista"  "Ava&nzado"     "A&yuda"
+BEGIN
+
+	POPUP "&Archivo" // "&File"
+	BEGIN
+		// C D L M N O S V X
+		MENUITEM "Medios...",					IDM_MEDIA           // "&Media..."
+		MENUITEM "Juego en Red...",			    IDM_NETPLAY         // "&Netplay..."
+		MENUITEM SEPARATOR
+		POPUP "Cambia Slot",					IDM_STATE_CHANGE    // "&Change Slot"
+		BEGIN
+			MENUITEM "Archivo 0",				IDM_STATE_0         // "File &0"
+			MENUITEM "Archivo 1",				IDM_STATE_1         // "File &0"
+			MENUITEM "Archivo 2",				IDM_STATE_2         // "File &0"
+			MENUITEM "Archivo 3",				IDM_STATE_3         // "File &0"
+			MENUITEM "Archivo 4",				IDM_STATE_4         // "File &0"
+			MENUITEM "Archivo 5",				IDM_STATE_5         // "File &0"
+			MENUITEM "Archivo 6",				IDM_STATE_6         // "File &0"
+			MENUITEM "Archivo 7",				IDM_STATE_7         // "File &0"
+			MENUITEM "Archivo 8",				IDM_STATE_8         // "File &0"
+			MENUITEM "Archivo 9",				IDM_STATE_9         // "File &0"
+			MENUITEM "Archivo A",				IDM_STATE_A         // "File &A"
+			MENUITEM "Archivo B",				IDM_STATE_B         // "File &B"
+			MENUITEM "Archivo C",				IDM_STATE_C         // "File &C"
+			MENUITEM "Archivo D",				IDM_STATE_D         // "File &D"
+			MENUITEM "Archivo E",				IDM_STATE_E         // "File &E"
+			MENUITEM "Archivo F",				IDM_STATE_F         // "File &F"
+			MENUITEM SEPARATOR
+			MENUITEM "Costumbre",				IDM_STATE_CUSTOM    // "C&ustom"
+			MENUITEM "Memoria",					IDM_STATE_M         // "&Memory"
+		END
+		MENUITEM "Guarda Estado",				IDM_STATE_SAVE      // "Sa&ve State"
+		MENUITEM "Carga Estado",				IDM_STATE_LOAD      // "&Load State",
+		POPUP "Película"                                            // "M&ovie"
+		BEGIN
+			MENUITEM "Grabar",					IDM_MOVIE_RECORD    // "&Record"
+			MENUITEM "Reproducir",				IDM_MOVIE_PLAY      // "&Play"
+			MENUITEM "Parar",					IDM_MOVIE_STOP      // "&Stop"
+			MENUITEM SEPARATOR
+			MENUITEM "Código de tiempo",		IDM_TIMECODE        // "&Time Code"
+		END
+		MENUITEM SEPARATOR
+		MENUITEM "Captura de pantalla",			IDM_SCREENSHOT      // "&Screenshot"
+		MENUITEM "Directorios...",				IDM_DIRECTORIES     // "&Directories..."
+		MENUITEM SEPARATOR
+		MENUITEM "Salir",						IDM_EXITEMU         // "E&xit"
+	END
+
+	POPUP "&Editar"       // "&Edit"
+	BEGIN
+		// 1 2 H L M P R S T
+		MENUITEM "Reinicio Completo",			IDM_HARDRESET       // "&Hard Reset"
+		MENUITEM "Reinicio Suave",				IDM_SOFTRESET       // "Soft &Reset"
+		MENUITEM SEPARATOR
+		POPUP "Puerto 1",						IDM_PORT1           // "Port &1"
+		BEGIN
+			MENUITEM "Joystick",				IDM_PORT1_J         // "&Joystick"
+			MENUITEM "Ratón",					IDM_PORT1_M         // "&Mouse"
+			MENUITEM "Trackball",				IDM_PORT1_T         // "&Trackball"
+			MENUITEM SEPARATOR
+			MENUITEM "Konami HyperShot",		IDM_PORT1_HS        // "&Konami HyperShot"
+			MENUITEM "Sony Magic Key",			IDM_PORT1_MAGIC     // "&Sony Magic Key"
+			MENUITEM "Taito Arkanoid Pad",		IDM_PORT1_ARK       // "Taito &Arkanoid Pad"
+			MENUITEM SEPARATOR
+			MENUITEM "Nada",       				IDM_PORT1_NO        // "&Nothing"
+		END
+		POPUP "Puerto 2",						IDM_PORT2           // "Port &2"
+		BEGIN
+			MENUITEM "Joystick",				IDM_PORT2_J         // "&Joystick"
+			MENUITEM "Ratón",					IDM_PORT2_M         // "&Mouse"
+			MENUITEM "Trackball",				IDM_PORT2_T         // "&Trackball"
+			MENUITEM SEPARATOR
+			MENUITEM "Konami HyperShot",		IDM_PORT2_HS        // "&Konami HyperShot"
+			MENUITEM "Sony Magic Key",			IDM_PORT2_MAGIC     // "&Sony Magic Key"
+			MENUITEM "Taito Arkanoid Pad",		IDM_PORT2_ARK       // "Taito &Arkanoid Pad"
+			MENUITEM SEPARATOR
+			MENUITEM "Nada",	    			IDM_PORT2_NO        // "&Nothing"
+		END
+		MENUITEM "Pegar Texto",				    IDM_PASTE           // "Paste &Text  "
+		MENUITEM SEPARATOR
+		MENUITEM "Sonido",						IDM_SOUND           // "&Sound"
+		MENUITEM "Ruido Luminoso",				IDM_LUMINOISE       // "&Lumi Noise"
+		MENUITEM SEPARATOR
+		MENUITEM "Pausa",						IDM_PAUSEEMU        // "&Pause"
+		MENUITEM "Tiempo...",					IDM_TIMING          // "Ti&ming..."
+	END
+
+	POPUP "&Vista"  //  "&View"
+	BEGIN
+		// C F P R S T V W
+		POPUP "Tamaño de Ventana"                                   //  "&Window Size"
+		BEGIN
+			MENUITEM "1x",						IDM_ZOOM1           // "&1x"
+			MENUITEM "2x",						IDM_ZOOM2           // "&2x"
+			MENUITEM "3x",						IDM_ZOOM3
+			MENUITEM "4x",						IDM_ZOOM4
+			MENUITEM "5x",						IDM_ZOOM5
+			MENUITEM "6x",						IDM_ZOOM6           // "&6x"
+		END
+		MENUITEM "Pantalla Completa",			IDM_FULLSCREEN      // "&Full Screen"
+		MENUITEM SEPARATOR
+		POPUP "Renderizador"                                        // "&Renderer"
+		BEGIN
+			MENUITEM "Direct3D",				IDM_RENDERD3D       // "Direct&3D"
+			MENUITEM "DirectDraw",				IDM_RENDERDD        // "Direct&Draw"
+			MENUITEM SEPARATOR
+			MENUITEM "Renderizado por software",IDM_SOFTRENDER      // "Software &Rendering"
+			MENUITEM "Sincronización Vertical",	IDM_VSYNC           // "&VSync"
+			MENUITEM SEPARATOR
+			MENUITEM "Mensajes en Pantalla",	IDM_SHELLMSG        // "&Shell Messages"
+			MENUITEM "Filtrado Bilineal",		IDM_BFILTER         // "&Bilinear Filtering"
+			MENUITEM "Modo Espejo",	    		IDM_FLIP_X          // "&Mirror Mode"
+		END
+		MENUITEM "Aspecto Corregido",			IDM_CORRECTASPECT   // "&Correct Aspect"
+		MENUITEM "Estirar para Caber",			IDM_STRETCHFIT      // "&Stretch to Fit"
+		MENUITEM SEPARATOR
+		POPUP "Señal de Vídeo"                                      // "&Video Signal"
+		BEGIN
+			MENUITEM "&RGB",					IDM_VSRGB
+			MENUITEM SEPARATOR
+			MENUITEM "Monocromo",				IDM_VSMONOCHROME    // "&Monochrome"
+			MENUITEM "Componentes",				IDM_VSCOMPOSITE     // "&Composite"
+			MENUITEM "&S-Video",				IDM_VSSVIDEO
+			MENUITEM SEPARATOR
+			MENUITEM "Personalizada...",		IDM_VSCUSTOM        // "C&ustom..."
+		END
+		MENUITEM "Cambiar a 60Hz",				IDM_VIDEOFORMAT     // "Switch &to 60Hz"
+		MENUITEM "Paleta...",					IDM_PALETTE         // "&Palette..."
+	END
+
+	POPUP "Ava&nzado"                                               // "&Advanced"
+	BEGIN
+		MENUITEM "Visor de Baldosas",			IDM_TILEVIEW        // "&Tile Viewer"
+		MENUITEM "Visor de Sprites",			IDM_SPRITEVIEW      // "&Sprite Viewer"
+		MENUITEM SEPARATOR
+		POPUP "Capas"                                               // "&Layer"
+		BEGIN
+			MENUITEM "Capa de Baldosas",		IDM_LAYERB          // "&Tile Layer"
+			MENUITEM "Capa de Sprites",			IDM_LAYERS          // "&Sprite Layer"
+			MENUITEM SEPARATOR
+			MENUITEM "Sprites Ilimitados",		IDM_LAYERUNL        // "&Unlimited Sprites"
+		END
+		MENUITEM SEPARATOR
+		MENUITEM "Juega con el PSG",			IDM_PSGTOY          // &PSG Toy
+	END
+
+	POPUP "A&yuda"                                                  //  "&Help"
+	BEGIN
+		MENUITEM "Ayuda",						IDM_HELP            // "&Help"
+		MENUITEM "Obtener actualizaciones...",	IDM_UPDATE          // "Get &Updates..."
+		MENUITEM SEPARATOR
+		MENUITEM "Sobre meisei",				IDM_ABOUT           // "&About meisei"
+	END
+END
+
+// popup menus
+mediatapepopup MENU
+BEGIN
+	POPUP "Surgir"                              // "popup"
+	BEGIN
+		MENUITEM "Abre...",					    IDM_MEDIATAPE_OPEN      // "&Open..."
+		MENUITEM "Guarda Como...",				IDM_MEDIATAPE_SAVE      // "&Save As..."
+		MENUITEM SEPARATOR
+		MENUITEM "Inserta",						IDM_MEDIATAPE_INSERT    // "&Insert"
+		MENUITEM "Borra",						IDM_MEDIATAPE_DELETE    // "&Delete"
+		MENUITEM "Renombra...",					IDM_MEDIATAPE_RENAME    // "&Rename..."
+		MENUITEM SEPARATOR
+		MENUITEM "Información",					IDM_MEDIATAPE_INFO      // "I&nfo"
+	END
+END
+
+tileviewpatternpopup MENU
+BEGIN
+	POPUP "Surgir"                                                      // "popup"
+	BEGIN
+		MENUITEM "Resaltar  	Shift+RMB",		IDM_TILEVIEW_HL         // "&Highlight	Shift+RMB"
+		MENUITEM "Muestra RE",					IDM_TILEVIEW_SHOWHL     // "&Show HL"
+		MENUITEM SEPARATOR
+		MENUITEM "Corta",						IDM_TILEVIEW_CUT        // "C&ut"
+		MENUITEM "Copia",						IDM_TILEVIEW_COPY       // &Copy"
+		MENUITEM "Pega",						IDM_TILEVIEW_PASTE      // "&Paste"
+		MENUITEM SEPARATOR
+		MENUITEM "Edita Baldosa...",			IDM_TILEVIEW_EDIT       // "&Edit Tile..."
+	END
+END
+
+tileviewntpopup MENU
+BEGIN
+	POPUP "Surgir"                                                      // "popup"
+	BEGIN
+		MENUITEM "Resaltar  	Shift+RMB",		IDM_TILEVIEW_HL         // "&Highlight	Shift+RMB"
+		MENUITEM "Muestra RE",					IDM_TILEVIEW_SHOWHL     // "&Show HL"
+		MENUITEM SEPARATOR
+		MENUITEM "NT -> RE	Shift+LMB",			IDM_TILEVIEW_NTHL       // "NT -> H&L	Shift+LMB"
+		MENUITEM "&NT -> ...",					IDM_TILEVIEW_NTCHANGE
+		MENUITEM SEPARATOR
+		MENUITEM "Edita Baldosa...",			IDM_TILEVIEW_EDIT       // "&Edit Tile..."
+	END
+END
+
+spriteviewspgtpopup MENU
+BEGIN
+	POPUP "Surgir"                                                      // "popup"
+	BEGIN
+		MENUITEM "Corta",						IDM_SPRITEVIEW_CUT      // "C&ut"
+		MENUITEM "Copia",						IDM_SPRITEVIEW_COPY     // "&Copy"
+		MENUITEM "Pega",						IDM_SPRITEVIEW_PASTE    // "&Paste"
+		MENUITEM SEPARATOR
+		MENUITEM "Edita Sprite...",				IDM_SPRITEVIEW_EDIT     // "&Edit Sprite..."
+	END
+END
+
+spriteviewspatpopup MENU
+BEGIN
+	POPUP "Surgir"                                                      // "popup"
+	BEGIN
+		MENUITEM "&SPAT -> ...",				IDM_SPRITEVIEW_SPAT
+		MENUITEM SEPARATOR
+		MENUITEM "Edita Sprite...",				IDM_SPRITEVIEW_EDIT     // "&Edit Sprite..."
+	END
+END
+
+psgtoypianopopup MENU
+BEGIN
+	POPUP "Surgir"                                                      // "popup"
+	BEGIN
+		MENUITEM "Muestra A",					IDM_PSGTOYPIANO_A       // "Show &A"
+		MENUITEM "Muestra B",					IDM_PSGTOYPIANO_B       // "Show &B"
+		MENUITEM "Muestra C",					IDM_PSGTOYPIANO_C       // "Show &C"
+		MENUITEM SEPARATOR
+		MENUITEM "&Offset Cents...",			IDM_PSGTOYPIANO_CENT
+	END
+END
+
+
+// dialogs
+IDD_MEDIA DIALOGEX 0,0,212,122
+STYLE DS_MODALFRAME|WS_POPUP|WS_CAPTION|WS_SYSMENU|DS_FIXEDSYS|DS_SETFONT
+CAPTION "Medios"                                                        // "Media"
+FONT 8,"MS Shell Dlg",400,0,1
+BEGIN
+	DEFPUSHBUTTON	"Bien+Reinicio",IDOK,45,102,50,14                   // "OK + Reset"
+	PUSHBUTTON		"Bien",IDC_MEDIA_OK,100,102,50,14                   // "&OK"
+	PUSHBUTTON		"Cancelar",IDCANCEL,155,102,50,14                   // "Cancel"
+	CONTROL			"",IDC_MEDIA_TAB,"SysTabControl32",0,5,5,200,92
+
+	// 1 2 B C E P O
+	LTEXT			"Slot &1:",IDC_MEDIA_SLOT1TEXT,15,35,25,13          // "Slot &1:"
+	PUSHBUTTON		"...",IDC_MEDIA_SLOT1BROWSE,149,25,12,12
+	EDITTEXT		IDC_MEDIA_SLOT1FILE,43,25,105,12,ES_AUTOHSCROLL
+	COMBOBOX		IDC_MEDIA_SLOT1TYPE,43,39,118,300,CBS_DROPDOWNLIST|WS_VSCROLL|WS_TABSTOP
+	PUSHBUTTON		"Expulsa",IDC_MEDIA_SLOT1EJECT,165,25,30,12         // "&Eject"
+	PUSHBUTTON		"PCB...",IDC_MEDIA_SLOT1EXTRA,165,39,30,12          // "&PCB..."
+	LTEXT			"Slot &2:",IDC_MEDIA_SLOT2TEXT,15,69,25,13
+	PUSHBUTTON		"...",IDC_MEDIA_SLOT2BROWSE,149,60,12,12
+	EDITTEXT		IDC_MEDIA_SLOT2FILE,43,60,105,12,ES_AUTOHSCROLL
+	COMBOBOX		IDC_MEDIA_SLOT2TYPE,43,74,118,300,CBS_DROPDOWNLIST|WS_VSCROLL|WS_TABSTOP
+	PUSHBUTTON		"Expulsa",IDC_MEDIA_SLOT2EJECT,165,60,30,12         // "Eje&ct"
+	PUSHBUTTON		"PCB...",IDC_MEDIA_SLOT2EXTRA,165,74,30,12          // "PC&B..."
+
+	LTEXT			"Archivo:",IDC_MEDIA_TAPEFILET,15,27,25,8           //  "&File:"
+	PUSHBUTTON		"...",IDC_MEDIA_TAPEBROWSE,149,25,12,12
+	EDITTEXT		IDC_MEDIA_TAPEFILE,43,25,105,12,ES_AUTOHSCROLL|ES_READONLY
+	PUSHBUTTON		"Expulsa",IDC_MEDIA_TAPEEJECT,165,25,30,12          // "&Eject"
+	PUSHBUTTON		"Nuevo",IDC_MEDIA_TAPENEW,165,39,30,12              // "&New..."
+	LTEXT			"Bloques:",IDC_MEDIA_TAPECONTENTST,15,40,27,8       // "&Blocks:"
+	LISTBOX			IDC_MEDIA_TAPECONTENTS,43,39,117,51,LBS_NOINTEGRALHEIGHT|LBS_DISABLENOSCROLL|WS_VSCROLL|WS_TABSTOP|LBS_NOTIFY
+	LTEXT			" ",IDC_MEDIA_TAPER,166,57,30,8,WS_DISABLED
+	LTEXT			" ",IDC_MEDIA_TAPEPOS,166,71,40,8,WS_DISABLED
+	LTEXT			" ",IDC_MEDIA_TAPESIZE,166,81,40,8,WS_DISABLED
+
+	// B E N O P R V
+	LTEXT			"&BIOS:",IDC_MEDIA_BIOSTEXT,15,27,25,8
+	PUSHBUTTON		"...",IDC_MEDIA_BIOSBROWSE,149,25,12,12
+	EDITTEXT		IDC_MEDIA_BIOSFILE,43,25,105,12,ES_AUTOHSCROLL
+	PUSHBUTTON		"Revertir",IDC_MEDIA_BIOSDEFAULT,165,25,30,12        // "R&evert"
+	LTEXT			"&RAM:",IDC_MEDIA_RAMSIZETEXT,15,42,27,9
+	COMBOBOX		IDC_MEDIA_RAMSIZE,43,39,52,300,CBS_DROPDOWNLIST|WS_VSCROLL|WS_TABSTOP
+	LTEXT			"en",IDC_MEDIA_RAMSLOTTEXT,100,42,9,9               // "i&n"
+	COMBOBOX		IDC_MEDIA_RAMSLOT,109,39,52,300,CBS_DROPDOWNLIST|WS_VSCROLL|WS_TABSTOP
+	LTEXT			"&VDP:",IDC_MEDIA_VDPTEXT,15,56,27,10
+	COMBOBOX		IDC_MEDIA_VDP,43,53,118,300,CBS_DROPDOWNLIST|WS_VSCROLL|WS_TABSTOP
+	LTEXT			"&PSG:",IDC_MEDIA_PSGTEXT,15,70,27,10
+	COMBOBOX		IDC_MEDIA_PSG,43,67,118,300,CBS_DROPDOWNLIST|WS_VSCROLL|WS_TABSTOP
+	LTEXT			"Configuración medios internos se guardará al salir.",IDC_MEDIA_INTTEXT,15,83,175,15 // "Internal media settings will also be saved after exit."
+END
+
+IDD_MEDIACART_E_A DIALOGEX 0,0,238,94
+STYLE DS_MODALFRAME|WS_POPUP|WS_CAPTION|WS_SYSMENU|DS_FIXEDSYS|DS_SETFONT
+FONT 8,"MS Shell Dlg",400,0,1
+BEGIN
+	DEFPUSHBUTTON	"Bien",IDOK,126,73,50,14                                                // "OK"
+	PUSHBUTTON		"Cancelar",IDCANCEL,181,73,50,14                                        // "Cancel"
+
+	GROUPBOX		"                              ",IDC_STATIC,5,10,226,57
+	LTEXT			"Tablero:",IDC_STATIC,15,9,27,10                                        // "&Board:"
+	COMBOBOX		IDC_MCE_A_BOARD,48,7,94,300,CBS_DROPDOWNLIST|WS_VSCROLL|WS_TABSTOP
+
+	LTEXT			"Mapeador:",IDC_MCE_A_MAPPERTEXT,15,28,32,8                             // "&Mapper:"
+	COMBOBOX		IDC_MCE_A_MAPPER,48,26,94,300,CBS_DROPDOWNLIST|WS_VSCROLL|WS_TABSTOP
+	LTEXT			"Bancos:",IDC_MCE_A_BANKSTEXT,152,28,26,8
+	COMBOBOX		IDC_MCE_A_BANKS,179,26,45,300,CBS_DROPDOWNLIST|WS_VSCROLL|WS_TABSTOP    // "B&anks:"
+	LTEXT			"Escribe Máscara bits:",IDC_MCE_A_WRITETEXT,15,47,51,8                  // "&Write bitmask:"
+	EDITTEXT		IDC_MCE_A_WRITE,72,45,70,12,ES_LOWERCASE|ES_AUTOHSCROLL
+	LTEXT			"&SRAM:",IDC_MCE_A_SRAMTEXT1,152,47,26,8                                // "&SRAM:"
+	EDITTEXT		IDC_MCE_A_SRAM,179,45,21,12,ES_NUMBER|ES_AUTOHSCROLL
+	LTEXT			"KB",IDC_MCE_A_SRAMTEXT2,206,47,13,8                                    // "KB"
+END
+
+IDD_MEDIACART_E_NM DIALOGEX 0,0,116,90
+STYLE DS_MODALFRAME|WS_POPUP|WS_CAPTION|WS_SYSMENU|DS_FIXEDSYS|DS_SETFONT
+FONT 8,"MS Shell Dlg",400,0,1
+BEGIN
+	DEFPUSHBUTTON	"Bien",IDOK,5,69,50,14                                      // "OK"
+	PUSHBUTTON		"Cancelar",IDCANCEL,60,69,50,14                             // "Cancel"
+	GROUPBOX		"8KB Tamaño Páqina",IDC_STATIC,5,5,104,57                   // 8KB Pages Layout"
+	LTEXT			"R&OM:",IDC_STATIC,15,22,23,8
+	EDITTEXT		IDC_MCE_NM_ROM,39,20,60,12,ES_LOWERCASE|ES_AUTOHSCROLL
+	LTEXT			"R&AM:",IDC_STATIC,15,42,21,8
+	EDITTEXT		IDC_MCE_NM_RAM,39,40,60,12,ES_LOWERCASE|ES_AUTOHSCROLL
+END
+
+IDD_MEDIACART_E_SCCI DIALOGEX 0,0,157,54
+STYLE DS_MODALFRAME|WS_POPUP|WS_CAPTION|WS_SYSMENU|DS_FIXEDSYS|DS_SETFONT
+FONT 8,"MS Shell Dlg",400,0,1
+BEGIN
+	DEFPUSHBUTTON	"Bien",IDOK,46,33,50,14                                 // "OK"
+	PUSHBUTTON		"Cancelar",IDCANCEL,101,33,50,14                        // "Cancel"
+	LTEXT			"Tamaño RAM:",IDC_STATIC,6,9,34,8                       // "&RAM Size:"
+	COMBOBOX		IDC_MCE_SCCI_RAM,47,7,104,300,CBS_DROPDOWNLIST|WS_VSCROLL|WS_TABSTOP
+	LTEXT			"",IDC_STATIC,5,26,147,1,SS_SUNKEN
+END
+
+
+IDD_MEDIATAPE_RENAME DIALOGEX 0,0,119,52
+STYLE DS_MODALFRAME|WS_POPUP|WS_CAPTION|WS_SYSMENU|DS_FIXEDSYS|DS_SETFONT
+CAPTION "Renombra Bloque de la Cinta"                                       // "Rename Tape Block"
+FONT 8,"MS Shell Dlg",400,0,1
+BEGIN
+	DEFPUSHBUTTON	"Bien",IDOK,7,31,50,14                                  // "OK"
+	PUSHBUTTON		"Cancelar",IDCANCEL,62,31,50,14                         // "Cancel"
+	LTEXT			"Nombre archivo:",IDC_STATIC,7,9,33,8                   // "&Filename:"
+	EDITTEXT		IDC_MEDIATAPE_RENAME_EDIT,43,7,69,12,ES_AUTOHSCROLL
+	LTEXT			"",IDC_STATIC,5,24,109,1,SS_SUNKEN
+END
+
+IDD_MEDIATAPE_INFO DIALOGEX 0,0,161,126
+STYLE DS_MODALFRAME|WS_POPUP|WS_CAPTION|WS_SYSMENU|DS_FIXEDSYS|DS_SETFONT
+CAPTION "Información Bloque de Cinta"                                       // "Tape Block Info"
+FONT 8,"MS Shell Dlg",400,0,1
+BEGIN
+	EDITTEXT		IDC_MEDIATAPE_INFO_TEXT,5,5,150,95,ES_MULTILINE|ES_READONLY
+	DEFPUSHBUTTON	"¡Miseria!",IDOK,57,106,50,14                           // "&Peanuts!"
+END
+
+
+IDD_DIRECTORIES DIALOGEX 0,0,272,172
+STYLE DS_MODALFRAME|WS_POPUP|WS_CAPTION|WS_SYSMENU|DS_FIXEDSYS|DS_SETFONT
+CAPTION "Establecer Directorios"                                            // "Set Directories"
+FONT 8,"MS Shell Dlg",400,0,1
+BEGIN                                                                       // x, y, ancho, alto
+	DEFPUSHBUTTON	"Bien",IDOK,160,152,50,14                               // "OK"
+	PUSHBUTTON		"Cancelar",IDCANCEL,215,152,50,14                       // "Cancel"
+	GROUPBOX		"Directorios Personalizados",IDC_STATIC,5,5,261,140     // "Custom Directories"
+
+	EDITTEXT		IDC_DIR_PATCHESEDIT,50,21,161,12,ES_AUTOHSCROLL|ES_READONLY
+	LTEXT			"Parches:",IDC_STATIC,15,23,31,10                       // "&Patches:"
+	PUSHBUTTON		"...",IDC_DIR_PATCHESBROWSE,211,21,12,12
+	PUSHBUTTON		"Defecto",IDC_DIR_PATCHESDEFAULT,229,21,30,12           // "Default"
+	EDITTEXT		IDC_DIR_SAMPLESEDIT,50,41,161,12,ES_AUTOHSCROLL|ES_READONLY
+	LTEXT			"Muestras:",IDC_STATIC,15,43,31,10                      // "&Samples:"
+	PUSHBUTTON		"...",IDC_DIR_SAMPLESBROWSE,211,41,12,12
+	PUSHBUTTON		"Defecto",IDC_DIR_SAMPLESDEFAULT,229,41,30,12           // "Default"
+	EDITTEXT		IDC_DIR_SCREENSHOTSEDIT,50,61,161,12,ES_AUTOHSCROLL|ES_READONLY
+	LTEXT			"Capturas:",IDC_STATIC,15,63,34,10                      // "S&hots:"        // 15,63,25,10
+	PUSHBUTTON		"...",IDC_DIR_SCREENSHOTSBROWSE,211,61,12,12
+	PUSHBUTTON		"Defecto",IDC_DIR_SCREENSHOTSDEFAULT,229,61,30,12       // "Default"
+	EDITTEXT		IDC_DIR_SRAMEDIT,50,81,161,12,ES_AUTOHSCROLL|ES_READONLY
+	LTEXT			"S&RAM:",IDC_STATIC,15,83,27,10                         // "S&RAM:"
+	PUSHBUTTON		"...",IDC_DIR_SRAMBROWSE,211,81,12,12
+	PUSHBUTTON		"Defecto",IDC_DIR_SRAMDEFAULT,229,81,30,12              // "Default"
+	EDITTEXT		IDC_DIR_STATESEDIT,50,101,161,12,ES_AUTOHSCROLL|ES_READONLY
+	LTEXT			"Estados:",IDC_STATIC,15,103,28,10                      // "St&ates:"
+	PUSHBUTTON		"...",IDC_DIR_STATESBROWSE,211,101,12,12
+	PUSHBUTTON		"Defecto",IDC_DIR_STATESDEFAULT,229,101,30,12           // "Default"
+	EDITTEXT		IDC_DIR_TOOLEDIT,50,121,161,12,ES_AUTOHSCROLL|ES_READONLY
+	LTEXT			"Herr.I/O:",IDC_STATIC,15,123,34,10                     // "&Tool I/O:"
+	PUSHBUTTON		"...",IDC_DIR_TOOLBROWSE,211,121,12,12
+	PUSHBUTTON		"Defecto",IDC_DIR_TOOLDEFAULT,229,121,30,12             // "Default"
+END
+
+IDD_TIMING DIALOGEX 0,0,167,166
+STYLE DS_MODALFRAME|WS_POPUP|WS_CAPTION|WS_SYSMENU|DS_FIXEDSYS|DS_SETFONT
+CAPTION "Configuración de Tiempo"      // "Timing Settings"
+FONT 8,"MS Shell Dlg",400,0,1
+BEGIN
+	DEFPUSHBUTTON	"Bien",IDOK,55,145,50,14                            // "OK"
+	PUSHBUTTON		"Cancelar",IDCANCEL,110,145,50,14                   // "Cancel"
+	GROUPBOX		"Inversa",IDC_TIMING_REVERSE_GROUP,5,5,155,40       // "Reverse"
+	LTEXT			"Longitud:",IDC_STATIC,15,20,30,10                  // "&Length:"
+	CONTROL			"Slider1",IDC_TIMING_REVERSE_SLIDER,"msctls_trackbar32",TBS_BOTH|TBS_NOTICKS|WS_TABSTOP,50,17,90,15
+	LTEXT			"3",IDC_TIMING_REVERSE_INFO,145,20,10,10
+	RTEXT			"desactivado",IDC_TIMING_REVERSE_TIME,53,33,80,10   // "disabled"
+
+	GROUPBOX		"Velocidad",IDC_TIMING_SPEED_GROUP,5,50,155,50      // "Speed"
+	LTEXT			"Desacelera máximo:",IDC_STATIC,15,65,65,10         // "&Max Slowdown:"
+	EDITTEXT		IDC_TIMING_SLOWDOWN_EDIT,85,63,32,12,ES_AUTOHSCROLL|ES_NUMBER
+	CONTROL			"Spin1",IDC_TIMING_SLOWDOWN_SPIN,"msctls_updown32",UDS_SETBUDDYINT|UDS_ALIGNRIGHT|UDS_AUTOBUDDY|UDS_ARROWKEYS|UDS_NOTHOUSANDS,115,55,11,15
+	LTEXT			"%",IDC_STATIC,120,65,10,10
+
+	LTEXT			"Acelera máximo:",IDC_STATIC,15,80,65,10             // "Max &Speed Up:"
+	EDITTEXT		IDC_TIMING_SPEEDUP_EDIT,85,78,32,12,ES_AUTOHSCROLL|ES_NUMBER
+	CONTROL			"Spin1",IDC_TIMING_SPEEDUP_SPIN,"msctls_updown32",UDS_SETBUDDYINT|UDS_ALIGNRIGHT|UDS_AUTOBUDDY|UDS_ARROWKEYS|UDS_NOTHOUSANDS,115,80,11,15
+	LTEXT			"%",IDC_STATIC,120,80,10,10
+
+	GROUPBOX		"Z80",IDC_TIMING_Z80_GROUP,5,105,155,35
+	LTEXT			"Porcentaje de reloj:",IDC_STATIC,15,121,65,10        // "&Clock Percentage:
+	EDITTEXT		IDC_TIMING_Z80_EDIT,84,118,32,12,ES_AUTOHSCROLL|ES_NUMBER
+	CONTROL			"Spin1",IDC_TIMING_Z80_SPIN,"msctls_updown32",UDS_SETBUDDYINT|UDS_ALIGNRIGHT|UDS_AUTOBUDDY|UDS_ARROWKEYS|UDS_NOTHOUSANDS,115,110,11,15
+	LTEXT			"3.58 MHz",IDC_TIMING_Z80_INFO,120,121,35,10
+END
+
+IDD_VIDEOSIGNAL DIALOGEX 0,0,237,170
+STYLE DS_MODALFRAME|WS_POPUP|WS_CAPTION|WS_SYSMENU|DS_FIXEDSYS|DS_SETFONT
+CAPTION "Señal de Vídeo Personalizada"                              // "Custom Video Signal"
+FONT 8,"MS Shell Dlg",400,0,1
+BEGIN
+	DEFPUSHBUTTON	"Bien",IDOK,125,150,50,14                       // "OK"
+	PUSHBUTTON		"Cancelar",IDCANCEL,180,150,50,14               // "Cancel"
+
+	GROUPBOX		"Propiedades",IDC_STATIC,5,5,225,135            // "Properties"
+	LTEXT			"Menos",IDC_STATIC,76,15,20,10,WS_DISABLED      // "Less"
+	LTEXT			"0",IDC_STATIC,123,15,8,10,WS_DISABLED
+	LTEXT			"Más",IDC_STATIC,159,15,20,10,WS_DISABLED       // "More"
+	LTEXT			"Nitidez:",IDC_STATIC,15,33,60,10               // "&Sharpness:"
+	CONTROL			"Slider1",IDC_VIDSIGNAL_SHARPNESS_SLIDER,"msctls_trackbar32",TBS_TOP|WS_TABSTOP,75,25,100,20
+	EDITTEXT		IDC_VIDSIGNAL_SHARPNESS_EDIT,180,30,40,12, ES_AUTOHSCROLL  // 180,30,40,12,
+	LTEXT			"Luma Ancho Bnd.:",IDC_STATIC,15,52,70,10       // "&Luma Bandwidth:"      // 15,52,60,10
+	CONTROL			"Slider1",IDC_VIDSIGNAL_RESOLUTION_SLIDER,"msctls_trackbar32",TBS_TOP|WS_TABSTOP,75,45,100,20
+	EDITTEXT		IDC_VIDSIGNAL_RESOLUTION_EDIT,180,50,40,12,ES_AUTOHSCROLL
+	LTEXT			"Luma Artefactos:",IDC_STATIC,15,73,60,10       // "Luma &Artifacts:"
+	CONTROL			"Slider1",IDC_VIDSIGNAL_FRINGING_SLIDER,"msctls_trackbar32",TBS_TOP|WS_TABSTOP,75,65,100,20
+	EDITTEXT		IDC_VIDSIGNAL_FRINGING_EDIT,180,70,40,12,ES_AUTOHSCROLL
+	LTEXT			"Croma Artefactos:",IDC_STATIC,15,93,60,10      // "&Chroma Artifacts:"
+	CONTROL			"Slider1",IDC_VIDSIGNAL_ARTIFACTS_SLIDER,"msctls_trackbar32",TBS_TOP|WS_TABSTOP,75,85,100,20
+	EDITTEXT		IDC_VIDSIGNAL_ARTIFACTS_EDIT,180,90,40,12,ES_AUTOHSCROLL
+	LTEXT			"Color Sangrado:",IDC_STATIC,15,113,60,10       // "Colour &Bleed:"
+	CONTROL			"Slider1",IDC_VIDSIGNAL_BLEED_SLIDER,"msctls_trackbar32",TBS_TOP|WS_TABSTOP,75,105,100,20
+	EDITTEXT		IDC_VIDSIGNAL_BLEED_EDIT,180,110,40,12,ES_AUTOHSCROLL
+END
+
+IDD_PALETTE DIALOGEX 0,0,237,326
+STYLE DS_MODALFRAME|WS_POPUP|WS_CAPTION|WS_SYSMENU|DS_FIXEDSYS|DS_SETFONT
+CAPTION "Configuración de Paleta"                                   // "Palette Settings"
+FONT 8,"MS Shell Dlg",400,0,1
+BEGIN
+	DEFPUSHBUTTON	"Bien",IDOK,125,305,50,14                       // "OK"
+	PUSHBUTTON		"Cancelar",IDCANCEL,180,305,50,14               // "Cancel"
+
+	LTEXT			"Usar:",IDC_STATIC,11,12,25,10                  // "&Preset:"
+	COMBOBOX		IDC_PALGEN_PRESET,45,10,130,300,CBS_DROPDOWNLIST|WS_VSCROLL|WS_TABSTOP
+	PUSHBUTTON		"Editar",IDC_PALGEN_EDIT,180,10,40,12           // "&Edit..."
+
+	GROUPBOX		"Afinación de Paleta",IDC_STATIC,5,30,225,145   // "Palette Tuning"
+	LTEXT			"Menos",IDC_STATIC,75,40,20,10,WS_DISABLED      // "Less"
+	LTEXT			"0",IDC_STATIC,123,40,8,10,WS_DISABLED
+	LTEXT			"Más",IDC_STATIC,160,40,20,10,WS_DISABLED       // "More"
+	LTEXT			"Ángulo C. Tono:",IDC_STATIC,15,59,62,10        // 15,59,60,10 "&Hue Shift Angle:"
+	CONTROL			"Slider1",IDC_PALGEN_HUE_SLIDER,"msctls_trackbar32",TBS_TOP|WS_TABSTOP,75,51,100,20
+	EDITTEXT		IDC_PALGEN_HUE_EDIT,180,55,40,12,ES_AUTOHSCROLL
+	LTEXT			"Saturación:",IDC_STATIC,15,79,60,10            // "&Saturation:"
+	CONTROL			"Slider1",IDC_PALGEN_SAT_SLIDER,"msctls_trackbar32",TBS_TOP|WS_TABSTOP,75,71,100,20
+	EDITTEXT		IDC_PALGEN_SAT_EDIT,180,75,40,12,ES_AUTOHSCROLL
+	LTEXT			"Contraste:",IDC_STATIC,15,99,60,10             // "&Contrast:"
+	CONTROL			"Slider1",IDC_PALGEN_CON_SLIDER,"msctls_trackbar32",TBS_TOP|WS_TABSTOP,75,91,100,20
+	EDITTEXT		IDC_PALGEN_CON_EDIT,180,95,40,12,ES_AUTOHSCROLL
+	LTEXT			"Brillo:",IDC_STATIC,15,120,60,10               // "&Brightness:"
+	CONTROL			"Slider1",IDC_PALGEN_BRI_SLIDER,"msctls_trackbar32",TBS_TOP|WS_TABSTOP,75,111,100,20
+	EDITTEXT		IDC_PALGEN_BRI_EDIT,180,115,40,12,ES_AUTOHSCROLL
+	LTEXT			"Corrección Gamma:",IDC_STATIC,15,139,62,10     // "&Gamma Correction:"
+	CONTROL			"Slider1",IDC_PALGEN_GAM_SLIDER,"msctls_trackbar32",TBS_TOP|WS_TABSTOP,75,131,100,20
+	EDITTEXT		IDC_PALGEN_GAM_EDIT,180,135,40,12,ES_AUTOHSCROLL
+	LTEXT			"(los extremos pueden causan desbordamientos)",IDC_STATIC,22,158,170,10,WS_DISABLED // RTEXT 22,158,148,10 "(extremes may cause undesired overflows)"
+	PUSHBUTTON		"Defecto",IDC_PALGEN_DEFAULT,180,155,40,12      // "De&fault"
+
+	LTEXT			"Descodificador:",IDC_STATIC,11,182,50,10                                   // 11,182,31,10 "&Decoder:"
+	COMBOBOX		IDC_PALDEC_PRESET,65,180,130,300,CBS_DROPDOWNLIST|WS_VSCROLL|WS_TABSTOP     // 45,180,130,300,
+
+	GROUPBOX		"Propiedades del Decodificador",IDC_PALDEC_PROP,5,200,225,95                // "Decoder Properties"
+	LTEXT			"0°",IDC_STATIC,57,210,15,10,WS_DISABLED
+	LTEXT			"360°",IDC_STATIC,140,210,20,10,WS_DISABLED
+	LTEXT			"Ganancia",IDC_PALDEC_PROPG,185,210,30,10                                   // 190,210,20,10 "Gain"
+	LTEXT			"R-Y Ángulo:",IDC_PALDEC_PROPRY,13,229,40,10                                // 15,229,34,10 "R-Y &Angle:"
+	CONTROL			"Slider1",IDC_PALDEC_RY_SLIDER,"msctls_trackbar32",TBS_TOP|WS_TABSTOP,50,220,105,20
+	EDITTEXT		IDC_PALDEC_RY_EDIT,155,225,20,12,ES_AUTOHSCROLL|ES_NUMBER
+	EDITTEXT		IDC_PALDEC_RY_GAIN,180,225,40,12,ES_AUTOHSCROLL
+	LTEXT			"G-Y Ángulo:",IDC_PALDEC_PROPGY,13,250,40,10                                 // 15,250,35,10 "G-Y Angle:"
+	CONTROL			"Slider1",IDC_PALDEC_GY_SLIDER,"msctls_trackbar32",TBS_TOP|WS_TABSTOP,50,241,105,20
+	EDITTEXT		IDC_PALDEC_GY_EDIT,155,245,20,12,ES_AUTOHSCROLL|ES_NUMBER
+	EDITTEXT		IDC_PALDEC_GY_GAIN,180,245,40,12,ES_AUTOHSCROLL
+	LTEXT			"B-Y Ángulo:",IDC_PALDEC_PROPBY,13,270,40,10                                 // 15,270,34,10 "B-Y Angle:"
+	CONTROL			"Slider1",IDC_PALDEC_BY_SLIDER,"msctls_trackbar32",TBS_TOP|WS_TABSTOP,50,262,105,20
+	EDITTEXT		IDC_PALDEC_BY_EDIT,155,266,20,12,ES_AUTOHSCROLL|ES_NUMBER
+	EDITTEXT		IDC_PALDEC_BY_GAIN,180,266,40,12,ES_AUTOHSCROLL
+END
+
+IDD_PALETTE_EDIT DIALOGEX 0,0,147,157
+STYLE DS_MODALFRAME|WS_POPUP|WS_CAPTION|WS_SYSMENU|DS_FIXEDSYS|DS_SETFONT
+CAPTION "Palette Editor"
+FONT 8,"MS Shell Dlg",400,0,1
+BEGIN
+	DEFPUSHBUTTON	"Close",IDOK,90,137,50,14
+
+	GROUPBOX		"Raw Palette Data",IDC_STATIC,5,5,135,115
+	LTEXT			"",IDC_PALEDIT_00,15,21,10,10,0,WS_EX_CLIENTEDGE
+	LTEXT			"",IDC_PALEDIT_01,27,21,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_02,39,21,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_03,51,21,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_04,63,21,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_05,75,21,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_06,87,21,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_07,99,21,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_08,15,33,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_09,27,33,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_10,39,33,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_11,51,33,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_12,63,33,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_13,75,33,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_14,87,33,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_15,99,33,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"Colour:",IDC_STATIC,114,22,24,8
+	LTEXT			"0",IDC_PALEDIT_COLOUR,118,34,12,8
+
+	LTEXT			"0",IDC_STATIC,21,45,10,8,WS_DISABLED
+	LTEXT			"255",IDC_STATIC,101,45,20,8,WS_DISABLED
+	CONTROL			"Slider1",IDC_PALEDIT_RSLIDER,"msctls_trackbar32",TBS_TOP|WS_TABSTOP,15,54,100,20
+	CONTROL			"Slider1",IDC_PALEDIT_GSLIDER,"msctls_trackbar32",TBS_TOP|WS_TABSTOP,15,74,100,20
+	CONTROL			"Slider1",IDC_PALEDIT_BSLIDER,"msctls_trackbar32",TBS_TOP|WS_TABSTOP,15,94,100,20
+	LTEXT			"&R:",IDC_STATIC,9,62,10,8
+	EDITTEXT		IDC_PALEDIT_REDIT,115,59,20,12,ES_AUTOHSCROLL|ES_NUMBER
+	LTEXT			"&G:",IDC_STATIC,9,82,10,8
+	EDITTEXT		IDC_PALEDIT_GEDIT,115,79,20,12,ES_AUTOHSCROLL|ES_NUMBER
+	LTEXT			"&B:",IDC_STATIC,9,102,10,8
+	EDITTEXT		IDC_PALEDIT_BEDIT,115,99,20,12,ES_AUTOHSCROLL|ES_NUMBER
+
+	PUSHBUTTON		"&Save As...",IDC_PALEDIT_SAVE,35,137,50,14
+	LTEXT			"Closing without saving will discard changes.",IDC_STATIC,3,125,143,8
+END
+
+
+IDD_PSGTOY DIALOGEX 0,0,197,332
+STYLE DS_MODALFRAME|WS_POPUP|WS_MINIMIZEBOX|WS_CAPTION|WS_SYSMENU|DS_FIXEDSYS|DS_SETFONT
+CAPTION "PSG Toy"
+FONT 8,"MS Shell Dlg",400,0,1
+BEGIN
+	DEFPUSHBUTTON	"Close",IDOK,140,312,50,14
+
+	GROUPBOX		"Output Activity",IDC_STATIC,5,5,185,86
+	LTEXT			"",IDC_PSGTOY_PIANO,10,18,175,16,0,WS_EX_DLGMODALFRAME
+	LTEXT			"Ch A:",IDC_PSGTOY_ACTAT,12,38,20,8
+	LTEXT			"Ch B:",IDC_PSGTOY_ACTBT,12,48,20,8
+	LTEXT			"Ch C:",IDC_PSGTOY_ACTCT,12,58,20,8
+	LTEXT			"Noise:",IDC_STATIC,105,38,25,8
+	LTEXT			"Env:",IDC_STATIC,105,48,25,8
+	LTEXT			" ",IDC_PSGTOY_ACTAS,72,38,15,8
+	LTEXT			" ",IDC_PSGTOY_ACTBS,72,48,15,8
+	LTEXT			" ",IDC_PSGTOY_ACTCS,72,58,15,8
+	LTEXT			"$0",IDC_PSGTOY_ACTES,135,58,12,8
+	LTEXT			"/  0",IDC_PSGTOY_ACTAV,52,38,15,8
+	LTEXT			"/  0",IDC_PSGTOY_ACTBV,52,48,15,8
+	LTEXT			"/  0",IDC_PSGTOY_ACTCV,52,58,15,8
+	LTEXT			"/  0",IDC_PSGTOY_ACTEV,148,58,15,8
+	LTEXT			"$000",IDC_PSGTOY_ACTAD,32,38,20,8
+	LTEXT			"$000",IDC_PSGTOY_ACTBD,32,48,20,8
+	LTEXT			"$000",IDC_PSGTOY_ACTCD,32,58,20,8
+	LTEXT			"$00",IDC_PSGTOY_ACTND,135,38,25,8
+	LTEXT			"$0000",IDC_PSGTOY_ACTED,135,48,25,8
+
+	PUSHBUTTON		"&Log...",IDC_PSGTOY_LOGSTART,12,72,32,12
+	PUSHBUTTON		"S&top",IDC_PSGTOY_LOGSTOP,48,72,32,12
+	LTEXT			" ",IDC_PSGTOY_LOGINFO,85,74,95,8
+
+	GROUPBOX		"",IDC_STATIC,5,95,185,212
+	CONTROL			" Channel &Waveforms",IDC_PSGTOY_CUSTOM,"Button",BS_AUTOCHECKBOX|WS_TABSTOP,10,95,80,8
+	CONTROL			"&A",IDC_PSGTOY_CAR,"Button",BS_AUTORADIOBUTTON,13,111,20,8
+	CONTROL			"&B",IDC_PSGTOY_CBR,"Button",BS_AUTORADIOBUTTON,34,111,20,8
+	CONTROL			"&C",IDC_PSGTOY_CCR,"Button",BS_AUTORADIOBUTTON,55,111,20,8
+	LTEXT			"P&reset:",IDC_PSGTOY_PRESETT,84,111,23,8
+	COMBOBOX		IDC_PSGTOY_PRESET,112,108,72,300,CBS_DROPDOWNLIST|WS_VSCROLL|WS_TABSTOP
+	LTEXT			"",IDC_PSGTOY_WAVE,12,125,171,159,0,WS_EX_STATICEDGE
+	PUSHBUTTON		"&Open...",IDC_PSGTOY_OPEN,12,288,32,12
+	PUSHBUTTON		"&Save...",IDC_PSGTOY_SAVE,48,288,32,12
+	LTEXT			"A&mp:",IDC_PSGTOY_VTEXT,84,290,18,8
+	EDITTEXT		IDC_PSGTOY_VEDIT,103,288,32,12,ES_AUTOHSCROLL|ES_NUMBER
+	CONTROL			"Spin1",IDC_PSGTOY_VSPIN,"msctls_updown32",UDS_SETBUDDYINT|UDS_ALIGNRIGHT|UDS_AUTOBUDDY|UDS_ARROWKEYS|UDS_NOTHOUSANDS,100,285,11,15
+	LTEXT			"%",IDC_PSGTOY_VPER,138,290,10,8
+	RTEXT			" ",IDC_PSGTOY_XY,149,285,35,8,WS_DISABLED
+	LTEXT			" ",IDC_PSGTOY_XYS,161,294,25,8,WS_DISABLED
+END
+
+IDD_PSGTOY_CENT DIALOGEX 0,0,115,60
+STYLE DS_MODALFRAME|WS_POPUP|WS_CAPTION|WS_SYSMENU|DS_FIXEDSYS|DS_SETFONT
+CAPTION "Tune Offset Cents"
+FONT 8,"MS Shell Dlg",400,0,1
+BEGIN
+	DEFPUSHBUTTON	"OK",IDOK,5,40,50,14
+	PUSHBUTTON		"Cancel",IDCANCEL,60,40,50,14
+	LTEXT			"-25",IDC_STATIC,3,5,15,8,WS_DISABLED
+	LTEXT			"0",IDC_STATIC,49,5,15,8,WS_DISABLED
+	LTEXT			"+25",IDC_STATIC,84,5,15,8,WS_DISABLED
+	CONTROL			"Slider1",IDC_PSGTOYCENT_S,"msctls_trackbar32",TBS_TOP|WS_TABSTOP,0,14,100,20
+	LTEXT			" ",IDC_PSGTOYCENT_T,98,23,17,8
+END
+
+
+IDD_PSGLOG_SAVE DIALOGEX 0,0,225,103
+STYLE WS_CHILD|WS_CLIPSIBLINGS|DS_CONTROL
+FONT 8,"MS Shell Dlg",400,0,1
+BEGIN
+	CONTROL			" Sa&ve Interleaved",IDC_YMLOGSAVE_INTERLEAVED,"Button",BS_AUTOCHECKBOX|WS_TABSTOP,54,1,125,8
+	CONTROL			" Tri&m silence at edges",IDC_YMLOGSAVE_TRIMSILENCE,"Button",BS_AUTOCHECKBOX|WS_TABSTOP,54,14,125,8
+
+	GROUPBOX		"Optional Information",IDC_STATIC,5,26,215,70
+	LTEXT			"S&ong:",IDC_STATIC,15,41,25,8
+	EDITTEXT		IDC_YMLOGSAVE_SONG,54,39,155,12,ES_AUTOHSCROLL
+	LTEXT			"&Author:",IDC_STATIC,15,59,30,8
+	EDITTEXT		IDC_YMLOGSAVE_AUTHOR,54,57,155,12,ES_AUTOHSCROLL
+	LTEXT			"&Comment:",IDC_STATIC,15,77,35,8
+	EDITTEXT		IDC_YMLOGSAVE_COMMENT,54,75,155,12,ES_AUTOHSCROLL
+END
+
+
+IDD_TILEVIEW DIALOGEX 0,0,192,331
+STYLE DS_MODALFRAME|WS_POPUP|WS_MINIMIZEBOX|WS_CAPTION|WS_SYSMENU|DS_FIXEDSYS|DS_SETFONT|WS_SIZEBOX|WS_CLIPCHILDREN|WS_CLIPSIBLINGS
+CAPTION "Visor de Baldosas"                                 // "Tile Viewer"
+FONT 8,"MS Shell Dlg",400,0,1
+BEGIN                                                       // x, y, ancho, alto
+	DEFPUSHBUTTON	"Cerrar",IDOK,135,311,50,14             // "Close"
+
+	LTEXT			"Mapa Baldosas:",IDC_STATIC,5,8,55,8    // "&Tilemap Source:"
+	COMBOBOX		IDC_TILEVIEW_SOURCE,64,5,122,45,CBS_DROPDOWNLIST|WS_VSCROLL|WS_TABSTOP
+	LTEXT			"BL",IDC_TILEVIEW_BLANK,5,20,10,8
+	LTEXT			"M1",IDC_TILEVIEW_M1,16,20,14,8,WS_DISABLED
+	LTEXT			"M2",IDC_TILEVIEW_M2,31,20,14,8,WS_DISABLED
+	LTEXT			"M3",IDC_TILEVIEW_M3,46,20,14,8,WS_DISABLED
+	LTEXT			"(NT: $0000,",IDC_TILEVIEW_NT,64,20,39,8
+	LTEXT			"PGT: $0000,",IDC_TILEVIEW_PT,107,20,43,8
+	LTEXT			"CT: $0000)",IDC_TILEVIEW_CT,151,20,39,8
+	LTEXT			"p0",IDC_TILEVIEW_B0,5,30,8,10
+	LTEXT			"--",IDC_TILEVIEW_B1,5,69,8,10
+	LTEXT			"--",IDC_TILEVIEW_B2,5,108,8,10
+	LTEXT			"",IDC_TILEVIEW_TILES,15,31,170,120,0,WS_EX_STATICEDGE
+	LTEXT			"",IDC_TILEVIEW_HTILE,15,154,20,20,0,WS_EX_STATICEDGE
+	RTEXT			" ",IDC_TILEVIEW_XY,155,150,33,10,WS_DISABLED
+
+	LTEXT			"Patrón:",IDC_TILEVIEW_HPATT,43,153,30,8                    // "Pattern:"
+	LTEXT			"ninguno apuntado",IDC_TILEVIEW_HTEXTT,75,153,75,8          // "none targeted"
+	LTEXT			"Dirección:",IDC_TILEVIEW_HTEXTAT,43,163,30,8,WS_DISABLED   // "Address:"
+	LTEXT			" ",IDC_TILEVIEW_HTEXTA,75,163,113,8
+	LTEXT			" ",IDC_TILEVIEW_HTEXTNA,75,173,113,8
+
+	CONTROL			"Resaltar Bald.",IDC_TILEVIEW_FCHECK,"Button",BS_AUTOCHECKBOX|WS_TABSTOP,15,184,58,8 // " &Highlight Tile:"
+	LTEXT			"&E",IDC_STATIC,70,184,4,8,NOT WS_VISIBLE
+	EDITTEXT		IDC_TILEVIEW_FEDIT,75,182,32,12,ES_AUTOHSCROLL|ES_NUMBER
+	CONTROL			"Spin1",IDC_TILEVIEW_FSPIN,"msctls_updown32",UDS_SETBUDDYINT|UDS_ALIGNRIGHT|UDS_AUTOBUDDY|UDS_ARROWKEYS|UDS_NOTHOUSANDS,75,182,11,15
+	LTEXT			"($00, not in NT)",IDC_TILEVIEW_FTEXT,111,184,75,15
+
+	LTEXT			"",IDC_TILEVIEW_SEPARATOR,5,201,180,1,SS_SUNKEN
+	LTEXT			"Datos de Patrón",IDC_TILEVIEW_DETAILST,5,208,120,10        // "&Pattern Data"
+	EDITTEXT		IDC_TILEVIEW_SDETAILS,15,219,170,85,ES_MULTILINE|ES_AUTOVSCROLL|ES_AUTOHSCROLL|ES_READONLY
+	LTEXT			"Colour Data",IDC_TILEVIEW_DETAILSC,127,209,45,8
+
+	PUSHBUTTON		"Abrir",IDC_TILEVIEW_OPEN,15,311,50,14                      // "&Open..."
+	PUSHBUTTON		"Guardar como",IDC_TILEVIEW_SAVE,70,311,50,14               // "&Save As..."
+END
+
+IDD_TILEVIEW_OPEN DIALOGEX 0,0,215,40
+STYLE WS_CHILD|WS_CLIPSIBLINGS|DS_CONTROL
+FONT 8,"MS Shell Dlg",400,0,1
+BEGIN
+	LTEXT			"Import:",IDC_STATIC,5,2,40,8
+	CONTROL			" NT",IDC_TILEVIEWOPEN_NT,"Button",BS_AUTOCHECKBOX|WS_TABSTOP,54,1,25,8
+	CONTROL			" &PGT",IDC_TILEVIEWOPEN_PGT,"Button",BS_AUTOCHECKBOX|WS_TABSTOP,99,1,30,8
+	CONTROL			" &CT",IDC_TILEVIEWOPEN_CT,"Button",BS_AUTOCHECKBOX|WS_TABSTOP,144,1,25,8
+	CONTROL			" &Simulate other mode on wrong table size",IDC_TILEVIEWOPEN_SIM,"Button",BS_AUTOCHECKBOX|WS_TABSTOP,54,14,150,8
+	LTEXT			"Warning: Mixed modes are not fully supported.",IDC_TILEVIEWOPEN_INFO,54,27,160,8
+END
+
+IDD_TILEVIEW_SAVE DIALOGEX 0,0,273,40
+STYLE WS_CHILD|WS_CLIPSIBLINGS|DS_CONTROL
+FONT 8,"MS Shell Dlg",400,0,1
+BEGIN
+	CONTROL			" &Mimic base table masks",IDC_TILEVIEWSAVE_MASK,"Button",BS_AUTOCHECKBOX|WS_TABSTOP,54,1,95,8
+	CONTROL			" Include &BLOAD header",IDC_TILEVIEWSAVE_HEADER,"Button",BS_AUTOCHECKBOX|WS_TABSTOP,54,14,90,8
+	PUSHBUTTON		"&Help...",IDC_TILEVIEWSAVE_HELP,222,10,50,14
+	LTEXT			"Warning: Mixed modes are not fully supported.",IDC_TILEVIEWSAVE_INFO,54,27,160,8
+END
+
+IDD_TILEVIEW_SINFO DIALOGEX 0,0,221,90
+STYLE DS_MODALFRAME|WS_POPUP|WS_CAPTION|WS_SYSMENU|DS_FIXEDSYS|DS_SETFONT
+CAPTION "Información de Archivo en Pantalla"                // "Screen File Info"
+FONT 8,"MS Shell Dlg",400,0,1
+BEGIN
+	EDITTEXT		IDC_TILEVIEW_SINFO_TEXT,5,5,210,60,ES_MULTILINE|ES_READONLY
+	DEFPUSHBUTTON	"¡Miseria!",IDOK,80,70,50,14            //"&Peanuts!"
+END
+
+IDD_TILEVIEW_CHANGENT DIALOGEX 0,0,117,53
+STYLE DS_MODALFRAME|WS_POPUP|WS_CAPTION|WS_SYSMENU|DS_FIXEDSYS|DS_SETFONT
+CAPTION "Cambiar Byte NT"                                       // "Change NT Byte"
+FONT 8,"MS Shell Dlg",400,0,1
+BEGIN
+	DEFPUSHBUTTON	"Bien",IDOK,5,32,50,14                      // "OK"
+	PUSHBUTTON		"Cancelar",IDCANCEL,60,32,50,14             // "Cancel"
+	RTEXT			" ",IDC_TILEVIEW_CHANGENT_A,5,9,50,8
+	EDITTEXT		IDC_TILEVIEW_CHANGENT_V,60,7,31,12,ES_AUTOHSCROLL|ES_NUMBER
+	CONTROL			"Spin1",IDC_TILEVIEW_CHANGENT_S,"msctls_updown32",UDS_SETBUDDYINT|UDS_ALIGNRIGHT|UDS_AUTOBUDDY|UDS_ARROWKEYS|UDS_NOTHOUSANDS,60,7,11,15
+	LTEXT			" ",IDC_TILEVIEW_CHANGENT_VX,95,9,21,8
+	LTEXT			"",IDC_STATIC,5,25,107,1,SS_SUNKEN
+END
+
+IDD_TILE0EDIT DIALOGEX 0,0,167,182
+STYLE DS_MODALFRAME|WS_POPUP|WS_CAPTION|WS_SYSMENU|DS_FIXEDSYS|DS_SETFONT
+CAPTION "Editor de Baldosa"                                                 // "Tile Editor"
+FONT 8,"MS Shell Dlg",400,0,1
+BEGIN                                                                       // x, y, ancho, alto
+	DEFPUSHBUTTON	"Aplicar",IDC_TILEEDIT_APPLY,112,163,50,14              // "&Apply"
+	PUSHBUTTON		"Abrir",IDC_TILEEDIT_OPEN,22,130,32,12                  // "&Open..."
+	PUSHBUTTON		"Guardar",IDC_TILEEDIT_SAVE,58,130,32,12                // "&Save..."
+	CONTROL			"Aplicar a todos bloq.",IDC_TILEEDIT_ALLBLOCKS,"Button",BS_AUTOCHECKBOX|WS_TABSTOP,5,152,85,8 // " Apply to all &blocks"
+	PUSHBUTTON		"Bien",IDOK,4,163,50,14                                 // "OK"
+	PUSHBUTTON		"Cancelar",IDCANCEL,58,163,50,14                        // "Cancel"
+	LTEXT			"Patrón",IDC_TILEEDIT_ZOOMT,10,5,60,8                   // "Pattern"
+	LTEXT			"",IDC_TILEEDIT_ZOOM,10,20,87,81,0,WS_EX_STATICEDGE
+	LTEXT			"",IDC_TILEEDIT_FG,107,20,16,80,0,WS_EX_STATICEDGE
+	LTEXT			"",IDC_TILEEDIT_BG,131,20,20,80,0,WS_EX_STATICEDGE
+	LTEXT			"Pos X,Y:",IDC_TILEEDIT_XYT,23,108,35,8,WS_DISABLED
+	LTEXT			" ",IDC_TILEEDIT_XY,59,108,30,8
+	LTEXT			"Color:",IDC_TILEEDIT_CT,23,118,35,8,WS_DISABLED        // "Colour:"
+	LTEXT			" ",IDC_TILEEDIT_C,59,118,30,8,WS_DISABLED
+
+	LTEXT			"",IDC_PALEDIT_00,107,105,10,10,0,WS_EX_CLIENTEDGE
+	LTEXT			"",IDC_PALEDIT_01,119,105,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_02,131,105,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_03,143,105,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_04,107,116,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_05,119,116,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_06,131,116,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_07,143,116,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_08,107,127,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_09,119,127,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_10,131,127,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_11,143,127,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_12,107,138,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_13,119,138,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_14,131,138,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_15,143,138,10,10,0,WS_EX_DLGMODALFRAME
+	GROUPBOX		"  FG         BG  ",IDC_STATIC,101,5,60,150
+	CONTROL			"",IDC_TICKS_HU00,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HU01,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HU02,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HU03,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HU04,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HU05,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HU06,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HU07,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HD00,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HD01,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HD02,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HD03,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HD04,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HD05,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HD06,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HD07,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VL00,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VL01,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VL02,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VL03,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VL04,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VL05,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VL06,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VL07,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	LTEXT			"...",IDC_TICKS_VR00,0,0,7,10
+	LTEXT			"...",IDC_TICKS_VR01,0,0,7,10
+	LTEXT			"...",IDC_TICKS_VR02,0,0,7,10
+	LTEXT			"...",IDC_TICKS_VR03,0,0,7,10
+	LTEXT			"...",IDC_TICKS_VR04,0,0,7,10
+	LTEXT			"...",IDC_TICKS_VR05,0,0,7,10
+	LTEXT			"...",IDC_TICKS_VR06,0,0,7,10
+	LTEXT			"...",IDC_TICKS_VR07,0,0,7,10
+	LTEXT			"...",IDC_TICKS_VR08,0,0,7,10
+	LTEXT			"   ",IDC_TICKS_VR09,0,0,7,2
+	LTEXT			"",IDC_STATIC,5,147,92,1,SS_SUNKEN
+END
+
+IDD_TILE3EDIT DIALOGEX 0,0,171,123
+STYLE DS_MODALFRAME|WS_POPUP|WS_CAPTION|WS_SYSMENU|DS_FIXEDSYS|DS_SETFONT
+CAPTION "Editor de Baldosas"                                            // "Tile Editor"
+FONT 8,"MS Shell Dlg",400,0,1
+BEGIN                                                                   // x, y, ancho, alto
+	DEFPUSHBUTTON	"Aplicar",IDC_TILEEDIT_APPLY,115,103,50,14          // "&Apply"
+	PUSHBUTTON		"Abrir",IDC_TILEEDIT_OPEN,97,80,32,12               // "&Open..."
+	PUSHBUTTON		"Guardar",IDC_TILEEDIT_SAVE,133,80,32,12            // "&Save..."
+	PUSHBUTTON		"Bueno",IDOK,5,103,50,14                            // OK
+	PUSHBUTTON		"Cancelar",IDCANCEL,60,103,50,14                    // "Cancel"
+
+	LTEXT			"Patrón",IDC_TILEEDIT_ZOOMT,5,7,90,8                // "Pattern"
+	LTEXT			"",IDC_TILEEDIT_ZOOM,5,18,87,81,0,WS_EX_STATICEDGE
+	LTEXT			"Color:",IDC_TILEEDIT_CT,98,67,25,8,WS_DISABLED     // "Colour:"
+	LTEXT			" ",IDC_TILEEDIT_C,133,67,25,8,WS_DISABLED
+	LTEXT			"",IDC_STATIC,98,97,67,1,SS_SUNKEN
+
+	LTEXT			"Paleta",IDC_STATIC,97,7,30,8                       // "Palette"
+	LTEXT			"",IDC_PALEDIT_00,97,19,10,10,0,WS_EX_CLIENTEDGE
+	LTEXT			"",IDC_PALEDIT_01,109,19,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_02,121,19,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_03,133,19,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_04,97,30,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_05,109,30,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_06,121,30,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_07,133,30,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_08,97,41,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_09,109,41,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_10,121,41,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_11,133,41,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_12,97,52,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_13,109,52,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_14,121,52,10,10,0,WS_EX_DLGMODALFRAME
+	LTEXT			"",IDC_PALEDIT_15,133,52,10,10,0,WS_EX_DLGMODALFRAME
+END
+
+
+IDD_SPRITEVIEW DIALOGEX 0,0,185,300
+STYLE DS_MODALFRAME|WS_POPUP|WS_MINIMIZEBOX|WS_CAPTION|WS_SYSMENU|DS_FIXEDSYS|DS_SETFONT|WS_SIZEBOX|WS_CLIPCHILDREN|WS_CLIPSIBLINGS
+CAPTION "Visor de Sprites"                                                      // "Sprite Viewer"
+FONT 8,"MS Shell Dlg",400,0,1
+BEGIN                                                                           // x, y, ancho, alto
+	PUSHBUTTON		"Cerrar",IDOK,130,280,50,14                                 // "Close"
+
+	LTEXT			"BL",IDC_SPRITEVIEW_BLANK,5,5,12,8,WS_DISABLED
+	LTEXT			"M1",IDC_SPRITEVIEW_M1,18,5,15,8,WS_DISABLED
+	LTEXT			"Activo",IDC_SPRITEVIEW_ACTIVE,5,5,25,8                     // "Active"
+	LTEXT			"SIZE",IDC_SPRITEVIEW_SIZE,54,5,18,8,WS_DISABLED
+	LTEXT			"MAG",IDC_SPRITEVIEW_MAG,73,5,18,8,WS_DISABLED
+	LTEXT			"Estado:",IDC_SPRITEVIEW_STATUS,97,5,25,8                   // "Status:"
+	LTEXT			"C",IDC_SPRITEVIEW_C,124,5,8,8,WS_DISABLED
+	LTEXT			"5S:$1F",IDC_SPRITEVIEW_5S,133,5,30,8,WS_DISABLED
+
+	LTEXT			"SPGT ($0000)",IDC_SPRITEVIEW_PATA,5,15,49,8
+	LTEXT			"",IDC_SPRITEVIEW_SEPARATOR1,55,19,126,1,SS_SUNKEN
+	LTEXT			"",IDC_SPRITEVIEW_TILES,5,25,88,81,0,WS_EX_STATICEDGE
+
+	LTEXT			"",IDC_SPRITEVIEW_HL,97,25,46,43,0,WS_EX_STATICEDGE
+	RTEXT			"(8*8)",IDC_SPRITEVIEW_HLINFO,97,66,44,8,WS_DISABLED
+	LTEXT			"Patrón:",IDC_SPRITEVIEW_HLPT,97,76,30,8                    // "Pattern:"
+	LTEXT			"ninguno apuntado",IDC_SPRITEVIEW_HLP,129,76,56,10          // "none targeted"
+	LTEXT			"Dirección:",IDC_SPRITEVIEW_HLAT,97,86,30,8,WS_DISABLED     // "Address:"
+	LTEXT			" ",IDC_SPRITEVIEW_HLA,129,86,56,8
+	LTEXT			"En SPAT:",IDC_SPRITEVIEW_HLST,97,96,30,8,WS_DISABLED       // "In SPAT:"
+	LTEXT			" ",IDC_SPRITEVIEW_HLS,129,96,56,8
+
+	LTEXT			"SPAT ($0000)",IDC_SPRITEVIEW_SPATA,5,111,49,8
+	LTEXT			"",IDC_SPRITEVIEW_SEPARATOR2,55,115,126,1,SS_SUNKEN
+	LTEXT			"",IDC_SPRITEVIEW_SPAT,5,121,88,42,0,WS_EX_STATICEDGE
+
+	LTEXT			"Sprite:",IDC_SPRITEVIEW_SPATT,97,118,30,8
+	LTEXT			"ninguno apuntado",IDC_SPRITEVIEW_SPATS,129,118,56,8        // "none targeted"
+	LTEXT			"Dirección:",IDC_SPRITEVIEW_SPATSAT,97,128,30,8,WS_DISABLED // "Address:"
+	LTEXT			" ",IDC_SPRITEVIEW_SPATSA,129,128,56,8
+	LTEXT			"Pos X,Y:",IDC_SPRITEVIEW_SPATXY,97,138,30,8,WS_DISABLED
+	LTEXT			" ",IDC_SPRITEVIEW_SPATXYH,129,138,56,8
+	LTEXT			" ",IDC_SPRITEVIEW_SPATXYD,129,148,56,8
+	LTEXT			"Color:",IDC_SPRITEVIEW_SPATCT,97,158,30,8,WS_DISABLED      // "Colour:"
+	LTEXT			" ",IDC_SPRITEVIEW_SPATC,129,158,56,8
+
+	LTEXT			"Datos de Patrón",IDC_SPRITEVIEW_DETAILST,5,167,80,8        // "&Pattern Data"
+	EDITTEXT		IDC_SPRITEVIEW_SDETAILS,5,177,175,95,ES_MULTILINE|ES_AUTOVSCROLL|ES_AUTOHSCROLL|ES_READONLY|WS_VSCROLL|WS_HSCROLL
+
+	PUSHBUTTON		"Abrir...",IDC_SPRITEVIEW_OPEN,5,280,50,14                  // "&Open..."
+	PUSHBUTTON		"Guardar como",IDC_SPRITEVIEW_SAVE,60,280,50,14             // "&Save As..."
+END
+
+IDD_SPRITEVIEW_CHANGESPAT DIALOGEX 0,0,128,87
+STYLE DS_MODALFRAME|WS_POPUP|WS_CAPTION|WS_SYSMENU|DS_FIXEDSYS|DS_SETFONT
+CAPTION "Cambiar entrada SPAT"                                                  // "Change SPAT Entry"
+FONT 8,"MS Shell Dlg",400,0,1
+BEGIN
+	DEFPUSHBUTTON	"Bien",IDOK,17,68,50,14                                     // "OK"
+	PUSHBUTTON		"Cancelar",IDCANCEL,72,68,50,14                             // "Cancel"
+
+	GROUPBOX		"Sprite",IDC_SPRITEVIEW_CS_GROUP,5,5,117,59
+	LTEXT			"Patrón:",IDC_STATIC,15,19,30,8                             // "&Pattern:"
+	EDITTEXT		IDC_SPRITEVIEW_CS_PATTERN,45,18,38,12,ES_AUTOHSCROLL|ES_NUMBER
+	CONTROL			"Spin1",IDC_SPRITEVIEW_CS_PATTERNS,"msctls_updown32",UDS_SETBUDDYINT|UDS_ALIGNRIGHT|UDS_AUTOBUDDY|UDS_ARROWKEYS|UDS_NOTHOUSANDS,48,18,11,15
+	LTEXT			" ",IDC_SPRITEVIEW_CS_PATTERNX,92,19,25,8
+	LTEXT			"Pos &X:",IDC_STATIC,15,34,25,8
+	EDITTEXT		IDC_SPRITEVIEW_CS_POSX,45,32,25,12,ES_AUTOHSCROLL|ES_NUMBER
+	LTEXT			"&Y:",IDC_STATIC,75,34,10,8
+	EDITTEXT		IDC_SPRITEVIEW_CS_POSY,92,32,25,12,ES_AUTOHSCROLL|ES_NUMBER
+	LTEXT			"Color:",IDC_STATIC,15,48,25,8                              // "&Colour:"
+	EDITTEXT		IDC_SPRITEVIEW_CS_COLOUR,45,46,25,12,ES_AUTOHSCROLL|ES_NUMBER
+	CONTROL			"&EC:",IDC_SPRITEVIEW_CS_EC,"Button",BS_AUTOCHECKBOX|BS_LEFTTEXT|WS_TABSTOP,75,48,25,8
+END
+
+IDD_SPRITEEDIT DIALOGEX 0,0,191,229
+STYLE DS_MODALFRAME|WS_POPUP|WS_CAPTION|WS_SYSMENU|DS_FIXEDSYS|DS_SETFONT
+CAPTION "Editor de Sprite"                                              // "Sprite Editor"
+FONT 8,"MS Shell Dlg",400,0,1
+BEGIN
+	DEFPUSHBUTTON	"Aplicar",IDC_SPRITEEDIT_APPLY,132,210,50,14        // "Apply"
+	PUSHBUTTON		"Abre...",IDC_SPRITEEDIT_OPEN,22,188,32,12          // "&Open..."
+	PUSHBUTTON		"Guarda",IDC_SPRITEEDIT_SAVE,58,188,32,12           // "&Save..."
+	PUSHBUTTON		"Bien",IDOK,22,210,50,14                            // "OK"
+	PUSHBUTTON		"Cancelar",IDCANCEL,77,210,50,14                    // "Cancel"
+	LTEXT			"Patrón",IDC_SPRITEEDIT_ZOOMT,10,5,50,8             // "Pattern"
+	LTEXT			"",IDC_SPRITEEDIT_ZOOM,10,20,171,159,0,WS_EX_STATICEDGE
+	RTEXT			" ",IDC_SPRITEEDIT_XY,142,188,40,10,WS_DISABLED
+
+	CONTROL			"",IDC_TICKS_HU00,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HU01,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HU02,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HU03,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HU04,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HU05,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HU06,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HU07,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HU08,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HU09,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HU10,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HU11,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HU12,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HU13,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HU14,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HU15,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HD00,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HD01,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HD02,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HD03,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HD04,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HD05,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HD06,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HD07,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HD08,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HD09,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HD10,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HD11,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HD12,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HD13,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HD14,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_HD15,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VL00,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VL01,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VL02,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VL03,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VL04,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VL05,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VL06,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VL07,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VL08,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VL09,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VL10,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VL11,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VL12,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VL13,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VL14,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VL15,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VR00,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VR01,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VR02,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VR03,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VR04,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VR05,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VR06,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VR07,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VR08,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VR09,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VR10,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VR11,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VR12,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VR13,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VR14,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	CONTROL			"",IDC_TICKS_VR15,"Static",SS_BITMAP|WS_GROUP,0,0,1,1
+	LTEXT			"",IDC_STATIC,22,205,160,1,SS_SUNKEN
+END
+
+
+IDD_HELP DIALOGEX 0,0,326,316
+STYLE DS_MODALFRAME|WS_POPUP|WS_CAPTION|WS_SYSMENU|DS_FIXEDSYS|DS_SETFONT
+CAPTION "Documentación de meisei "
+FONT 8,"MS Shell Dlg",400,0,1
+BEGIN
+	EDITTEXT		IDC_HELPTEXT,5,5,315,285,ES_MULTILINE|ES_READONLY|WS_VSCROLL
+	DEFPUSHBUTTON	"¡Miseria!",IDOK,130,295,50,14      // "Peanuts!"
+END
+
+IDD_ABOUT DIALOGEX 0,0,132,111
+STYLE DS_MODALFRAME|WS_POPUP|WS_CAPTION|WS_SYSMENU|DS_FIXEDSYS|DS_SETFONT
+CAPTION "Sobre meisei"                                  // "About meisei"
+FONT 8,"MS Shell Dlg",400,0,1
+BEGIN
+	DEFPUSHBUTTON	"Bien",IDOK,40,90,50,14             // "OK"
+	ICON			"",IDC_ABOUT_ICON,5,5,21,20         // x, y, ancho, alto
+	LTEXT			"meisei",IDC_ABOUT_TEXT,35,7,95,17
+	LTEXT			VERSION_URL_S,IDC_ABOUT_URL,5,50,95,8
+	LTEXT			"Un emulador de MSX gratuito y de código abierto para Microsoft Windows",IDC_STATIC,5,30,125,16 // "A free and open source MSX emulator for Microsoft Windows"
+	LTEXT			"© 2005-2011 hap",IDC_STATIC,5,65,120,8
+	LTEXT			VERSION_EMAIL_S,IDC_ABOUT_EMAIL,5,75,75,8
+END
+
+IDD_UPDATE DIALOGEX 0,0,204,123
+STYLE DS_MODALFRAME|WS_POPUP|WS_CAPTION|WS_SYSMENU|DS_FIXEDSYS|DS_SETFONT
+CAPTION "Descargador de firmware"                           // "Firmware Downloader"
+FONT 8,"MS Shell Dlg",400,0,1
+BEGIN
+	DEFPUSHBUTTON	"Cerrar",IDOK,147,103,50,14         // "Close"
+	EDITTEXT		IDC_UPDATE_VIEW,7,7,190,89,ES_MULTILINE|ES_AUTOVSCROLL|ES_AUTOHSCROLL|ES_READONLY|WS_VSCROLL|WS_HSCROLL
+	PUSHBUTTON		"Aplicar Actualizaciones",IDC_UPDATE_APPLY,72,103,70,14,WS_DISABLED      // "&Apply Updates"
+END
+
+// etc
+// 1 24 MOVEABLE PURE "meisei.manifest"
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "meisei.manifest"
+/*
+1 24 // RT_MANIFEST
+BEGIN
+    "<?xml version=""1.0"" encoding=""UTF-8"" standalone=""yes""?>"
+    "<assembly xmlns=""urn:schemas-microsoft-com:asm.v1"" manifestVersion=""1.0"">"
+    "</assembly>"
+END
+*/
+// 1 VERSIONINFO
+CREATEPROCESS_MANIFEST_RESOURCE_ID VERSIONINFO
+FILEVERSION		VERSION_NUMBER_R
+PRODUCTVERSION	1,0,0,0
+FILEFLAGSMASK	0x3fL
+FILEFLAGS		0x0L
+FILEOS			0x4L
+FILETYPE		0x1L
+FILESUBTYPE		0x0L
+BEGIN
+	BLOCK "StringFileInfo"
+	BEGIN
+		BLOCK "0C0A04B0"                        // 0x0C0A Spanish (España) - 0x04B0	1200	Unicode
+		BEGIN
+			VALUE "FileVersion",		VERSION_NUMBER_S
+			VALUE "LegalCopyright",		VERSION_AUTHOR_S
+			VALUE "OriginalFilename",	VERSION_FILENAME_S
+			VALUE "FileDescription",	VERSION_DESCRIPTION_S
+			VALUE "InternalName",		VERSION_NAME_S
+			VALUE "ProductName",		VERSION_NAME_S
+			VALUE "ProductVersion",		VERSION_STAGE_S
+		END
+	END
+	BLOCK "VarFileInfo"
+	BEGIN
+		VALUE "Translation", 0x0C0A, 1200    // 0x0C0A Spanish (España) - 1200 Unicode
+	END
+END
+
+// 0x04B0	1200	Unicode
+// 0x04E4	1252	Multilingual
+// 0x0409   U.S. English
+// 0x0809	U.K. English
+// 0x080A	Spanish (Mexico)
+// 0x0C0A   Spanish (España)
