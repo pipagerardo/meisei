@@ -1555,9 +1555,14 @@ static INT_PTR CALLBACK draw_palette_edit( HWND dialog, UINT msg, WPARAM wParam,
 
 				/* save */
 				case IDC_PALEDIT_SAVE: {
+                #ifdef MEISEI_ESP
+				    const char* filter="Archivo de Paleta (*.pal)\0*.pal\0\0";
+				    const char* title="Guardar Paleta como";
+                #else
 					const char* filter="Palette File (*.pal)\0*.pal\0\0";
-					const char* defext="pal";
 					const char* title="Save Palette As";
+                #endif
+					const char* defext="pal";
 					char fn[STRING_SIZE]={0};
 					OPENFILENAME of;
 					int same=FALSE;
@@ -1601,7 +1606,14 @@ static INT_PTR CALLBACK draw_palette_edit( HWND dialog, UINT msg, WPARAM wParam,
 						/* error */
 						else {
 							file_close();
-							LOG_ERROR_WINDOW(dialog,"Couldn't save palette!");
+							LOG_ERROR_WINDOW(
+                                dialog,
+                            #ifdef MEISEI_ESP
+                                "¡No se pudo guardar la paleta!"
+                            #else
+                                "Couldn't save palette!"
+                            #endif // MEISEI_ESP
+                            );
 						}
 					}
 
@@ -2263,8 +2275,13 @@ static void draw_text_out(void)
 
 		if (start) {
 			start=FALSE;
-
-			if ( (DWORD)(ticks - dt->ticks) >= (DWORD)(draw.text_max_ticks||dt->type&LT_IGNORE) ) {
+			// ----------------------------------------------------------------------------------------
+			// Desconozco que hace "||dt->type&LT_IGNORE)" pero si no lo quito no se ven los mensajes
+			// en: void __cdecl LOG(int,const char*,...);
+			// Código Original:
+            // if ( (DWORD)(ticks - dt->ticks) >= (DWORD)(draw.text_max_ticks||dt->type&LT_IGNORE) ) {
+            // ----------------------------------------------------------------------------------------
+			if ( (DWORD)(ticks - dt->ticks) >= (DWORD)(draw.text_max_ticks) ) {
 				int res,divl=dt->div+3;
 				del=(dt->type&LT_IGNORE)^LT_IGNORE;
 				draw_text_begin=dt->next; MEM_CLEAN(dt);

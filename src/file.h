@@ -43,15 +43,7 @@ extern File* file;
 
 FILE* file_get_fd(void);    // retorna el puntero FILE*
 
-/*
-void file_setfile(
-    char**      filedir,
-    const char* filename,
-    const char* fileext,
-    const char* zipextension
-);
-*/
-void file_setfile(char**,const char*,const char*,const char*);
+void file_setfile( char** filedir, const char* filename, const char* fileext, const char* zipextension );
 
 int file_accessible(void);
 int file_open(void);

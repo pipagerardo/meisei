@@ -152,23 +152,7 @@ static LRESULT CALLBACK WndProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
                     }
                 break;
 				case IDM_NETPLAY:
-                #ifdef MEISEI_KAILLERA
 				    if ( !netplay_is_active() && !movie_get_active_state() ) netplay_open();
-                #else
-                    MessageBox(
-                        MAIN->window,
-                    #ifdef MEISEI_ESP
-                        "El Juego en la Red usa \"kailleraclient.dll\" y ha sido desactivado por su seguridad.\n"
-                        "Siempre puede compilar una versión que use \"kailleraclient.dll\" bajo su responsabilidad.",
-                        "¡Aviso de Seguridad Importante!",
-                    #else
-                        "Network Gaming uses \"kailleraclient.dll\" and has been disabled for your security.\n"
-                        "You can always compile a version that uses \"kailleraclient.dll\" at your own risk.",
-                        "Important Safety Notice!",
-                    #endif // MEISEI_ESP
-                        MB_OK
-                    );
-                #endif
                 break;
 				case IDM_EXITEMU:
                     PostMessage(hwnd,WM_CLOSE,0,0);
@@ -655,6 +639,11 @@ int WINAPI WinMain( HINSTANCE inst, HINSTANCE prev, LPSTR arg, int show )
         version_get(VERSION_AUTHOR)
     );
 
+	LOG(
+        LOG_MISC|LOG_COLOUR(LC_PINK),
+        "Pipagerardo © 2024\n"
+    );
+
 	if (draw_get_fullscreen_set()) draw_switch_screenmode();
 	draw_draw();
 	SetClassLongPtr(MAIN->window,GCLP_HBRBACKGROUND,0);
@@ -664,7 +653,7 @@ int WINAPI WinMain( HINSTANCE inst, HINSTANCE prev, LPSTR arg, int show )
 	tool_init();
 
 	media_init();
-	mapper_init();
+	mapper_init();              // Inicia DEFAULT_BIOS
 	mapper_open_bios(NULL);
 	tape_init();
 

@@ -86,7 +86,16 @@ int media_open_single(const char* fn)
 	if (file->ext&&(strlen(file->ext)==3)&&(stricmp(file->ext,"cas")==0)) {
 		tape_cur_to_od();
 		tape_flush_cache_od();
-		if (!tape_save_od()) LOG(LOG_MISC|LOG_WARNING,"couldn't save tape\n");
+		if (!tape_save_od()) {
+            LOG(
+                LOG_MISC|LOG_WARNING,
+            #ifdef MEISEI_ESP
+                "no se pudo guardar la cinta\n"
+            #else
+                "couldn't save tape\n"
+            #endif
+            );
+		}
 
 		if (tape_open_od(TRUE)) {
 			char c[STRING_SIZE];
@@ -142,7 +151,17 @@ void media_drop(WPARAM p)
 	DragQueryFile(drop,0,fn,STRING_SIZE);
 	DragFinish(drop);
 
-	if (numfiles!=1) { LOG(LOG_MISC|LOG_WARNING,"can't open multiple files\n"); return; }
+	if (numfiles!=1) {
+        LOG(
+            LOG_MISC|LOG_WARNING,
+        #ifdef MEISEI_ESP
+            "no se pueden abrir varios archivos\n"
+        #else
+            "can't open multiple files\n"
+        #endif // MEISEI_ESP
+        );
+        return;
+    }
 
 	msx_wait();
 	if ((i=media_open_single(fn))) msx_reset(TRUE);
@@ -536,7 +555,16 @@ INT_PTR CALLBACK media_dialog( HWND dialog, UINT msg, WPARAM wParam, LPARAM lPar
 
 				/* tape eject */
 				case IDC_MEDIA_TAPEEJECT:
-					if (!tape_save_od()) LOG_ERROR_WINDOW(dialog,"Couldn't save tape!");
+					if (!tape_save_od()) {
+                        LOG_ERROR_WINDOW(
+                            dialog,
+                        #ifdef MEISEI_ESP
+                            "¡No se pudo guardar la cinta!"
+                        #else
+                            "Couldn't save tape!"
+                        #endif
+                        );
+					}
 					tape_clean_od();
 					tape_draw_listbox(GetDlgItem(dialog,IDC_MEDIA_TAPECONTENTS));
 					tape_draw_gui(dialog);
@@ -600,7 +628,14 @@ INT_PTR CALLBACK media_dialog( HWND dialog, UINT msg, WPARAM wParam, LPARAM lPar
 					if (c) c=4<<c;
 
 					if (slot==0&&c==64) {
-						LOG_ERROR_WINDOW(dialog,"Can't have 64KB RAM in slot 0.");
+						LOG_ERROR_WINDOW(
+                            dialog,
+                        #ifdef MEISEI_ESP
+                            "No se puede 64KB de RAM en el slot 0."
+                        #else
+                            "Can't have 64KB RAM in slot 0."
+                        #endif
+                        );
 						return 0;
 					}
 

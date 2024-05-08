@@ -31,7 +31,7 @@ const char* version_get(u32);
 
 /* (some copyright info is also in resource.rc) */
 #define VERSION_AUTHOR_S		"hap"
-#define VERSION_URL_S			"http://tsk-tsk.net/"
+#define VERSION_URL_S			"https://github.com/pipagerardo/meisei" // "http://tsk-tsk.net/"
 #define VERSION_EMAIL_S			"mkoelew@yahoo.com"
 
 #ifdef MEISEI_ESP

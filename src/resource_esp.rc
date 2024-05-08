@@ -566,12 +566,12 @@ END
 
 IDD_PALETTE_EDIT DIALOGEX 0,0,147,157
 STYLE DS_MODALFRAME|WS_POPUP|WS_CAPTION|WS_SYSMENU|DS_FIXEDSYS|DS_SETFONT
-CAPTION "Palette Editor"
+CAPTION "Editor de Paleta"                                          // "Palette Editor"
 FONT 8,"MS Shell Dlg",400,0,1
 BEGIN
-	DEFPUSHBUTTON	"Close",IDOK,90,137,50,14
+	DEFPUSHBUTTON	"Cierra",IDOK,90,137,50,14                      // "Close"
 
-	GROUPBOX		"Raw Palette Data",IDC_STATIC,5,5,135,115
+	GROUPBOX		"Datos de Paleta",IDC_STATIC,5,5,135,115       // "Raw Palette Data"
 	LTEXT			"",IDC_PALEDIT_00,15,21,10,10,0,WS_EX_CLIENTEDGE
 	LTEXT			"",IDC_PALEDIT_01,27,21,10,10,0,WS_EX_DLGMODALFRAME
 	LTEXT			"",IDC_PALEDIT_02,39,21,10,10,0,WS_EX_DLGMODALFRAME
@@ -588,7 +588,7 @@ BEGIN
 	LTEXT			"",IDC_PALEDIT_13,75,33,10,10,0,WS_EX_DLGMODALFRAME
 	LTEXT			"",IDC_PALEDIT_14,87,33,10,10,0,WS_EX_DLGMODALFRAME
 	LTEXT			"",IDC_PALEDIT_15,99,33,10,10,0,WS_EX_DLGMODALFRAME
-	LTEXT			"Colour:",IDC_STATIC,114,22,24,8
+	LTEXT			"Color:",IDC_STATIC,114,22,24,8                        // "Colour:"
 	LTEXT			"0",IDC_PALEDIT_COLOUR,118,34,12,8
 
 	LTEXT			"0",IDC_STATIC,21,45,10,8,WS_DISABLED
@@ -603,8 +603,8 @@ BEGIN
 	LTEXT			"&B:",IDC_STATIC,9,102,10,8
 	EDITTEXT		IDC_PALEDIT_BEDIT,115,99,20,12,ES_AUTOHSCROLL|ES_NUMBER
 
-	PUSHBUTTON		"&Save As...",IDC_PALEDIT_SAVE,35,137,50,14
-	LTEXT			"Closing without saving will discard changes.",IDC_STATIC,3,125,143,8
+	PUSHBUTTON		"Guarda como",IDC_PALEDIT_SAVE,35,137,50,14                         // "&Save As..."
+	LTEXT			"Cerrar sin guardar descartará los cambios.",IDC_STATIC,3,125,143,8 // "Closing without saving will discard changes."
 END
 
 
@@ -1053,18 +1053,20 @@ BEGIN
 	DEFPUSHBUTTON	"¡Miseria!",IDOK,130,295,50,14      // "Peanuts!"
 END
 
-IDD_ABOUT DIALOGEX 0,0,132,111
+IDD_ABOUT DIALOGEX 0,0,140,140
 STYLE DS_MODALFRAME|WS_POPUP|WS_CAPTION|WS_SYSMENU|DS_FIXEDSYS|DS_SETFONT
 CAPTION "Sobre meisei"                                  // "About meisei"
 FONT 8,"MS Shell Dlg",400,0,1
 BEGIN
-	DEFPUSHBUTTON	"Bien",IDOK,40,90,50,14             // "OK"
-	ICON			"",IDC_ABOUT_ICON,5,5,21,20         // x, y, ancho, alto
+	DEFPUSHBUTTON	"Bien",IDOK,40,120,50,14                // "OK"
+	ICON			"",IDC_ABOUT_ICON,5,5,21,20             // x, y, ancho, alto
 	LTEXT			"meisei",IDC_ABOUT_TEXT,35,7,95,17
-	LTEXT			VERSION_URL_S,IDC_ABOUT_URL,5,50,95,8
-	LTEXT			"Un emulador de MSX gratuito y de código abierto para Microsoft Windows",IDC_STATIC,5,30,125,16 // "A free and open source MSX emulator for Microsoft Windows"
-	LTEXT			"© 2005-2011 hap",IDC_STATIC,5,65,120,8
-	LTEXT			VERSION_EMAIL_S,IDC_ABOUT_EMAIL,5,75,75,8
+	LTEXT			VERSION_URL_S,IDC_ABOUT_URL,5,50,130,8  // 5,50,95,8
+	LTEXT			"Un emulador de MSX gratuito y de código abierto para Microsoft Windows.",IDC_STATIC,5,30,125,16
+	LTEXT			"© 2005-2011 hap", IDC_STATIC          ,20,65,120,8
+	LTEXT			VERSION_EMAIL_S,IDC_ABOUT_EMAIL        ,20,75,75,8
+    LTEXT			"© 2024 PipaGerardo",   IDC_STATIC     ,20,90,75,8
+    LTEXT			"pipagerardo@gmail.com",IDC_ABOUT_EMAIL,20,100,85,8
 END
 
 IDD_UPDATE DIALOGEX 0,0,204,123

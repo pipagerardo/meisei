@@ -19,10 +19,26 @@
 #include "tape.h"
 #include "zlib.h"
 
-#ifdef MEISEI_KAILLERA
+/*
+    https://github.com/God-Weapon/SupraclientC
+    SupraclientC
+    This is unofficially updated version of Supraclient, based on original latest source v87.9 (03-30-2008).
+    This version includes bug fixes and other improvements.
+*/
+#ifdef MEISEI_32BITS        // 32 BITS
+    #ifdef MEISEI_ESP       // ESPAÑOL
+        #define DLL_FILE    "kaillera/kailleraclient32_esp.dll"
+    #else                   // INGLÉS
+        #define DLL_FILE    "kaillera/kailleraclient32_eng.dll"
+    #endif
+#else                       // 64 BITS
+    #ifdef MEISEI_ESP       // ESPAÑOL
+        #define DLL_FILE    "kaillera/kailleraclient_esp.dll"
+    #else                   // INGLÉS
+        #define DLL_FILE    "kaillera/kailleraclient_eng.dll"
+    #endif  // MEISEI_ESP
+#endif      // MEISEI_32BITS
 
-/* uses Kaillera: http://www.kaillera.com/ */
-#define DLL_FILE    "kaillera/kailleraclient.dll"
 #define PLAY_MUTEX_TIME	7000 /* 7 seconds */
 
 /* hack related */
@@ -65,38 +81,25 @@ typedef struct {
 	void (WINAPI *moreInfosCallback)(char *gamename);
 } kailleraInfos;
 
-int (WINAPI *kailleraGetVersion)(char*);            // WINAPI kailleraGetVersion(char *version);
-int (WINAPI *kailleraInit)(void);                   // WINAPI kailleraInit();
-int (WINAPI *kailleraShutdown)(void);               // WINAPI kailleraShutdown();
-int (WINAPI *kailleraSetInfos)(kailleraInfos*);     // WINAPI kailleraSetInfos(kailleraInfos *infos);
-int (WINAPI *kailleraSelectServerDialog)(HWND);     // WINAPI kailleraSelectServerDialog(HWND parent);
-int (WINAPI *kailleraModifyPlayValues)(void*,int);  // WINAPI kailleraModifyPlayValues(void *values, int size);
-int (WINAPI *kailleraChatSend)(char*);              // WINAPI kailleraChatSend(char *text);
-int (WINAPI *kailleraEndGame)(void);                // WINAPI kailleraEndGame();
+INT_PTR (WINAPI *kailleraGetVersion)(char*);            // WINAPI kailleraGetVersion(char *version);
+INT_PTR (WINAPI *kailleraInit)(void);                   // WINAPI kailleraInit();
+INT_PTR (WINAPI *kailleraShutdown)(void);               // WINAPI kailleraShutdown();
+INT_PTR (WINAPI *kailleraSetInfos)(kailleraInfos*);     // WINAPI kailleraSetInfos(kailleraInfos *infos);
+INT_PTR (WINAPI *kailleraSelectServerDialog)(HWND);     // WINAPI kailleraSelectServerDialog(HWND parent);
+INT_PTR (WINAPI *kailleraModifyPlayValues)(void*,int);  // WINAPI kailleraModifyPlayValues(void *values, int size);
+INT_PTR (WINAPI *kailleraChatSend)(char*);              // WINAPI kailleraChatSend(char *text);
+INT_PTR (WINAPI *kailleraEndGame)(void);                // WINAPI kailleraEndGame();
 
 static void netplay_end(void);
 
-#endif // MEISEI_KAILLERA
-
 int __fastcall netplay_is_active(void) {
-#ifdef MEISEI_KAILLERA
     return (netplay.dialog|netplay.playing)&netplay_init_done;
-#else
-    return FALSE;
-#endif
 }
-
 
 int netplay_keyboard_enabled(void) {
-#ifdef MEISEI_KAILLERA
     return netplay.keyboard_enabled;
-#else
-    return FALSE;
-#endif // MEISEI_KAILLERA
 }
 
-
-#ifdef MEISEI_KAILLERA
 static void netplay_clean_kaillera(void)
 {
 	if (!netplay_init_done) return;
@@ -110,20 +113,16 @@ static void netplay_clean_kaillera(void)
 
 	netplay_init_done=FALSE;
 }
-#endif // MEISEI_KAILLERA
 
 void netplay_clean(void)
 {
-#ifdef MEISEI_KAILLERA
 	netplay_clean_kaillera();
 
 	if (netplay.play_mutex) { CloseHandle(netplay.play_mutex); netplay.play_mutex=NULL; }
-#endif // MEISEI_KAILLERA
 }
 
 void netplay_init(void)
 {
-#ifdef MEISEI_KAILLERA
 	int i;
 	memset(&netplay,0,sizeof(netplay));
 
@@ -132,10 +131,8 @@ void netplay_init(void)
 	if ((netplay.play_mutex=(CreateMutex(NULL,FALSE,NULL)))==NULL) {
 		LOG(LOG_MISC|LOG_ERROR,"Can't create netplay mutex!\n"); exit(1);
 	}
-#endif // MEISEI_KAILLERA
 }
 
-#ifdef MEISEI_KAILLERA
 int netplay_init_kaillera(void)
 {
 	// file_setfile(&file->appdir,DLL_FILE,NULL,NULL);
@@ -143,36 +140,47 @@ int netplay_init_kaillera(void)
 	if (file_open()) netplay.enable_hack=file->crc32==DLL_CRC;
 	file_close();
 
-	if ((netplay.dll=LoadLibrary(file->filename))!=NULL) {
-        // get functions
+	// WINBASEAPI HMODULE WINAPI LoadLibrary(LPCSTR lpLibFileName);
+	if ( (netplay.dll=LoadLibrary(file->filename) ) != NULL ) {
 
-		if ((kailleraGetVersion=GetProcAddress(netplay.dll,"_kailleraGetVersion@4"))!=NULL				&&
-		 (kailleraInit=GetProcAddress(netplay.dll,"_kailleraInit@0"))!=NULL								&&
-		 (kailleraShutdown=GetProcAddress(netplay.dll,"_kailleraShutdown@0"))!=NULL						&&
-		 (kailleraSetInfos=GetProcAddress(netplay.dll,"_kailleraSetInfos@4"))!=NULL						&&
-		 (kailleraSelectServerDialog=GetProcAddress(netplay.dll,"_kailleraSelectServerDialog@4"))!=NULL	&&
-		 (kailleraModifyPlayValues=GetProcAddress(netplay.dll,"_kailleraModifyPlayValues@8"))!=NULL		&&
-		 (kailleraChatSend=GetProcAddress(netplay.dll,"_kailleraChatSend@4"))!=NULL						&&
-		 (kailleraEndGame=GetProcAddress(netplay.dll,"_kailleraEndGame@0"))!=NULL) {
+        // get functions
+#ifdef MEISEI_32BITS
+    if (
+         (kailleraGetVersion=GetProcAddress(netplay.dll,"kailleraGetVersion@4"))!=NULL				    &&
+		 (kailleraInit=GetProcAddress(netplay.dll,"kailleraInit@0"))!=NULL								&&
+		 (kailleraShutdown=GetProcAddress(netplay.dll,"kailleraShutdown@0"))!=NULL						&&
+		 (kailleraSetInfos=GetProcAddress(netplay.dll,"kailleraSetInfos@4"))!=NULL						&&
+		 (kailleraSelectServerDialog=GetProcAddress(netplay.dll,"kailleraSelectServerDialog@4"))!=NULL	&&
+		 (kailleraModifyPlayValues=GetProcAddress(netplay.dll,"kailleraModifyPlayValues@8"))!=NULL		&&
+		 (kailleraChatSend=GetProcAddress(netplay.dll,"kailleraChatSend@4"))!=NULL						&&
+		 (kailleraEndGame=GetProcAddress(netplay.dll,"kailleraEndGame@0"))!=NULL
+      ) {
+#else   // 64 Bits
+    if (
+         (kailleraGetVersion=GetProcAddress(netplay.dll,"kailleraGetVersion"))!=NULL				    &&
+		 (kailleraInit=GetProcAddress(netplay.dll,"kailleraInit"))!=NULL								&&
+		 (kailleraShutdown=GetProcAddress(netplay.dll,"kailleraShutdown"))!=NULL						&&
+		 (kailleraSetInfos=GetProcAddress(netplay.dll,"kailleraSetInfos"))!=NULL						&&
+		 (kailleraSelectServerDialog=GetProcAddress(netplay.dll,"kailleraSelectServerDialog"))!=NULL	&&
+		 (kailleraModifyPlayValues=GetProcAddress(netplay.dll,"kailleraModifyPlayValues"))!=NULL		&&
+		 (kailleraChatSend=GetProcAddress(netplay.dll,"kailleraChatSend"))!=NULL						&&
+		 (kailleraEndGame=GetProcAddress(netplay.dll,"kailleraEndGame"))!=NULL
+      ) {
+#endif // MEISEI_32BITS
 
 			netplay_init_done=TRUE;
 			kailleraInit();
-		}
-
-		else {
+		} else {
 			FreeLibrary(netplay.dll);
 			LOG(LOG_MISC|LOG_WARNING,"couldn't initialise Kaillera\n");
 		}
 
-	}
-
-	else {
+	} else {
 		LOG(LOG_MISC|LOG_WARNING,"couldn't open %s\n",DLL_FILE);
 	}
 
 	return netplay_init_done;
 }
-#endif // MEISEI_KAILLERA
 
 /* Kaillera bugs:
 - crashes if child window is closed while a game is in progress (fixed in callwnd_proc)
@@ -190,7 +198,7 @@ these require the user to do something less common or are abnormal. I left them 
 - harmless/trivial: after opening the Kaillera window, until exiting the emulator, every child window of meisei
   will show the Bubble Bobble icon in the title bar, even common dialogs like messageboxes.. kinda funny actually :P
 */
-#ifdef MEISEI_KAILLERA
+
 static LRESULT CALLBACK callwnd_proc(int code,WPARAM wParam,LPARAM lParam)
 {
 	if (code==HC_ACTION&&lParam) {
@@ -212,9 +220,7 @@ static LRESULT CALLBACK callwnd_proc(int code,WPARAM wParam,LPARAM lParam)
 
 	return CallNextHookEx(netplay.callwnd_hook,code,wParam,lParam);
 }
-#endif // MEISEI_KAILLERA
 
-#ifdef MEISEI_KAILLERA
 static LRESULT CALLBACK getmsg_proc(int code,WPARAM wParam,LPARAM lParam)
 {
 	if (code==HC_ACTION&&lParam) {
@@ -232,9 +238,7 @@ static LRESULT CALLBACK getmsg_proc(int code,WPARAM wParam,LPARAM lParam)
 
 	return CallNextHookEx(netplay.getmsg_hook,code,wParam,lParam);
 }
-#endif // MEISEI_KAILLERA
 
-#ifdef MEISEI_KAILLERA
 static DWORD WINAPI netplay_thread(void*)
 {
 	u32 crc=0;
@@ -326,11 +330,9 @@ static DWORD WINAPI netplay_thread(void*)
 
 	return 0;
 }
-#endif // MEISEI_KAILLERA
 
 void netplay_open(void)
 {
-#ifdef MEISEI_KAILLERA
 	if (netplay.playing) return;
 	if (!netplay_init_done&&!netplay_init_kaillera()) return;
 
@@ -338,12 +340,10 @@ void netplay_open(void)
 
 	/* in a separate thread to prevent program lockup if kaillera locks up */
 	netplay.thread=CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)(netplay_thread),NULL,0,&netplay.tid);
-#endif // MEISEI_KAILLERA
 }
 
 int WINAPI netplay_starts(char* name,int player,int numplayers)
 {
-#ifdef MEISEI_KAILLERA
     name = name;
 	if (!netplay_init_done||!netplay.dialog) return 0;
 
@@ -360,16 +360,8 @@ int WINAPI netplay_starts(char* name,int player,int numplayers)
 
 	LOG(LOG_MISC,"netplay started, you are player %d\n",player);
     return 0;
-
-#else
-     name = name;
-     player = player;
-     numplayers = numplayers;
-    return 0;
-#endif
 }
 
-#ifdef MEISEI_KAILLERA
 static void netplay_end(void)
 {
 	if (!netplay.playing) return;
@@ -379,11 +371,9 @@ static void netplay_end(void)
 	netplay.playing=FALSE;
 	kailleraEndGame();
 }
-#endif // MEISEI_KAILLERA
 
 void WINAPI netplay_drop(char* name,int player)
 {
-#ifdef MEISEI_KAILLERA
 	if (player!=netplay.player&&player>2) {
 		if (name&&strlen(name)) {
 			char namec[0x100];
@@ -406,13 +396,8 @@ void WINAPI netplay_drop(char* name,int player)
 	}
 
 	else netplay_end();
-#else
-    name = name;
-    player = player;
-#endif // MEISEI_KAILLERA
 }
 
-#ifdef MEISEI_KAILLERA
 /* joy orig: ..barldu .. l>r, u>d, same conversion as MSX Basic STICK(j) */
 static const int joy2net[]={
 	6<<2,	/* 0, rldu --> .ld. */
@@ -433,11 +418,9 @@ static const int joy2net[]={
 	0		/* f, .... */
 };
 static const int net2joy[]={0xf,0xe,6,7,5,0xd,9,0xb,0xa,0xf,0xf,0xf,0xf,0xf,0xf,0xf}; /* same, but backwards and pre-shift */
-#endif // MEISEI_KAILLERA
 
 void netplay_frame( u8* key, int* keyextra, u8* joy )
 {
-#ifdef MEISEI_KAILLERA
 	u8 data[0x100];
 	int size=0;
 
@@ -528,9 +511,4 @@ void netplay_frame( u8* key, int* keyextra, u8* joy )
 
 		JFETCH(0) JFETCH(1)
 	}
-#else
-    key = key;
-    keyextra = keyextra;
-    joy = joy;
-#endif // MEISEI_KAILLERA
 }

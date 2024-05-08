@@ -53,10 +53,7 @@ static __inline__ void refresh_cb(int);
 
 /* defaults */
 // #define DEFAULT_BIOS	"cbios_main_msx1_0.23.rom"
-// #define DEFAULT_BIOS	"cbios_main_msx1_0.29_50Hz.rom
-// #define DEFAULT_BIOS	"bios/cbios.rom"
-#define DEFAULT_BIOS	"bios/default_bios.zip"
-
+#define DEFAULT_BIOS	 "default_bios.zip"
 #define DEFAULT_RAMSIZE	64
 #define DEFAULT_RAMSLOT	3
 
@@ -235,10 +232,9 @@ static void nomapper_rom_config_default(int slot,int pages,int start)
 
 			default: break;
 		}
-	}
 
-	/* by startpage */
-	else {
+    /* by startpage */
+	} else {
 		int i;
 
 		nomapper_rom_layout_temp[slot]=~0;
@@ -247,7 +243,9 @@ static void nomapper_rom_config_default(int slot,int pages,int start)
 		pages+=start;
 		if (pages>8) pages=8;
 
-		for (i=start;i<pages;i++) nomapper_rom_layout_temp[slot]=(nomapper_rom_layout_temp[slot]^(0xf<<((i^7)<<2)))|((i-start)<<((i^7)<<2));
+		for (i=start;i<pages;i++) {
+            nomapper_rom_layout_temp[slot]=(nomapper_rom_layout_temp[slot]^(0xf<<((i^7)<<2)))|((i-start)<<((i^7)<<2));
+		}
 	}
 }
 
@@ -308,8 +306,7 @@ static void __fastcall maploadstatecur_nomapper(int slot,u8** s)
 
 		/* if no ram, no 1 error */
 		if (i!=(u32)~0) mel_error|=1;
-	}
-	else if (nomapper_ram_minmax[slot][1]) {
+	} else if (nomapper_ram_minmax[slot][1]) {
 		/* load ram */
 		STATE_LOAD_C(nomapper_ram[slot]+nomapper_ram_minmax[slot][0],nomapper_ram_minmax[slot][1]-nomapper_ram_minmax[slot][0]);
 	}
@@ -446,7 +443,14 @@ static INT_PTR CALLBACK mce_nm_dialog( HWND dialog, UINT msg, WPARAM wParam, LPA
 
 					/* error checking */
 					if (strlen(trom)!=8||strlen(tram)!=8) {
-						LOG_ERROR_WINDOW(dialog,"Input fields must be 8 characters.");
+						LOG_ERROR_WINDOW(
+                            dialog,
+                        #ifdef MEISEI_ESP
+                            "Campo de entrada deben tener 8 caracteres."
+                        #else
+                            "Input fields must be 8 characters."
+                        #endif
+                        );
 						return 0;
 					}
 
@@ -456,7 +460,17 @@ static INT_PTR CALLBACK mce_nm_dialog( HWND dialog, UINT msg, WPARAM wParam, LPA
 						case 'e': case 'E': trom[i]='e'; break;				/* empty */
 						case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': break;
 						default:
-							sprintf(t,"ROM block '%c' is unknown. Use 0-7 for mapped pages,\n'e' for empty pages, and 'u' for unmapped sections.",trom[i]);
+							sprintf(
+                                t,
+                            #ifdef MEISEI_ESP
+                                "El bloque ROM '%c' es desconocido. Usa 0-7 para páginas asignadas,\n"
+                                "'e' para páginas vacías y 'u' para secciones no asignadas.",
+                            #else
+                                "ROM block '%c' is unknown. Use 0-7 for mapped pages,\n"
+                                "'e' for empty pages, and 'u' for unmapped sections.",
+                            #endif
+                                trom[i]
+                            );
 							LOG_ERROR_WINDOW(dialog,t);
 							return 0;
 					}
@@ -471,19 +485,47 @@ static INT_PTR CALLBACK mce_nm_dialog( HWND dialog, UINT msg, WPARAM wParam, LPA
 							nram++; break;									/* 1 * 8KB */
 
 						default:
-							sprintf(t,"RAM block '%c' is unknown. Use 0-7 for mapped pages,\nand 'u' for unmapped sections. For RAM < 8KB, use\n'o' for 8 * 1KB, 'q' for 4 * 2KB, and 'd' for 2 * 4KB.",tram[i]);
+							sprintf(
+                                t,
+                            #ifdef MEISEI_ESP
+                                "RAM block '%c' is unknown. Use 0-7 for mapped pages,\n"
+                                "Bloque de RAM '%c' desconocido. Usa 0-7 para páginas asignadas,\n"
+                                "y 'u' para secciones no asignadas. Para RAM < 8 KB, use\n"
+                                "'o' para 8 * 1KB, 'q' para 4 * 2KB y 'd' para 2 * 4KB.",
+                            #else
+                                "RAM block '%c' is unknown. Use 0-7 for mapped pages,\n"
+                                "and 'u' for unmapped sections. For RAM < 8KB, use\n"
+                                "'o' for 8 * 1KB, 'q' for 4 * 2KB, and 'd' for 2 * 4KB.",
+                            #endif // MEISEI_ESP
+                                tram[i]
+                            );
 							LOG_ERROR_WINDOW(dialog,t);
 							return 0;
 					}
 
 					if ((mram&&nram)||(mram!=0&&mram!=1&&mram!=2&&mram!=4)) {
-						LOG_ERROR_WINDOW(dialog,"Can't combine different RAM sizes.");
+						LOG_ERROR_WINDOW(
+                            dialog,
+                        #ifdef MEISEI_ESP
+                            "No mezclar diferentes tamaños de RAM."
+                        #else
+                            "Can't combine different RAM sizes."
+                        #endif // MEISEI_ESP
+                        );
 						return 0;
 					}
 
 					for (i=0;i<8;i++)
 					if (trom[i]!='f'&&tram[i]!='f') {
-						sprintf(t,"ROM-RAM collision at character %d.",i+1);
+						sprintf(
+                            t,
+                        #ifdef MEISEI_ESP
+                            "ROM-RAM colisión en el carácter %d.",
+                        #else
+                            "ROM-RAM collision at character %d.",
+                        #endif // MEISEI_ESP
+                            i+1
+                        );
 						LOG_ERROR_WINDOW(dialog,t);
 						return 0;
 					}
@@ -548,10 +590,6 @@ static void mapinit_crossblaim(int slot)
 	mapsetcustom_write(slot,0,8,mapwrite_crossblaim);
 }
 
-
-
-
-
 /* --- MicroCabin Harry Fox (single game: Harry Fox - Yuki no Maou Hen), discrete logic, board: DSK-1 */
 static void __fastcall mapwrite_harryfox(int slot,u16 a,u8 v)
 {
@@ -575,10 +613,6 @@ static void mapinit_harryfox(int slot)
 	mapsetcustom_write(slot,3,1,mapwrite_harryfox);
 }
 
-
-
-
-
 /* --- Irem TAM-S1 (single game: R-Type), mapper chip: Irem TAM-S1, board: MSX-004 */
 static void __fastcall mapwrite_irem(int slot,u16 a,u8 v)
 {
@@ -600,10 +634,6 @@ static void mapinit_irem(int slot)
 
 	mapsetcustom_write(slot,2,2,mapwrite_irem);
 }
-
-
-
-
 
 /* --- Al-Alamiah Al-Qur'an (single program), mapper chip: Yamaha XE297A0 (protection is separate via resistor network), board: GCMK-16X, 2 ROM chips */
 /* (without having been hardware reverse engineered, and only 1 program to test it with, I'm not sure if this implementation is accurate) */
@@ -697,10 +727,6 @@ static void mapinit_quran(int slot)
 	for (i=0;i<0x100;i++) quran_lutp[i]=((i<<4&0x50)|(i>>3&5)|(i<<1&0xa0)|(i<<2&8)|(i>>6&2))^0x4d;
 }
 
-
-
-
-
 /* --- Matra INK (single game), AMD Am29F040B flash memory */
 static _am29f* ink_chip[2]={NULL,NULL};
 
@@ -793,10 +819,6 @@ static void mapinit_matraink(int slot)
 	mapsetcustom_write(slot,0,8,mapwrite_matraink);
 }
 
-
-
-
-
 /* --- Sony Playball (single game), discrete logic, board: Sony 1-621-028
 
 NOTE: If samples are used, it can cause reverse and speed up problems, unable to fix it for now.
@@ -862,10 +884,6 @@ static void mapinit_playball(int slot)
 	j=cartpages[slot]; if (j>6) j=6;
 	for (i=0;i<j;i++) cartbank[slot][i+2]=i;
 }
-
-
-
-
 
 /* --- Konami Synthesizer (single game), discrete logic and lots of resistors */
 #define KSYN_VOL_FACTOR 12 /* guessed */
@@ -1038,10 +1056,6 @@ static void mapinit_konamivrc(int slot)
 	if (cartmask[slot]<0x1f) konamivrc_mask[slot]=0x1f;
 	else konamivrc_mask[slot]=cartmask[slot];
 }
-
-
-
-
 
 /* --- Konami Game Master 2 (single game), Konami VRC007431 mapper and some discrete logic to handle SRAM */
 static int gm2_is_sram[2][4];
@@ -1293,10 +1307,6 @@ static void mapinit_konamiscc(int slot)
 	scc_poweron(scc_scc[slot]);
 	scc_enabled[slot]=FALSE;
 }
-
-
-
-
 
 /* --- Konami Sound Cartridge, mapper chip: Konami 052539 SCC-I 2312P001, board: KONAMI
 	SCC-I with (configurable) RAM, supported by the Game Collections (see below) (and some hacked ROMs)
@@ -1850,27 +1860,18 @@ static void mapinit_dsk2rom(int slot)
 	#define DFN_MAX 4
 
 	/* possible dsk2rom filenames */
-	/*
 	const char* fn[DFN_MAX][3]={
-	{ "dsk2rom-0.80", "zip", "rom" },
-	{ "dsk2rom",      "rom", NULL  },
 	{ "dsk2rom",      "zip", "rom" },
+	{ "dsk2rom",      "rom", NULL  },
+	{ "dsk2rom-0.80", "zip", "rom" },
 	{ "dsk2rom-0.70", "zip", "rom" }
 	};
-    */
-	const char* fn[DFN_MAX][3]={
-	{ "bios/dsk2rom-0.80", "zip", "rom" },
-	{ "bios/dsk2rom",      "rom", NULL  },
-	{ "bios/dsk2rom",      "zip", "rom" },
-	{ "bios/dsk2rom-0.70", "zip", "rom" }
-	};
-
 	MEM_CREATE(dsk2rom[0],0x2000); MEM_CREATE(dsk2rom[1],0x2000);
 
 	/* open dsk2rom */
 	for (i=0;i<DFN_MAX;i++) {
 		// file_setfile(&file->appdir,fn[i][0],fn[i][1],fn[i][2]);
-		file_setfile(NULL,fn[i][0],fn[i][1],fn[i][2]);
+        file_setfile(&file->biosdir,fn[i][0],fn[i][1],fn[i][2]);
 		if (file_open()&&file->size==0x4000&&file_read(dsk2rom[0],0x2000)&&file_read(dsk2rom[1],0x2000)) {
 			yay=TRUE; file_close();
 			break;
@@ -1880,7 +1881,17 @@ static void mapinit_dsk2rom(int slot)
 
 	#undef DFN_MAX
 
-	if (!yay) LOG(LOG_MISC|LOG_WARNING|LOG_TYPE(LT_SLOT1FAIL+slot),"slot %d: couldn't open DSK2ROM",slot+1);
+	if (!yay) {
+        LOG(
+            LOG_MISC|LOG_WARNING|LOG_TYPE(LT_SLOT1FAIL+slot),
+        #ifdef MEISEI_ESP
+            "slot %d: no pudo abrir DSK2ROM",
+        #else
+            "slot %d: couldn't open DSK2ROM",
+        #endif // MEISEI_ESP
+            slot+1
+        );
+	}
 	else if (cartpages[slot]!=0&&(cartpages[slot]+2)<=ROM_MAXPAGES&&memcmp(cart[slot][0],dsk2rom[0],0x2000)!=0&&memcmp(cart[slot][1],dsk2rom[1],0x2000)!=0)
     {
 		/* restructure */
@@ -2477,10 +2488,6 @@ static void mapinit_btl80(int slot)
 	mapsetcustom_write(slot,2,2,mapwrite_btl80);
 }
 
-
-
-
-
 /* --- Bootleg 90-in-1 (single game) */
 /* (without having been hardware reverse engineered, and only 1 game to test it with, I'm not sure if this implementation is accurate) */
 static int btl90_init_done[2]={0,0};
@@ -2528,10 +2535,6 @@ static void mapinit_btl90(int slot)
 	cartbank[slot][2]=cartbank[slot][4]=0;
 	cartbank[slot][3]=cartbank[slot][5]=1;
 }
-
-
-
-
 
 /* --- Bootleg 126-in-1 (single game) */
 /* (without having been hardware reverse engineered, and only 1 game to test it with, I'm not sure if this implementation is accurate) */
@@ -2850,10 +2853,14 @@ static const fp_mapread lut_mapread[2][8]={
 };
 
 /* custom cart read/write */
-static fp_mapread_custom mapread_custom_c1;					static fp_mapread_custom mapread_custom_c2;
-static u8 __fastcall mapreadc1x(u16 a) { return mapread_custom_c1(0,a); }	static u8 __fastcall mapreadc2x(u16 a) { return mapread_custom_c2(1,a); }
-static fp_mapwrite_custom mapwrite_custom_c1;					static fp_mapwrite_custom mapwrite_custom_c2;
-static void __fastcall mapwritec1x(u16 a,u8 v) { mapwrite_custom_c1(0,a,v); }	static void __fastcall mapwritec2x(u16 a,u8 v) { mapwrite_custom_c2(1,a,v); }
+static fp_mapread_custom mapread_custom_c1;
+static fp_mapread_custom mapread_custom_c2;
+static u8 __fastcall mapreadc1x(u16 a) { return mapread_custom_c1(0,a); }
+static u8 __fastcall mapreadc2x(u16 a) { return mapread_custom_c2(1,a); }
+static fp_mapwrite_custom mapwrite_custom_c1;
+static fp_mapwrite_custom mapwrite_custom_c2;
+static void __fastcall mapwritec1x(u16 a,u8 v) { mapwrite_custom_c1(0,a,v); }
+static void __fastcall mapwritec2x(u16 a,u8 v) { mapwrite_custom_c2(1,a,v); }
 
 static void mapsetcustom_read(int slot,int rb,int re,fp_mapread_custom f)
 {
@@ -2958,11 +2965,21 @@ void mapper_init(void)
 #endif
 
 	/* open default bios */
-	// file_setfile(&file->appdir,DEFAULT_BIOS,NULL,NULL);
-	file_setfile(NULL,DEFAULT_BIOS,NULL,NULL);              // HEY BABY!
+	// file_setfile( &file->appdir, DEFAULT_BIOS, NULL, NULL );
+    // file_setfile( &file->appdir, DEFAULT_BIOS, NULL, "zip" );        // HEY BABY!
+    file_setfile( &file->biosdir, DEFAULT_BIOS, NULL, "zip" );          // HEY BABY!
 	if (!file_open()||file->size!=0x8000||!file_read(default_bios,0x8000)) {
 		file_close();
-		LOG(LOG_MISC|LOG_ERROR,"Couldn't open default BIOS ROM.\nEnsure that %s\nis in the application directory.",DEFAULT_BIOS); exit(1);
+        LOG(
+            LOG_MISC | LOG_ERROR,
+        #ifdef MEISEI_ESP
+            "Error al abrir la BIOS ROM.\nAsegúrese de que %s\nesté en el directorio bios.",
+        #else
+            "Couldn't open default BIOS ROM.\nEnsure that %s\nis in the bios directory.",
+        #endif // MEISEI_ESP
+            DEFAULT_BIOS
+        );
+        exit(1);
 	}
 	default_bioscrc=file->crc32;
 	MEM_CREATE(fn_default_bios,strlen(file->filename)+1);
@@ -3071,7 +3088,14 @@ void mapper_open_bios(const char* f)
 
 	if (!file_open()||file->size>0x10000||file->size<2||!file_read(bios,file->size)) {
 		file_close();
-		LOG(LOG_MISC|LOG_WARNING,"couldn't open BIOS, reverting to default\n");
+		LOG(
+            LOG_MISC|LOG_WARNING,
+        #ifdef MEISEI_ESP
+            "No se pudo abrir la BIOS, volviendo a predeterminada\n"
+        #else
+            "couldn't open BIOS, reverting to default\n"
+        #endif // MEISEI_ESP
+        );
 		mapper_set_bios_default();
 	}
 	else {
@@ -3165,7 +3189,6 @@ void mapper_update_bios_hack(void)
 		for (i=0;i<4;i++) mapread_std[0][i]=mapreadbios;
 	}
 }
-
 
 /* carts */
 int mapper_open_cart(int slot,const char* f,int auto_patch)
@@ -3622,7 +3645,6 @@ static void sram_save(int slot,u8* d,u32 size,const char* fnc)
 	/* clean */
 	MEM_CLEAN(d);
 }
-
 
 /* state				size
 ram slot				1

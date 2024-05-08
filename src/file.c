@@ -410,6 +410,17 @@ void file_directories(void)
 	FILE_GETDIR(SETTINGS_SRAMDIR,file->batterydir);
 	FILE_GETDIR(SETTINGS_STATEDIR,file->statedir);
 	FILE_GETDIR(SETTINGS_TOOLDIR,file->tooldir);
+
+    // PARCHE DE LA MUERTE
+    // Esto es necesario para asignar a file->biosdir la ruta adecuada
+	if( strcmp( file->appdir, file->biosdir ) == 0 ) {
+        MEM_CLEAN(  file->biosdir );
+        MEM_CREATE( file->biosdir, strlen(file->appdir) + 5 + 1 );
+        strcpy( file->biosdir, file->appdir );
+        strcat( file->biosdir, "\\bios" );
+	}
+	// FIN PARCHE DE LA MUERTE
+
 }
 
 void file_settings_save(void)
@@ -482,16 +493,23 @@ void file_clean(void)
 	LOG(LOG_VERBOSE,"file I/O cleaned\n");
 }
 
-void file_setfile(char** filedir,const char* filename,const char* fileext,const char* zipextension)
+void file_setfile( char** filedir, const char* filename, const char* fileext, const char* zipextension )
 {
-	if (filename&&strlen(filename)) {
+	if ( filename && strlen(filename) ) {
+
 		int len=strlen(filename);
 		if (filedir&&*filedir) len+=strlen(*filedir)+1;
 		if (fileext) len+=strlen(fileext)+1;
 
-		MEM_CLEAN(file->dir); MEM_CLEAN(file->ext); MEM_CLEAN(file->name); MEM_CLEAN(file->filename);
-		if (len>=STRING_SIZE) { LOG(LOG_MISC|LOG_ERROR,"Filename too long!\n"); exit(1); }
-		else {
+		MEM_CLEAN(file->dir);
+		MEM_CLEAN(file->ext);
+		MEM_CLEAN(file->name);
+		MEM_CLEAN(file->filename);
+
+		if (len>=STRING_SIZE) {
+            LOG(LOG_MISC|LOG_ERROR,"Filename too long!\n");
+            exit(1);
+        } else {
 			char temp[STRING_SIZE];
 			int off,end,ed,d=0;
 

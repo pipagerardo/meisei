@@ -125,7 +125,19 @@ INT_PTR CALLBACK help_about( HWND dialog, UINT msg, WPARAM wParam, LPARAM lParam
 			SendDlgItemMessage(dialog,IDC_ABOUT_ICON,STM_SETICON,(WPARAM)icon,0);
 
 			/* set version/ran text */
-			sprintf(c,"%s %s, %s\nran %d time%s",VERSION_NAME_S,VERSION_NUMBER_S,VERSION_DATE_S,t,(t!=1)?"s":"");
+			sprintf(
+                c,
+            #ifdef MEISEI_ESP
+                "%s %s, %s\ncorriendo %d vece%s",
+            #else
+                "%s %s, %s\nran %d time%s",
+            #endif
+                VERSION_NAME_S,
+                VERSION_NUMBER_S,
+                VERSION_DATE_S,
+                t,
+                (t!=1)?"s":""
+            );
 			SetDlgItemText(dialog,IDC_ABOUT_TEXT,c);
 
 			main_parent_window(dialog,0,0,0,0,0);
