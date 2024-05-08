@@ -1,0 +1,294 @@
+----------------------------------------------------------------------------
+[1] INSTALAR COMPILADORES MSYS2
+===============================
+
+https://www.msys2.org/
+Descargar el instalador: msys2-x86_64-20240113.exe (O el más reciente)
+
+Instalar en C:\msys64
+Insisto en que instales MSYS2 en C:\msys64
+¿Te he dicho que debes instalar MSYS2 en "C:\msys64"?
+Si instalas MSYS2 en otra ruta, luego no me vengas llorando que no funciona.
+
+Arrancar MSYS2.EXE
+
+MiniTutorial MSYS:
+==================
+
+Actualizar repositorio:
+-----------------------
+pacman -Syu
+
+Reiniciar entorno:
+------------------
+pacman -Su
+
+Consultar Paquetes [packages]:
+------------------------------
+pacman -Ss [package-name]
+pacman -Ss msys
+pacman -Ss mingw64
+pacman -Ss ucrt64
+pacman -Ss mingw32
+pacman -Ss clang64
+pacman -Ss clang32
+
+Instalar Paquetes [packages]:
+-----------------------------
+pacman -S [package-name]
+
+Borrar Paquetes [packages]:
+---------------------------
+pacman -Rsc [package-name]
+
+
+INSTALANDO COMPILADORES:
+========================
+
+Yo sólo instalo los compiladores: MINGW64 UCRT y MINGW32.
+También se pueden instalar: MINGW64, CLANG64 y CLAN32 pero yo no los estoy usando. 
+
+pacman -Syu		// Actualizar repositorio
+pacman -Su		// Reiniciar entorno
+pacman -S make		// Instalar make
+
+[Compiladores Requeridos]
+
+MINGW64 UCRT: The Universal C Runtime (UCRT) (Windows 10, 11 y Xbox)
+	mingw-w64-ucrt-x86_64
+	pacman -S mingw-w64-ucrt-x86_64-gcc
+	pacman -S mingw-w64-ucrt-x86_64-gdb
+	pacman -S mingw-w64-ucrt-x86_64-make
+	pacman -S mingw-w64-ucrt-x86_64-windows-default-manifest	# Sólo si al compilar falta "default-manifest.o"
+
+MINGW32: To compile for 32-bit Windows (on 64-bit Windows). ( Windows 7, 8, 10 y 11 versión 32 bits ) 
+	mingw-w64-i686
+	pacman -S mingw-w64-i686-gcc
+	pacman -S mingw-w64-i686-gdb
+	pacman -S mingw-w64-i686-make
+	pacman -S mingw-w64-i686-windows-default-manifest		# Sólo si al compilar falta "default-manifest.o"
+
+[Compiladores Opcionales]
+
+MINGW64: It uses the older MSVCRT runtime ( Windows 7, 8, 10 y 11 )
+	mingw-w64-x86_64
+	pacman -S mingw-w64-x86_64-gcc
+	pacman -S mingw-w64-x86_64-gdb
+	pacman -S mingw-w64-x86_64-make
+	pacman -S mingw-w64-x86_64-windows-default-manifest		# Sólo si al compilar falta "default-manifest.o"
+
+CLANG64: It uses the older MSVCRT runtime ( Windows 7, 8, 10 y 11 )
+	mingw-w64-x86_64-clang
+	mingw-w64-x86_64-clang-tools-extra
+	mingw-w64-x86_64-clang-compiler-rt
+
+CLANG32: To compile for 32-bit Windows (on 64-bit Windows). ( Windows 7, 8, 10 y 11 versión 32 bits ) 
+	mingw-w64-i686-clang
+	mingw-w64-i686-clang-tools-extra
+	mingw-w64-i686-clang-compiler-rt
+
+----------------------------------------------------------------------------
+[2] COMPILAR ASÍ A LO LOCO CON ARCHIVOS BAT
+===========================================
+
+0 - INSTALAR ENTORNO PROGRAMACION.txt		# Este documento informativo en Español.
+0 - INSTALL PROGRAMMING ENVIRONMENT.txt 	# Este documento informativo en Inglés.
+
+1 - meisei_esp_ucrt64bits.bat			# Compila Meisie Español, 64 bits MINGW GCC UCRT
+2 - meisei_eng_ucrt64bits.bat			# Compila Meisie Inglés,  64 bits MINGW GCC UCRT
+
+3 - kailleraclient_esp_ucrt64.bat		# Compila kailleraclient Español, 64 bits MINGW GCC UCRT
+4 - kailleraclient_eng_ucrt64.bat		# Compila kailleraclient Inglés,  64 bits MINGW GCC UCRT
+
+5 - meisei_esp_gcc32bits.bat			# Compila Meisie Español, 32 bits MINGW GCC
+6 - meisei_eng_gcc32bits.bat			# Compila Meisie Inglés,  32 bits MINGW GCC
+
+7 - kailleraclient_esp_gcc32.bat		# Compila kailleraclient Español, 32 bits MINGW GCC
+8 - kailleraclient_eng_gcc32.bat		# Compila kailleraclient Inglés,  32 bits MINGW GCC
+
+9 - limpia-clean.bat				# Borra todos los archivos creados al compilar, menos los ejecutables.
+
+RESULTADOS:
+	.\bin\Meisei_esp.exe
+	.\bin\Meisei_eng.exe
+	.\bin\kaillera\kailleraclient_esp.dll
+	.\bin\kaillera\kailleraclient_eng.dll
+	.\bin\Meisei32_esp.exe
+	.\bin\Meisei32_eng.exe
+	.\bin\kaillera\kailleraclient32_esp.dll
+	.\bin\kaillera\kailleraclient32_eng.dll
+
+----------------------------------------------------------------------------
+[3] INSTALAR IDE CODE::BLOCKS
+=============================
+Descargar Code::Blocks versión "codeblocks-20.03-nosetup.zip" 
+https://www.codeblocks.org/downloads/binaries/
+
+Instalar en  "C:\msys64\codeblocks"
+
+Configurar los Compiladores en Code::Blocks
+-------------------------------------------
+
+Code::Blocks -> Settings -> Compiler
+
+Global compiler settings 
+
+Selected Compiler: [ Copy | Rename | Delete ]
+------------------
+	- GNU GCC Compiler UCRT 64 bits
+	- GNU GCC Compiler 32 bits
+	- GNU GCC Compiler 64 bits
+	- LLVM Clang Compiler 64 bits
+	- LLVM Clang Compiler 32 bits
+	...
+
+[Pestaña] Toolchain executables:
+--------------------------------
+Compiler's Directory UCRT       64 bits:	C:\msys64\ucrt64\bin	
+Compiler's Directory MINGW GCC  32 bits:	C:\msys64\mingw32\bin
+Compiler's Directory MINGW GCC  64 bits: 	C:\msys64\mingw64\bin
+Compiler's Directory CLANG VLLM 64 bits: 	C:\msys64\clang64\bin
+Compiler's Directory CLANG VLLM 32 bits:	C:\msys64\clang32\bin
+
+[Pestaña] Program Files:	MINGW GCC / UCRT	CLANG VLLM
+------------------------	-----------------	-----------------
+C compiler:			gcc.exe			clang.exe
+C++ compiler:			g++.exe			clang++.exe
+Linker for dinamic libs:	g++.exe			clang++.exe
+Linker for static libs:		ar.exe			llvm-ar.exe
+Debugger:			Default			Default
+Resurce compiler:		windres.exe		windres.exe
+Make program:			mingw32-make.exe	mingw32-make.exe
+
+Configurar los Settings Code::Blocks
+------------------------------------
+
+Code::Blocks -> Settings -> Editor
+Encode settings / Use encoding when opening files: UTF-8
+
+Abrir proyectos CBP:
+--------------------
+File -> Open -> Proyecto.cbp
+
+Si al abrir un proyecto CBP has configurado mal los compiladores te lo dirá.
+Vuelve a leerte la parte de "Configura los Compiladores en Code::Blocks"
+
+Con Code::Blocks puedes modificar el código del Meisei, si sólo quieres
+compilarlo puedes usar los archivos BAT para compilar sin usar Code::Blocks.
+
+----------------------------------------------------------------------------
+[4] PROGRAMAR
+=============
+¡Ay Amigo! aquí ya no te puedo ayudar mucho.
+Debes saber programar en C, Windows Winapi, DirectX, etc...
+...
+...
+...
+
+
+----------------------------------------------------------------------------
+[5] CONSIDERACIONES IMPORTANTES:
+================================
+
+Meisei es un emulador de MSX1, no emula MSX2, ni MSX2+, ni leches en vinagre.
+¿Darle soporte a MSX2? A día de hoy dudo mucho que esté cualificado para esa
+tarea por falta de conocimientos. Cuando suba el código fuente a Github 
+veremos si alguien se anima y me echa una mano...
+
+Está programado en C usando Winapi, DirectDraw y Direct X, así que olvídate
+de compilarlo en otras plataformas que no son Windows 8, 10 y 11.
+Adaptarlo a otras plataformas usando SDL2 no digo que no sea posible, pero
+está fuera de mi tiempo limitado de vida en este planeta.
+
+Meisei estaba originalmente en Inglés, ha sido traducido al Español y no
+pienso darle soporte a ningún otro idioma. Si quieres traducirlo al Élfico
+Oscuro de Mordor... pues píllate el código fuente y al lio ¡Campeón!
+
+Tengo intención de darle soporte para cintas de cassete en formato TSX, pero
+esto aún no está implementado. 
+
+Puedes escribirme a: pipagerardo@gmail.com
+
+-----------------------------------------------------------------------------
+
+Parar Windows 64 bits
+---------------------
+-march=x86-64
+
+Para Windows 32 bits
+--------------------
+-march=i686 
+-mfpmath=387
+
+-std=c17
+-static
+-fomit-frame-pointer
+-ftracer
+-O3
+-s
+
+-mwindows		// Windows GUI App
+-mconsole		// Consola Windows [Opcional]
+-lgdi32
+-lkernel32
+-lole32
+-lcomdlg32
+-lcomctl32
+-lshell32
+-lwinmm
+-lwininet		// NET [Opcional]
+-luser32
+-ld3d9
+-lddraw
+-ldsound
+-ldinput
+-ldxguid
+-luuid
+-lz
+
+#DEFINES:
+---------
+
+MEISEI_ESP		Activa el idioma en Español
+
+MEISEI_32BITS		32 bits
+
+MEISEI_UPDATE		Activa actualización del programa (no funciona)
+
+DEBUG_PROFILER		???
+
+-----------------------------------------------------------------------------
+"meisei_autorun.zip" con una rom o dsk ya lo arranca y ejecuta. Si es un cas no funciona.
+
+Puedes meterle por linea de comandos un juego:
+Meisei_esp.exe games\rom\MJTT.zip
+
+-----------------------------------------------------------------------------
+
+RUTAS DE ARCHIVO CAMBIADAS:
+===========================
+
+"netplay.c"
+	"kaillera/kailleraclient_esp.dll"
+	"kaillera/kailleraclient_eng.dll"
+	"kaillera/kailleraclient32_esp.dll"
+	"kaillera/kailleraclient32_eng.dll"
+
+"mapper.c"
+	"bios/default_bios.zip"
+	"bios/dsk2rom.zip"
+
+"help.c"
+	"docs/meisei_esp.txt"
+	"docs/meisei_eng.txt"
+
+-----------------------------------------------------------------------------
+
+WARNINGS MOLESTOS:
+------------------
+
+// Warning -Wformat-overvlow
+
+// Warning -Wimplicit-fallthrough
+
+
