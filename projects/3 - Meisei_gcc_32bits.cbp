@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Meisei 32 bits" />
+		<Option platforms="Windows;" />
+		<Option makefile="makefile" />
+		<Option pch_mode="2" />
+		<Option compiler="gnu_gcc_compiler_32_bits" />
+		<Build>
+			<Target title="Release ESP">
+				<Option platforms="Windows;" />
+				<Option output="../bin/Meisei32_esp" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../bin/." />
+				<Option object_output="../obj/esp_32bits/" />
+				<Option type="0" />
+				<Option compiler="gnu_gcc_compiler_32_bits" />
+				<Compiler>
+					<Add option="-march=i686" />
+					<Add option="-fomit-frame-pointer" />
+					<Add option="-O3" />
+					<Add option="-Wall" />
+					<Add option="-std=c17" />
+					<Add option="-ftracer" />
+					<Add option="-DMEISEI_ESP" />
+					<Add option="-DMEISEI_32BITS" />
+					<Add directory="C:/msys64/mingw32/include" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="../src/resources" />
+				</ResourceCompiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-static" />
+					<Add option="-mwindows" />
+					<Add option="-lgdi32" />
+					<Add option="-lkernel32" />
+					<Add option="-lole32" />
+					<Add option="-lcomdlg32" />
+					<Add option="-lcomctl32" />
+					<Add option="-lshell32" />
+					<Add option="-lwinmm" />
+					<Add option="-lwininet" />
+					<Add option="-luser32" />
+					<Add option="-ld3d9" />
+					<Add option="-lddraw" />
+					<Add option="-ldsound" />
+					<Add option="-ldinput" />
+					<Add option="-ldxguid" />
+					<Add option="-luuid" />
+					<Add option="-lz" />
+					<Add directory="C:/msys64/mingw32/lib" />
+					<Add directory="C:/msys64/mingw32/bin" />
+					<Add directory="C:/msys64/mingw32/i686-w64-mingw32/bin" />
+				</Linker>
+			</Target>
+			<Target title="Release ENG">
+				<Option platforms="Windows;" />
+				<Option output="../bin/Meisei32_eng" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../bin/." />
+				<Option object_output="../obj/eng_32bits/" />
+				<Option type="0" />
+				<Option compiler="gnu_gcc_compiler_32_bits" />
+				<Compiler>
+					<Add option="-march=i686" />
+					<Add option="-fomit-frame-pointer" />
+					<Add option="-O3" />
+					<Add option="-Wall" />
+					<Add option="-std=c17" />
+					<Add option="-ftracer" />
+					<Add option="-DMEISEI_32BITS" />
+					<Add directory="C:/msys64/mingw32/include" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="../src/resources" />
+				</ResourceCompiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-static" />
+					<Add option="-mwindows" />
+					<Add option="-lgdi32" />
+					<Add option="-lkernel32" />
+					<Add option="-lole32" />
+					<Add option="-lcomdlg32" />
+					<Add option="-lcomctl32" />
+					<Add option="-lshell32" />
+					<Add option="-lwinmm" />
+					<Add option="-lwininet" />
+					<Add option="-luser32" />
+					<Add option="-ld3d9" />
+					<Add option="-lddraw" />
+					<Add option="-ldsound" />
+					<Add option="-ldinput" />
+					<Add option="-ldxguid" />
+					<Add option="-luuid" />
+					<Add option="-lz" />
+					<Add directory="C:/msys64/mingw32/lib" />
+					<Add directory="C:/msys64/mingw32/bin" />
+					<Add directory="C:/msys64/mingw32/i686-w64-mingw32/bin" />
+				</Linker>
+			</Target>
+		</Build>
+		<Unit filename="../src/am29f040b.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/am29f040b.h" />
+		<Unit filename="../src/cont.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/cont.h" />
+		<Unit filename="../src/crypt.h" />
+		<Unit filename="../src/crystal.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/crystal.h" />
+		<Unit filename="../src/draw.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/draw.h" />
+		<Unit filename="../src/file.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/file.h" />
+		<Unit filename="../src/global.h" />
+		<Unit filename="../src/help.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/help.h" />
+		<Unit filename="../src/input.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/input.h" />
+		<Unit filename="../src/io.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/io.h" />
+		<Unit filename="../src/ioapi.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/ioapi.h" />
+		<Unit filename="../src/log.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/log.h" />
+		<Unit filename="../src/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/main.h" />
+		<Unit filename="../src/mapper.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/mapper.h" />
+		<Unit filename="../src/mapper_table.h" />
+		<Unit filename="../src/media.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/media.h" />
+		<Unit filename="../src/movie.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/movie.h" />
+		<Unit filename="../src/msx.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/msx.h" />
+		<Unit filename="../src/netplay.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/netplay.h" />
+		<Unit filename="../src/paste.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/paste.h" />
+		<Unit filename="../src/paste_table.h" />
+		<Unit filename="../src/psg.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/psg.h" />
+		<Unit filename="../src/psglogger.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/psglogger.h" />
+		<Unit filename="../src/psgtoy.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/psgtoy.h" />
+		<Unit filename="../src/resource.h" />
+		<Unit filename="../src/resource_eng.rc">
+			<Option compilerVar="WINDRES" />
+			<Option target="Release ENG" />
+		</Unit>
+		<Unit filename="../src/resource_esp.rc">
+			<Option compilerVar="WINDRES" />
+			<Option target="Release ESP" />
+		</Unit>
+		<Unit filename="../src/reverse.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/reverse.h" />
+		<Unit filename="../src/sample.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/sample.h" />
+		<Unit filename="../src/scc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/scc.h" />
+		<Unit filename="../src/screenshot.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/screenshot.h" />
+		<Unit filename="../src/settings.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/settings.h" />
+		<Unit filename="../src/sound.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/sound.h" />
+		<Unit filename="../src/spriteview.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/spriteview.h" />
+		<Unit filename="../src/state.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/state.h" />
+		<Unit filename="../src/tape.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/tape.h" />
+		<Unit filename="../src/ti_ntsc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/ti_ntsc.h" />
+		<Unit filename="../src/tileview.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/tileview.h" />
+		<Unit filename="../src/tool.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/tool.h" />
+		<Unit filename="../src/unzip.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/unzip.h" />
+		<Unit filename="../src/update.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/update.h" />
+		<Unit filename="../src/vdp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/vdp.h" />
+		<Unit filename="../src/version.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/version.h" />
+		<Unit filename="../src/z80.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/z80.h" />
+		<Unit filename="../src/zconf.h" />
+		<Unit filename="../src/zlib.h" />
+		<Extensions>
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
