@@ -210,6 +210,6 @@ If you (dear reader) were expecting a list of changes, please read this:
 - Changed documents to docs folder
 - Translated into Spanish from Spain
 - Updates disabled (They do not work)
-- Disabled "kailleraclient.dll" (Possible Trojan)
+- Kaillera Client compiled in pure C "kailleraclient_eng.dll"
 - Conveniently compile with BAT files
 - Code::Blocks Projects

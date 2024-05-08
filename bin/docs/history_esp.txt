@@ -221,8 +221,8 @@ Si usted (querido lector) esperaba una lista de cambios, lea esto:
 - Bios cambiadas a la carpeta bios
 - Documentos cambiados a la carpeta docs
 - Traducido al Español de España
+- Compilado Kaillera Client en puro C "kailleraclient_esp.dll"
 - Desactivadas las actualizaciones ( No funcionan )
-- Desactivado "kailleraclient.dll" (Posible Troyano)
 - Compilar cómodamente con archivos BAT
 - Proyectos de Code::Blocks
 
