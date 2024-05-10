@@ -36,6 +36,8 @@ REM *******************************************************************
 REM ***                   BORRAMOS LA MORRALLA                      ***
 REM *******************************************************************
 
+DEL /S /Q bin\kaillera\*.a
+DEL /S /Q bin\kaillera\*.def
 DEL /S /Q obj\esp_32bits\*.*
 RMDIR /S /Q obj\esp_32bits
 

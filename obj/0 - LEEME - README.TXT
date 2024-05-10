@@ -1,1 +1,5 @@
-objects
+Objetos...
+Todo lo que puede ser materia de conocimiento o sensibilidad de parte del sujeto, incluso este mismo.
+
+Objects...
+Everything that can be a matter of knowledge or sensitivity on the part of the subject, including the subject himself.

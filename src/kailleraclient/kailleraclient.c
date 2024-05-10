@@ -47,8 +47,6 @@ DLLEXP kailleraGetVersion( char *version ) {
 
 DLLEXP kailleraInit() {
 
-    // ifstream config;    // CPP
-    // FILE *fopen(const char *nombre, const char *modo);
     FILE* config;
 
     char temp[2048];
@@ -83,20 +81,16 @@ DLLEXP kailleraInit() {
 	//strcpy(p2pServer, "127.0.0.1");
 
 	//Open File
-    // config.open( "supraclient.ini", ios::in );  // CPP
     config = fopen( "supraclient.ini", "r" );
 
-    // if (config.good()) {                        // CPP
-    if( config ) {                                 // C
+    if( config ) {
 
     //Get Contents
-		// while (!config.eof()) {                  // CPP
-		// int feof(FILE *stream);
-        while( !feof( config ) ) {                  // C
+        while( !feof( config ) ) {
 
-            // 	config.getline(temp, 128, '\n');        // CPP
+            // config.getline(temp, 128, '\n');        // CPP
             // char *fgets(char *cadena, int n, FILE *stream);
-            fgets( temp, 128, config );                 // C
+            fgets( temp, 128, config );
             clean_endl( temp );
 
         //Server Tab
@@ -310,9 +304,6 @@ DLLEXP kailleraInit() {
 
 	} // END IF
 
-
-	// config.close();              // CPP
-	// int fclose(FILE *stream);    // C
 	fclose( config );
 
 	ZeroMemory(myBuff, MESSAGE_LENGTH * MESSAGE_SIZE);
@@ -336,469 +327,460 @@ DLLEXP kailleraShutdown(){
 }
 
 DLLEXP kailleraSetInfos(kailleraInfos *infosp) {
-		long i;
-		short strSize;
-		int w = 0;
-		char temp[2048];
+    long i;
+	short strSize;
+	int w = 0;
+	char temp[2048];
 
-		kInfo = *infosp;
+	kInfo = *infosp;
 
-		//Get Emulator Name
-		strcpy(emulator, kInfo.appName);
+	//Get Emulator Name
+	strcpy(emulator, kInfo.appName);
 
-		//Get Game List
-		for(i = 0; i < 65536; i++){
-			strSize = strlen((kInfo.gameList) + w);
-			if(strSize == 0)
-				break;
-			strcpy(gameList[i].game, &kInfo.gameList[w]);
-			w = w + strSize + 1;
-			totalGames = totalGames + 1;
-			if(i % 1000 == 0)
-				DoEvents();
-		}
+	//Get Game List
+	for(i = 0; i < 65536; i++){
+		strSize = strlen((kInfo.gameList) + w);
+		if(strSize == 0) break;
+        strcpy(gameList[i].game, &kInfo.gameList[w]);
+		w = w + strSize + 1;
+		totalGames = totalGames + 1;
+		if(i % 1000 == 0) DoEvents();
+	}
 
-
-		//Sort Games by First Character
-		for(i = 0; i < totalGames; i++){
-			for(w = 0; w < totalGames; w++){
-				if(gameList[w].game[0] > gameList[i].game[0]){
-					strcpy(temp, gameList[i].game);
-					strcpy(gameList[i].game, gameList[w].game);
-					strcpy(gameList[w].game, temp);
-				}
-				if(w % 100 == 0)
-					DoEvents();
+	//Sort Games by First Character
+	for(i = 0; i < totalGames; i++){
+		for(w = 0; w < totalGames; w++) {
+			if(gameList[w].game[0] > gameList[i].game[0]){
+				strcpy(temp, gameList[i].game);
+				strcpy(gameList[i].game, gameList[w].game);
+				strcpy(gameList[w].game, temp);
 			}
+			if(w % 100 == 0) DoEvents();
 		}
+	}
 
-		//Create Menu
-		gameMenu = CreatePopupMenu();
-		AppendMenu(gameMenu, MF_STRING | MF_POPUP, (UINT)0xFFFD, lastGameToPlay1);
-		AppendMenu(gameMenu, MF_STRING | MF_POPUP, (UINT)0xFFFE, lastGameToPlay2);
-		AppendMenu(gameMenu, MF_STRING | MF_POPUP, (UINT)0xFFFF, lastGameToPlay3);
-		AppendMenu(gameMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
-		//Add Catagories
-		for(i = 0; i < totalGames; i++){
-			//Add Catagory
-			if(gameList[i].game[0] > gameList[i - 1].game[0]){
-				strncpy(temp, gameList[i].game, 1);
-				temp[1] = '\0';
-				gameSubMenu = CreatePopupMenu();
-                // WINUSERAPI WINBOOL WINAPI AppendMenuA( HMENU hMenu, UINT uFlags, UINT_PTR uIDNewItem, LPCSTR lpNewItem );
-				AppendMenu( gameMenu, MF_STRING | MF_POPUP, (UINT_PTR)gameSubMenu, temp );
-			}
-			//Add Game Under Catagory
-			AppendMenu(gameSubMenu, MF_STRING, i + 1, gameList[i].game);
-			if(i % 100 == 0)
-				DoEvents();
+    //Create Menu
+	gameMenu = CreatePopupMenu();
+	AppendMenu(gameMenu, MF_STRING | MF_POPUP, (UINT)0xFFFD, lastGameToPlay1);
+	AppendMenu(gameMenu, MF_STRING | MF_POPUP, (UINT)0xFFFE, lastGameToPlay2);
+	AppendMenu(gameMenu, MF_STRING | MF_POPUP, (UINT)0xFFFF, lastGameToPlay3);
+	AppendMenu(gameMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	//Add Catagories
+	for(i = 0; i < totalGames; i++){
+		//Add Catagory
+		if(gameList[i].game[0] > gameList[i - 1].game[0]){
+			strncpy(temp, gameList[i].game, 1);
+			temp[1] = '\0';
+			gameSubMenu = CreatePopupMenu();
+			AppendMenu( gameMenu, MF_STRING | MF_POPUP, (UINT_PTR)gameSubMenu, temp );
 		}
+        //Add Game Under Catagory
+		AppendMenu(gameSubMenu, MF_STRING, i + 1, gameList[i].game);
+		if(i % 100 == 0) DoEvents();
+    }
 
-		//Favorite List Menu
-		favoritelistMenu = CreatePopupMenu();
-		favoritelistSubMenu = CreatePopupMenu();
-		AppendMenu(favoritelistMenu, MF_STRING | MF_POPUP, 0xFFD8, "Connect");
-		AppendMenu(favoritelistMenu, MF_STRING | MF_POPUP, 0xFFD5, "Edit Entry");
-		AppendMenu(favoritelistMenu, MF_SEPARATOR | MF_POPUP, 0, 0 );
-		AppendMenu(favoritelistMenu, MF_STRING | MF_POPUP, 0xFFD9, "Remove");
-		AppendMenu(favoritelistMenu, MF_STRING | MF_POPUP, 0xFFDA, "Remove All");
-		AppendMenu(favoritelistMenu, MF_SEPARATOR | MF_POPUP, 0, 0 );
-		AppendMenu(favoritelistMenu, MF_STRING | MF_POPUP, (UINT_PTR)favoritelistSubMenu, "Copy");
-		AppendMenu(favoritelistSubMenu, MF_STRING, 0xFFDB, "Server Name");
-		AppendMenu(favoritelistSubMenu, MF_STRING, 0xFFDC, "IP Address");
-		AppendMenu(favoritelistSubMenu, MF_STRING, 0xFFDD, "Location");
-		AppendMenu(favoritelistSubMenu, MF_STRING, 0xFFDE, "Comments");
+	//Favorite List Menu
+	favoritelistMenu = CreatePopupMenu();
+	favoritelistSubMenu = CreatePopupMenu();
+	AppendMenu(favoritelistMenu, MF_STRING | MF_POPUP, 0xFFD8, "Connect");
+	AppendMenu(favoritelistMenu, MF_STRING | MF_POPUP, 0xFFD5, "Edit Entry");
+	AppendMenu(favoritelistMenu, MF_SEPARATOR | MF_POPUP, 0, 0 );
+	AppendMenu(favoritelistMenu, MF_STRING | MF_POPUP, 0xFFD9, "Remove");
+	AppendMenu(favoritelistMenu, MF_STRING | MF_POPUP, 0xFFDA, "Remove All");
+	AppendMenu(favoritelistMenu, MF_SEPARATOR | MF_POPUP, 0, 0 );
+	AppendMenu(favoritelistMenu, MF_STRING | MF_POPUP, (UINT_PTR)favoritelistSubMenu, "Copy");
+	AppendMenu(favoritelistSubMenu, MF_STRING, 0xFFDB, "Server Name");
+	AppendMenu(favoritelistSubMenu, MF_STRING, 0xFFDC, "IP Address");
+	AppendMenu(favoritelistSubMenu, MF_STRING, 0xFFDD, "Location");
+	AppendMenu(favoritelistSubMenu, MF_STRING, 0xFFDE, "Comments");
 
-		//Recent List Menu
-		recentlistMenu = CreatePopupMenu();
-		recentlistSubMenu = CreatePopupMenu();
-		AppendMenu(recentlistMenu, MF_STRING | MF_POPUP, 0xFFE1, "Add to Favorites");
-		AppendMenu(recentlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0 );
-		AppendMenu(recentlistMenu, MF_STRING | MF_POPUP, 0xFFE2, "Connect");
-        AppendMenu(recentlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0 );
-		AppendMenu(recentlistMenu, MF_STRING | MF_POPUP, 0xFFE3, "Remove");
-		AppendMenu(recentlistMenu, MF_STRING | MF_POPUP, 0xFFE0, "Remove All");
-		AppendMenu(recentlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0 );
-		AppendMenu(recentlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)recentlistSubMenu, "Copy");
-		AppendMenu(recentlistSubMenu, MF_STRING, 0xFFE4, "Server Name");
-		AppendMenu(recentlistSubMenu, MF_STRING, 0xFFE5, "IP Address");
-		AppendMenu(recentlistSubMenu, MF_STRING, 0xFFE6, "Location");
+	//Recent List Menu
+	recentlistMenu = CreatePopupMenu();
+	recentlistSubMenu = CreatePopupMenu();
+	AppendMenu(recentlistMenu, MF_STRING | MF_POPUP, 0xFFE1, "Add to Favorites");
+	AppendMenu(recentlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0 );
+	AppendMenu(recentlistMenu, MF_STRING | MF_POPUP, 0xFFE2, "Connect");
+    AppendMenu(recentlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0 );
+	AppendMenu(recentlistMenu, MF_STRING | MF_POPUP, 0xFFE3, "Remove");
+	AppendMenu(recentlistMenu, MF_STRING | MF_POPUP, 0xFFE0, "Remove All");
+	AppendMenu(recentlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0 );
+	AppendMenu(recentlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)recentlistSubMenu, "Copy");
+	AppendMenu(recentlistSubMenu, MF_STRING, 0xFFE4, "Server Name");
+	AppendMenu(recentlistSubMenu, MF_STRING, 0xFFE5, "IP Address");
+	AppendMenu(recentlistSubMenu, MF_STRING, 0xFFE6, "Location");
 
-		//Waiting List Menu
-		waitinglistMenu = CreatePopupMenu();
-		waitinglistSubMenu = CreatePopupMenu();
-		AppendMenu(waitinglistMenu, MF_STRING | MF_POPUP, 0xFFDF, "Add to Favorites");
-		AppendMenu(waitinglistMenu, MF_SEPARATOR | MF_POPUP, 0, 0 );
-		AppendMenu(waitinglistMenu, MF_STRING | MF_POPUP, 0xFFE7, "Refresh Waiting Games");
-		AppendMenu(waitinglistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
-		AppendMenu(waitinglistMenu, MF_STRING | MF_POPUP, 0xFFE8, "Connect");
-		AppendMenu(waitinglistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
-		AppendMenu(waitinglistMenu, MF_STRING | MF_POPUP, (UINT_PTR)waitinglistSubMenu, "Copy");
-		AppendMenu(waitinglistSubMenu, MF_STRING, 0xFFE9, "Game Name");
-		AppendMenu(waitinglistSubMenu, MF_STRING, 0xFFEA, "Emulator");
-		AppendMenu(waitinglistSubMenu, MF_STRING, 0xFFEB, "Username");
-		AppendMenu(waitinglistSubMenu, MF_STRING, 0xFFEC, "Server Name");
-		AppendMenu(waitinglistSubMenu, MF_STRING, 0xFFED, "IP Address");
-		AppendMenu(waitinglistSubMenu, MF_STRING, 0xFFEE, "Location");
+	//Waiting List Menu
+	waitinglistMenu = CreatePopupMenu();
+	waitinglistSubMenu = CreatePopupMenu();
+	AppendMenu(waitinglistMenu, MF_STRING | MF_POPUP, 0xFFDF, "Add to Favorites");
+	AppendMenu(waitinglistMenu, MF_SEPARATOR | MF_POPUP, 0, 0 );
+	AppendMenu(waitinglistMenu, MF_STRING | MF_POPUP, 0xFFE7, "Refresh Waiting Games");
+	AppendMenu(waitinglistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(waitinglistMenu, MF_STRING | MF_POPUP, 0xFFE8, "Connect");
+	AppendMenu(waitinglistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(waitinglistMenu, MF_STRING | MF_POPUP, (UINT_PTR)waitinglistSubMenu, "Copy");
+	AppendMenu(waitinglistSubMenu, MF_STRING, 0xFFE9, "Game Name");
+	AppendMenu(waitinglistSubMenu, MF_STRING, 0xFFEA, "Emulator");
+	AppendMenu(waitinglistSubMenu, MF_STRING, 0xFFEB, "Username");
+	AppendMenu(waitinglistSubMenu, MF_STRING, 0xFFEC, "Server Name");
+	AppendMenu(waitinglistSubMenu, MF_STRING, 0xFFED, "IP Address");
+	AppendMenu(waitinglistSubMenu, MF_STRING, 0xFFEE, "Location");
 
-		//Server List Menu
-		serverlistMenu = CreatePopupMenu();
-		serverlistSubMenu = CreatePopupMenu();
-		AppendMenu(serverlistMenu, MF_STRING | MF_POPUP, 0xFFE6, "Add to Favorites");
-		AppendMenu(serverlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
-		AppendMenu(serverlistMenu, MF_STRING | MF_POPUP, 0xFFEF, "Refresh Server List");
-		AppendMenu(serverlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
-		AppendMenu(serverlistMenu, MF_STRING | MF_POPUP, 0xFFD7, "Ping");
-		AppendMenu(serverlistMenu, MF_STRING | MF_POPUP, 0xFFD6, "Stop");
-		AppendMenu(serverlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
-		AppendMenu(serverlistMenu, MF_STRING | MF_POPUP, 0xFFF0, "Connect");
-		AppendMenu(serverlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
-		AppendMenu(serverlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)serverlistSubMenu, "Copy");
-		AppendMenu(serverlistSubMenu, MF_STRING, 0xFFF1, "Server Name");
-		AppendMenu(serverlistSubMenu, MF_STRING, 0xFFF2, "IP Address");
-		AppendMenu(serverlistSubMenu, MF_STRING, 0xFFF3, "Location");
+	//Server List Menu
+	serverlistMenu = CreatePopupMenu();
+	serverlistSubMenu = CreatePopupMenu();
+	AppendMenu(serverlistMenu, MF_STRING | MF_POPUP, 0xFFE6, "Add to Favorites");
+	AppendMenu(serverlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(serverlistMenu, MF_STRING | MF_POPUP, 0xFFEF, "Refresh Server List");
+	AppendMenu(serverlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(serverlistMenu, MF_STRING | MF_POPUP, 0xFFD7, "Ping");
+	AppendMenu(serverlistMenu, MF_STRING | MF_POPUP, 0xFFD6, "Stop");
+	AppendMenu(serverlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(serverlistMenu, MF_STRING | MF_POPUP, 0xFFF0, "Connect");
+	AppendMenu(serverlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(serverlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)serverlistSubMenu, "Copy");
+	AppendMenu(serverlistSubMenu, MF_STRING, 0xFFF1, "Server Name");
+	AppendMenu(serverlistSubMenu, MF_STRING, 0xFFF2, "IP Address");
+	AppendMenu(serverlistSubMenu, MF_STRING, 0xFFF3, "Location");
 
-		//Gamelist Menu
-		gamelistMenu = CreatePopupMenu();
-		gamelistSubMenu = CreatePopupMenu();
-		AppendMenu(gamelistMenu, MF_STRING | MF_POPUP, 0xFFF7, "Join");
-		AppendMenu(gamelistMenu, MF_STRING | MF_POPUP, 0xDDD9, "Close Game");
-		if(kInfo.moreInfosCallback != NULL){
-			AppendMenu(gamelistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
-			AppendMenu(gamelistMenu, MF_STRING | MF_POPUP, 0xFFF8, "More Information");
-		}
+	//Gamelist Menu
+	gamelistMenu = CreatePopupMenu();
+	gamelistSubMenu = CreatePopupMenu();
+	AppendMenu(gamelistMenu, MF_STRING | MF_POPUP, 0xFFF7, "Join");
+	AppendMenu(gamelistMenu, MF_STRING | MF_POPUP, 0xDDD9, "Close Game");
+	if(kInfo.moreInfosCallback != NULL){
 		AppendMenu(gamelistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
-		AppendMenu(gamelistMenu, MF_STRING | MF_POPUP, (UINT_PTR)gamelistSubMenu, "Copy");
-		AppendMenu(gamelistSubMenu, MF_STRING, 0xFFF9, "Game ID");
-		AppendMenu(gamelistSubMenu, MF_STRING, 0xFFFA, "Game");
-		AppendMenu(gamelistSubMenu, MF_STRING, 0xFFFB, "Emulator");
-		AppendMenu(gamelistSubMenu, MF_STRING, 0xFFFC, "Owner");
+		AppendMenu(gamelistMenu, MF_STRING | MF_POPUP, 0xFFF8, "More Information");
+	}
+	AppendMenu(gamelistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(gamelistMenu, MF_STRING | MF_POPUP, (UINT_PTR)gamelistSubMenu, "Copy");
+	AppendMenu(gamelistSubMenu, MF_STRING, 0xFFF9, "Game ID");
+	AppendMenu(gamelistSubMenu, MF_STRING, 0xFFFA, "Game");
+	AppendMenu(gamelistSubMenu, MF_STRING, 0xFFFB, "Emulator");
+	AppendMenu(gamelistSubMenu, MF_STRING, 0xFFFC, "Owner");
 
-		//Game Userlist Menu
-		gameUserlistMenu = CreatePopupMenu();
-		gameUserlistSubMenu = CreatePopupMenu();
-		AppendMenu(gameUserlistMenu, MF_STRING | MF_POPUP, 0xFFF4, "Kick");
+	//Game Userlist Menu
+	gameUserlistMenu = CreatePopupMenu();
+	gameUserlistSubMenu = CreatePopupMenu();
+	AppendMenu(gameUserlistMenu, MF_STRING | MF_POPUP, 0xFFF4, "Kick");
 
-		AppendMenu(gameUserlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(gameUserlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
 
-		AppendMenu(gameUserlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)gameUserlistSubMenu, "Mute Player");
-		AppendMenu(gameUserlistSubMenu, MF_STRING, 0xDDDD, "Mute");
-		AppendMenu(gameUserlistSubMenu, MF_STRING, 0xDDDC, "Unmute");
+	AppendMenu(gameUserlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)gameUserlistSubMenu, "Mute Player");
+	AppendMenu(gameUserlistSubMenu, MF_STRING, 0xDDDD, "Mute");
+	AppendMenu(gameUserlistSubMenu, MF_STRING, 0xDDDC, "Unmute");
 
-		AppendMenu(gameUserlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(gameUserlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
 
-		gameUserlistSubMenu = CreatePopupMenu();
-		AppendMenu(gameUserlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)gameUserlistSubMenu, "Copy");
-		AppendMenu(gameUserlistSubMenu, MF_STRING, 0xFFF5, "User ID");
-		AppendMenu(gameUserlistSubMenu, MF_STRING, 0xFFF6, "Username");
-
-
-		//txtChatroom Menu
-		txtChatroomMenu = CreatePopupMenu();
-		txtChatroomSubMenu = CreatePopupMenu();
-		txtChatroomPmSubMenu = CreatePopupMenu();
-		AppendMenu(txtChatroomMenu, MF_STRING | MF_POPUP, 0xDDD6, "Get My IP Address");
-		AppendMenu(txtChatroomMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
-
-		AppendMenu(txtChatroomMenu, MF_STRING | MF_POPUP, (UINT_PTR)txtChatroomPmSubMenu, "Private Messages");
-		AppendMenu(txtChatroomPmSubMenu, MF_STRING, 0xDDD4, "Off");
-		AppendMenu(txtChatroomPmSubMenu, MF_STRING, 0xDDD5, "On");
-		AppendMenu(txtChatroomMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
-
-		AppendMenu(txtChatroomMenu, MF_STRING | MF_POPUP, (UINT_PTR)txtChatroomSubMenu, "Stealth Mode");
-		AppendMenu(txtChatroomSubMenu, MF_STRING, 0xDDD8, "On");
-		AppendMenu(txtChatroomSubMenu, MF_STRING, 0xDDD7, "Off");
+	gameUserlistSubMenu = CreatePopupMenu();
+	AppendMenu(gameUserlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)gameUserlistSubMenu, "Copy");
+	AppendMenu(gameUserlistSubMenu, MF_STRING, 0xFFF5, "User ID");
+	AppendMenu(gameUserlistSubMenu, MF_STRING, 0xFFF6, "Username");
 
 
-		//Userlist Menu
-		userlistMenu = CreatePopupMenu();
-		strcpy(userlistCommands[0].commands, "/kick ");
+	//txtChatroom Menu
+	txtChatroomMenu = CreatePopupMenu();
+	txtChatroomSubMenu = CreatePopupMenu();
+	txtChatroomPmSubMenu = CreatePopupMenu();
+	AppendMenu(txtChatroomMenu, MF_STRING | MF_POPUP, 0xDDD6, "Get My IP Address");
+	AppendMenu(txtChatroomMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
 
-		strcpy(userlistCommands[1].commands, "/silence ");
-		strcpy(userlistCommands[2].commands, "/silence ");
-		strcpy(userlistCommands[3].commands, "/silence ");
-		strcpy(userlistCommands[4].commands, "/silence ");
-		strcpy(userlistCommands[5].commands, "/silence ");
-		strcpy(userlistCommands[6].commands, "/silence ");
-		strcpy(userlistCommands[7].commands, "/silence ");
-		strcpy(userlistCommands[8].commands, "/silence ");
-		strcpy(userlistCommands[9].commands, "/silence ");
-		strcpy(userlistCommands[10].commands, "/silence ");
-		userlistCommands[1].time = 5;
-		userlistCommands[2].time = 15;
-		userlistCommands[3].time = 30;
-		userlistCommands[4].time = 45;
-		userlistCommands[5].time = 60;
-		userlistCommands[6].time = 180;
-		userlistCommands[7].time = 300;
-		userlistCommands[8].time = 1440;
-		userlistCommands[9].time = 10080;
-		userlistCommands[10].time = 30000;
+	AppendMenu(txtChatroomMenu, MF_STRING | MF_POPUP, (UINT_PTR)txtChatroomPmSubMenu, "Private Messages");
+	AppendMenu(txtChatroomPmSubMenu, MF_STRING, 0xDDD4, "Off");
+	AppendMenu(txtChatroomPmSubMenu, MF_STRING, 0xDDD5, "On");
+	AppendMenu(txtChatroomMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+
+	AppendMenu(txtChatroomMenu, MF_STRING | MF_POPUP, (UINT_PTR)txtChatroomSubMenu, "Stealth Mode");
+	AppendMenu(txtChatroomSubMenu, MF_STRING, 0xDDD8, "On");
+	AppendMenu(txtChatroomSubMenu, MF_STRING, 0xDDD7, "Off");
+
+	//Userlist Menu
+	userlistMenu = CreatePopupMenu();
+	strcpy(userlistCommands[0].commands, "/kick ");
+
+	strcpy(userlistCommands[1].commands, "/silence ");
+	strcpy(userlistCommands[2].commands, "/silence ");
+	strcpy(userlistCommands[3].commands, "/silence ");
+	strcpy(userlistCommands[4].commands, "/silence ");
+	strcpy(userlistCommands[5].commands, "/silence ");
+	strcpy(userlistCommands[6].commands, "/silence ");
+	strcpy(userlistCommands[7].commands, "/silence ");
+	strcpy(userlistCommands[8].commands, "/silence ");
+	strcpy(userlistCommands[9].commands, "/silence ");
+	strcpy(userlistCommands[10].commands, "/silence ");
+	userlistCommands[1].time = 5;
+	userlistCommands[2].time = 15;
+	userlistCommands[3].time = 30;
+	userlistCommands[4].time = 45;
+	userlistCommands[5].time = 60;
+	userlistCommands[6].time = 180;
+	userlistCommands[7].time = 300;
+	userlistCommands[8].time = 1440;
+	userlistCommands[9].time = 10080;
+	userlistCommands[10].time = 30000;
+
+	strcpy(userlistCommands[11].commands, "/ban ");
+	strcpy(userlistCommands[12].commands, "/ban ");
+	strcpy(userlistCommands[13].commands, "/ban ");
+	strcpy(userlistCommands[14].commands, "/ban ");
+	strcpy(userlistCommands[15].commands, "/ban ");
+	strcpy(userlistCommands[16].commands, "/ban ");
+	strcpy(userlistCommands[17].commands, "/ban ");
+	strcpy(userlistCommands[18].commands, "/ban ");
+	strcpy(userlistCommands[19].commands, "/ban ");
+	strcpy(userlistCommands[20].commands, "/ban ");
+	userlistCommands[11].time = 5;
+	userlistCommands[12].time = 15;
+	userlistCommands[13].time = 30;
+	userlistCommands[14].time = 45;
+	userlistCommands[15].time = 60;
+	userlistCommands[16].time = 180;
+	userlistCommands[17].time = 300;
+	userlistCommands[18].time = 1440;
+	userlistCommands[19].time = 10080;
+	userlistCommands[20].time = 30000;
+
+	strcpy(userlistCommands[21].commands, "/tempadmin ");
+	strcpy(userlistCommands[22].commands, "/tempadmin ");
+	strcpy(userlistCommands[23].commands, "/tempadmin ");
+	strcpy(userlistCommands[24].commands, "/tempadmin ");
+	strcpy(userlistCommands[25].commands, "/tempadmin ");
+    strcpy(userlistCommands[26].commands, "/tempadmin ");
+	strcpy(userlistCommands[27].commands, "/tempadmin ");
+	strcpy(userlistCommands[28].commands, "/tempadmin ");
+	strcpy(userlistCommands[29].commands, "/tempadmin ");
+	strcpy(userlistCommands[30].commands, "/tempadmin ");
+	userlistCommands[21].time = 5;
+	userlistCommands[22].time = 15;
+	userlistCommands[23].time = 30;
+	userlistCommands[24].time = 45;
+	userlistCommands[25].time = 60;
+	userlistCommands[26].time = 180;
+	userlistCommands[27].time = 300;
+	userlistCommands[28].time = 1440;
+	userlistCommands[29].time = 10080;
+	userlistCommands[30].time = 30000;
+
+	strcpy(userlistCommands[41].commands, "/tempmoderator ");
+	strcpy(userlistCommands[42].commands, "/tempmoderator ");
+	strcpy(userlistCommands[43].commands, "/tempmoderator ");
+	strcpy(userlistCommands[44].commands, "/tempmoderator ");
+	strcpy(userlistCommands[45].commands, "/tempmoderator ");
+	strcpy(userlistCommands[46].commands, "/tempmoderator ");
+	strcpy(userlistCommands[47].commands, "/tempmoderator ");
+	strcpy(userlistCommands[48].commands, "/tempmoderator ");
+	strcpy(userlistCommands[49].commands, "/tempmoderator ");
+	strcpy(userlistCommands[50].commands, "/tempmoderator ");
+	userlistCommands[41].time = 5;
+	userlistCommands[42].time = 15;
+	userlistCommands[43].time = 30;
+	userlistCommands[44].time = 45;
+	userlistCommands[45].time = 60;
+	userlistCommands[46].time = 180;
+	userlistCommands[47].time = 300;
+	userlistCommands[48].time = 1440;
+	userlistCommands[49].time = 10080;
+	userlistCommands[50].time = 30000;
+
+	strcpy(userlistCommands[31].commands, "/tempelevated ");
+	strcpy(userlistCommands[32].commands, "/tempelevated ");
+	strcpy(userlistCommands[33].commands, "/tempelevated ");
+	strcpy(userlistCommands[34].commands, "/tempelevated ");
+	strcpy(userlistCommands[35].commands, "/tempelevated ");
+	strcpy(userlistCommands[36].commands, "/tempelevated ");
+	strcpy(userlistCommands[37].commands, "/tempelevated ");
+	strcpy(userlistCommands[38].commands, "/tempelevated ");
+	strcpy(userlistCommands[39].commands, "/tempelevated ");
+	strcpy(userlistCommands[40].commands, "/tempelevated ");
+	userlistCommands[31].time = 5;
+	userlistCommands[32].time = 15;
+	userlistCommands[33].time = 30;
+	userlistCommands[34].time = 45;
+	userlistCommands[35].time = 60;
+	userlistCommands[36].time = 180;
+	userlistCommands[37].time = 300;
+	userlistCommands[38].time = 1440;
+	userlistCommands[39].time = 10080;
+	userlistCommands[40].time = 30000;
+	strcpy(userlistCommands[51].commands, "/finduser ");
+
+	//Find User
+	AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT)0xCCCC, "Find User");
+
+	AppendMenu(userlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+
+	//PM
+	AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT)0xB2DD, "Private Message");
+
+	AppendMenu(userlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+
+	//Kick
+	AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT)0xFFFF, "Kick");
+
+	//Silence
+	userlistSubMenu = CreatePopupMenu();
+	AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)userlistSubMenu, "Silence");
+	AppendMenu(userlistSubMenu, MF_STRING, 1, "5 minutes");
+	AppendMenu(userlistSubMenu, MF_STRING, 2, "15 minutes");
+	AppendMenu(userlistSubMenu, MF_STRING, 3, "30 minutes");
+	AppendMenu(userlistSubMenu, MF_STRING, 4, "45 minutes");
+	AppendMenu(userlistSubMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(userlistSubMenu, MF_STRING, 5, "1 hour");
+	AppendMenu(userlistSubMenu, MF_STRING, 6, "3 hours");
+	AppendMenu(userlistSubMenu, MF_STRING, 7, "5 hours");
+	AppendMenu(userlistSubMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(userlistSubMenu, MF_STRING, 8, "1 day");
+	AppendMenu(userlistSubMenu, MF_STRING, 9, "1 week");
+	AppendMenu(userlistSubMenu, MF_STRING, 10, "For a very long time...");
+
+	//Ban
+	userlistSubMenu = CreatePopupMenu();
+	AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)userlistSubMenu, "Ban");
+	AppendMenu(userlistSubMenu, MF_STRING, 11, "5 minutes");
+	AppendMenu(userlistSubMenu, MF_STRING, 12, "15 minutes");
+	AppendMenu(userlistSubMenu, MF_STRING, 13, "30 minutes");
+	AppendMenu(userlistSubMenu, MF_STRING, 14, "45 minutes");
+	AppendMenu(userlistSubMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(userlistSubMenu, MF_STRING, 15, "1 hour");
+	AppendMenu(userlistSubMenu, MF_STRING, 16, "3 hours");
+	AppendMenu(userlistSubMenu, MF_STRING, 17, "5 hours");
+	AppendMenu(userlistSubMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(userlistSubMenu, MF_STRING, 18, "1 day");
+	AppendMenu(userlistSubMenu, MF_STRING, 19, "1 week");
+	AppendMenu(userlistSubMenu, MF_STRING, 20, "For a very long time...");
+
+	AppendMenu(userlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+
+	//Temp Elevated
+	userlistSubMenu = CreatePopupMenu();
+	AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)userlistSubMenu, "Temp Elevated");
+	AppendMenu(userlistSubMenu, MF_STRING, 31, "5 minutes");
+	AppendMenu(userlistSubMenu, MF_STRING, 32, "15 minutes");
+	AppendMenu(userlistSubMenu, MF_STRING, 33, "30 minutes");
+	AppendMenu(userlistSubMenu, MF_STRING, 34, "45 minutes");
+	AppendMenu(userlistSubMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(userlistSubMenu, MF_STRING, 35, "1 hour");
+	AppendMenu(userlistSubMenu, MF_STRING, 36, "3 hours");
+	AppendMenu(userlistSubMenu, MF_STRING, 37, "5 hours");
+	AppendMenu(userlistSubMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(userlistSubMenu, MF_STRING, 38, "1 day");
+	AppendMenu(userlistSubMenu, MF_STRING, 39, "1 week");
+	AppendMenu(userlistSubMenu, MF_STRING, 40, "For a very long time...");
+
+	//Temp Moderator
+	userlistSubMenu = CreatePopupMenu();
+	AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)userlistSubMenu, "Temp Moderator");
+	AppendMenu(userlistSubMenu, MF_STRING, 41, "5 minutes");
+	AppendMenu(userlistSubMenu, MF_STRING, 42, "15 minutes");
+	AppendMenu(userlistSubMenu, MF_STRING, 43, "30 minutes");
+	AppendMenu(userlistSubMenu, MF_STRING, 44, "45 minutes");
+	AppendMenu(userlistSubMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(userlistSubMenu, MF_STRING, 45, "1 hour");
+	AppendMenu(userlistSubMenu, MF_STRING, 46, "3 hours");
+	AppendMenu(userlistSubMenu, MF_STRING, 47, "5 hours");
+	AppendMenu(userlistSubMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(userlistSubMenu, MF_STRING, 48, "1 day");
+	AppendMenu(userlistSubMenu, MF_STRING, 49, "1 week");
+	AppendMenu(userlistSubMenu, MF_STRING, 50, "For a very long time...");
+
+	//Temp Admin
+	userlistSubMenu = CreatePopupMenu();
+	AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)userlistSubMenu, "Temp Admin");
+	AppendMenu(userlistSubMenu, MF_STRING, 21, "5 minutes");
+	AppendMenu(userlistSubMenu, MF_STRING, 22, "15 minutes");
+	AppendMenu(userlistSubMenu, MF_STRING, 23, "30 minutes");
+	AppendMenu(userlistSubMenu, MF_STRING, 24, "45 minutes");
+	AppendMenu(userlistSubMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(userlistSubMenu, MF_STRING, 25, "1 hour");
+	AppendMenu(userlistSubMenu, MF_STRING, 26, "3 hours");
+	AppendMenu(userlistSubMenu, MF_STRING, 27, "5 hours");
+	AppendMenu(userlistSubMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(userlistSubMenu, MF_STRING, 28, "1 day");
+	AppendMenu(userlistSubMenu, MF_STRING, 29, "1 week");
+	AppendMenu(userlistSubMenu, MF_STRING, 30, "For a very long time...");
+
+	AppendMenu(userlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	userlistSubMenu = CreatePopupMenu();
+	AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)userlistSubMenu, "Ignore User");
+	AppendMenu(userlistSubMenu, MF_STRING, 0xDDDB, "Ignore");
+	AppendMenu(userlistSubMenu, MF_STRING, 0xDDDA, "Unignore");
 
 
-		strcpy(userlistCommands[11].commands, "/ban ");
-		strcpy(userlistCommands[12].commands, "/ban ");
-		strcpy(userlistCommands[13].commands, "/ban ");
-		strcpy(userlistCommands[14].commands, "/ban ");
-		strcpy(userlistCommands[15].commands, "/ban ");
-		strcpy(userlistCommands[16].commands, "/ban ");
-		strcpy(userlistCommands[17].commands, "/ban ");
-		strcpy(userlistCommands[18].commands, "/ban ");
-		strcpy(userlistCommands[19].commands, "/ban ");
-		strcpy(userlistCommands[20].commands, "/ban ");
-		userlistCommands[11].time = 5;
-		userlistCommands[12].time = 15;
-		userlistCommands[13].time = 30;
-		userlistCommands[14].time = 45;
-		userlistCommands[15].time = 60;
-		userlistCommands[16].time = 180;
-		userlistCommands[17].time = 300;
-		userlistCommands[18].time = 1440;
-		userlistCommands[19].time = 10080;
-		userlistCommands[20].time = 30000;
-
-		strcpy(userlistCommands[21].commands, "/tempadmin ");
-		strcpy(userlistCommands[22].commands, "/tempadmin ");
-		strcpy(userlistCommands[23].commands, "/tempadmin ");
-		strcpy(userlistCommands[24].commands, "/tempadmin ");
-		strcpy(userlistCommands[25].commands, "/tempadmin ");
-		strcpy(userlistCommands[26].commands, "/tempadmin ");
-		strcpy(userlistCommands[27].commands, "/tempadmin ");
-		strcpy(userlistCommands[28].commands, "/tempadmin ");
-		strcpy(userlistCommands[29].commands, "/tempadmin ");
-		strcpy(userlistCommands[30].commands, "/tempadmin ");
-		userlistCommands[21].time = 5;
-		userlistCommands[22].time = 15;
-		userlistCommands[23].time = 30;
-		userlistCommands[24].time = 45;
-		userlistCommands[25].time = 60;
-		userlistCommands[26].time = 180;
-		userlistCommands[27].time = 300;
-		userlistCommands[28].time = 1440;
-		userlistCommands[29].time = 10080;
-		userlistCommands[30].time = 30000;
-
-		strcpy(userlistCommands[41].commands, "/tempmoderator ");
-		strcpy(userlistCommands[42].commands, "/tempmoderator ");
-		strcpy(userlistCommands[43].commands, "/tempmoderator ");
-		strcpy(userlistCommands[44].commands, "/tempmoderator ");
-		strcpy(userlistCommands[45].commands, "/tempmoderator ");
-		strcpy(userlistCommands[46].commands, "/tempmoderator ");
-		strcpy(userlistCommands[47].commands, "/tempmoderator ");
-		strcpy(userlistCommands[48].commands, "/tempmoderator ");
-		strcpy(userlistCommands[49].commands, "/tempmoderator ");
-		strcpy(userlistCommands[50].commands, "/tempmoderator ");
-		userlistCommands[41].time = 5;
-		userlistCommands[42].time = 15;
-		userlistCommands[43].time = 30;
-		userlistCommands[44].time = 45;
-		userlistCommands[45].time = 60;
-		userlistCommands[46].time = 180;
-		userlistCommands[47].time = 300;
-		userlistCommands[48].time = 1440;
-		userlistCommands[49].time = 10080;
-		userlistCommands[50].time = 30000;
-
-		strcpy(userlistCommands[31].commands, "/tempelevated ");
-		strcpy(userlistCommands[32].commands, "/tempelevated ");
-		strcpy(userlistCommands[33].commands, "/tempelevated ");
-		strcpy(userlistCommands[34].commands, "/tempelevated ");
-		strcpy(userlistCommands[35].commands, "/tempelevated ");
-		strcpy(userlistCommands[36].commands, "/tempelevated ");
-		strcpy(userlistCommands[37].commands, "/tempelevated ");
-		strcpy(userlistCommands[38].commands, "/tempelevated ");
-		strcpy(userlistCommands[39].commands, "/tempelevated ");
-		strcpy(userlistCommands[40].commands, "/tempelevated ");
-		userlistCommands[31].time = 5;
-		userlistCommands[32].time = 15;
-		userlistCommands[33].time = 30;
-		userlistCommands[34].time = 45;
-		userlistCommands[35].time = 60;
-		userlistCommands[36].time = 180;
-		userlistCommands[37].time = 300;
-		userlistCommands[38].time = 1440;
-		userlistCommands[39].time = 10080;
-		userlistCommands[40].time = 30000;
-		strcpy(userlistCommands[51].commands, "/finduser ");
-
-		//Find User
-		AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT)0xCCCC, "Find User");
-
-		AppendMenu(userlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
-
-		//PM
-		AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT)0xB2DD, "Private Message");
-
-		AppendMenu(userlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
-
-		//Kick
-		AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT)0xFFFF, "Kick");
-
-		//Silence
-		userlistSubMenu = CreatePopupMenu();
-		AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)userlistSubMenu, "Silence");
-		AppendMenu(userlistSubMenu, MF_STRING, 1, "5 minutes");
-		AppendMenu(userlistSubMenu, MF_STRING, 2, "15 minutes");
-		AppendMenu(userlistSubMenu, MF_STRING, 3, "30 minutes");
-		AppendMenu(userlistSubMenu, MF_STRING, 4, "45 minutes");
-		AppendMenu(userlistSubMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
-		AppendMenu(userlistSubMenu, MF_STRING, 5, "1 hour");
-		AppendMenu(userlistSubMenu, MF_STRING, 6, "3 hours");
-		AppendMenu(userlistSubMenu, MF_STRING, 7, "5 hours");
-		AppendMenu(userlistSubMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
-		AppendMenu(userlistSubMenu, MF_STRING, 8, "1 day");
-		AppendMenu(userlistSubMenu, MF_STRING, 9, "1 week");
-		AppendMenu(userlistSubMenu, MF_STRING, 10, "For a very long time...");
-
-		//Ban
-		userlistSubMenu = CreatePopupMenu();
-		AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)userlistSubMenu, "Ban");
-		AppendMenu(userlistSubMenu, MF_STRING, 11, "5 minutes");
-		AppendMenu(userlistSubMenu, MF_STRING, 12, "15 minutes");
-		AppendMenu(userlistSubMenu, MF_STRING, 13, "30 minutes");
-		AppendMenu(userlistSubMenu, MF_STRING, 14, "45 minutes");
-		AppendMenu(userlistSubMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
-		AppendMenu(userlistSubMenu, MF_STRING, 15, "1 hour");
-		AppendMenu(userlistSubMenu, MF_STRING, 16, "3 hours");
-		AppendMenu(userlistSubMenu, MF_STRING, 17, "5 hours");
-		AppendMenu(userlistSubMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
-		AppendMenu(userlistSubMenu, MF_STRING, 18, "1 day");
-		AppendMenu(userlistSubMenu, MF_STRING, 19, "1 week");
-		AppendMenu(userlistSubMenu, MF_STRING, 20, "For a very long time...");
-
-		AppendMenu(userlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
-
-		//Temp Elevated
-		userlistSubMenu = CreatePopupMenu();
-		AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)userlistSubMenu, "Temp Elevated");
-		AppendMenu(userlistSubMenu, MF_STRING, 31, "5 minutes");
-		AppendMenu(userlistSubMenu, MF_STRING, 32, "15 minutes");
-		AppendMenu(userlistSubMenu, MF_STRING, 33, "30 minutes");
-		AppendMenu(userlistSubMenu, MF_STRING, 34, "45 minutes");
-		AppendMenu(userlistSubMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
-		AppendMenu(userlistSubMenu, MF_STRING, 35, "1 hour");
-		AppendMenu(userlistSubMenu, MF_STRING, 36, "3 hours");
-		AppendMenu(userlistSubMenu, MF_STRING, 37, "5 hours");
-		AppendMenu(userlistSubMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
-		AppendMenu(userlistSubMenu, MF_STRING, 38, "1 day");
-		AppendMenu(userlistSubMenu, MF_STRING, 39, "1 week");
-		AppendMenu(userlistSubMenu, MF_STRING, 40, "For a very long time...");
-
-		//Temp Moderator
-		userlistSubMenu = CreatePopupMenu();
-		AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)userlistSubMenu, "Temp Moderator");
-		AppendMenu(userlistSubMenu, MF_STRING, 41, "5 minutes");
-		AppendMenu(userlistSubMenu, MF_STRING, 42, "15 minutes");
-		AppendMenu(userlistSubMenu, MF_STRING, 43, "30 minutes");
-		AppendMenu(userlistSubMenu, MF_STRING, 44, "45 minutes");
-		AppendMenu(userlistSubMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
-		AppendMenu(userlistSubMenu, MF_STRING, 45, "1 hour");
-		AppendMenu(userlistSubMenu, MF_STRING, 46, "3 hours");
-		AppendMenu(userlistSubMenu, MF_STRING, 47, "5 hours");
-		AppendMenu(userlistSubMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
-		AppendMenu(userlistSubMenu, MF_STRING, 48, "1 day");
-		AppendMenu(userlistSubMenu, MF_STRING, 49, "1 week");
-		AppendMenu(userlistSubMenu, MF_STRING, 50, "For a very long time...");
-
-		//Temp Admin
-		userlistSubMenu = CreatePopupMenu();
-		AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)userlistSubMenu, "Temp Admin");
-		AppendMenu(userlistSubMenu, MF_STRING, 21, "5 minutes");
-		AppendMenu(userlistSubMenu, MF_STRING, 22, "15 minutes");
-		AppendMenu(userlistSubMenu, MF_STRING, 23, "30 minutes");
-		AppendMenu(userlistSubMenu, MF_STRING, 24, "45 minutes");
-		AppendMenu(userlistSubMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
-		AppendMenu(userlistSubMenu, MF_STRING, 25, "1 hour");
-		AppendMenu(userlistSubMenu, MF_STRING, 26, "3 hours");
-		AppendMenu(userlistSubMenu, MF_STRING, 27, "5 hours");
-		AppendMenu(userlistSubMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
-		AppendMenu(userlistSubMenu, MF_STRING, 28, "1 day");
-		AppendMenu(userlistSubMenu, MF_STRING, 29, "1 week");
-		AppendMenu(userlistSubMenu, MF_STRING, 30, "For a very long time...");
-
-		AppendMenu(userlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
-		userlistSubMenu = CreatePopupMenu();
-		AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)userlistSubMenu, "Ignore User");
-		AppendMenu(userlistSubMenu, MF_STRING, 0xDDDB, "Ignore");
-		AppendMenu(userlistSubMenu, MF_STRING, 0xDDDA, "Unignore");
-
-
-		AppendMenu(userlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
-		userlistSubMenu = CreatePopupMenu();
-		AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)userlistSubMenu, "Copy");
-		AppendMenu(userlistSubMenu, MF_STRING, 0xFFFD, "User ID");
-		AppendMenu(userlistSubMenu, MF_STRING, 0xFFFE, "Username");
+	AppendMenu(userlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	userlistSubMenu = CreatePopupMenu();
+	AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)userlistSubMenu, "Copy");
+	AppendMenu(userlistSubMenu, MF_STRING, 0xFFFD, "User ID");
+	AppendMenu(userlistSubMenu, MF_STRING, 0xFFFE, "Username");
 
     return 0;
 }
 
 DLLEXP kailleraSelectServerDialog(HWND parent) {
-		MSG msg;//Used to get messages from the thread's message queue
-		WNDCLASSEX wcex; //Used to register window class information
-		hInstance = (HINSTANCE)GetModuleHandle(NULL);
-		hDefaultFont = (HFONT)CreateFont(-11, 0, 0, 0, FW_REGULAR, 0, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, "Microsoft Sans Serif");//GetStockObject(DEFAULT_GUI_FONT);
-		mainHwnd = parent;
+	MSG msg;//Used to get messages from the thread's message queue
+	WNDCLASSEX wcex; //Used to register window class information
+	hInstance = (HINSTANCE)GetModuleHandle(NULL);
+	hDefaultFont = (HFONT)CreateFont(-11, 0, 0, 0, FW_REGULAR, 0, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, "Microsoft Sans Serif");//GetStockObject(DEFAULT_GUI_FONT);
+	mainHwnd = parent;
 
-		wcex.cbSize         = sizeof(WNDCLASSEX);
-		wcex.style          = CS_DBLCLKS | CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
-		wcex.lpfnWndProc    = (WNDPROC)WndProc;
-		wcex.cbClsExtra     = 0;
-		wcex.cbWndExtra     = 0;
-		wcex.hInstance      = hInstance;
-		wcex.hIcon          = LoadIcon(hInstance, IDI_APPLICATION);
-		wcex.hCursor        = LoadCursor(NULL, IDC_ARROW);
-		wcex.hbrBackground  = (HBRUSH)COLOR_BTNFACE + 2;
-		wcex.lpszMenuName   = NULL;
-		wcex.lpszClassName  = "Supraclient";
-		wcex.hIconSm        = NULL;
+	wcex.cbSize         = sizeof(WNDCLASSEX);
+	wcex.style          = CS_DBLCLKS | CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
+	wcex.lpfnWndProc    = (WNDPROC)WndProc;
+	wcex.cbClsExtra     = 0;
+	wcex.cbWndExtra     = 0;
+	wcex.hInstance      = hInstance;
+	wcex.hIcon          = LoadIcon(hInstance, IDI_APPLICATION);
+	wcex.hCursor        = LoadCursor(NULL, IDC_ARROW);
+	wcex.hbrBackground  = (HBRUSH)COLOR_BTNFACE + 2;
+	wcex.lpszMenuName   = NULL;
+	wcex.lpszClassName  = "Supraclient";
+	wcex.hIconSm        = NULL;
 
-		//Class must be registered with the system before we can create the window
-		RegisterClassEx(&wcex);
-		LoadLibrary("Riched32.dll");
-		InitCommonControlsEx(0);
+	//Class must be registered with the system before we can create the window
+	RegisterClassEx(&wcex);
+	LoadLibrary("Riched32.dll");
+	InitCommonControlsEx(0);
 
 
-		//Create Child Window
-		form1 = CreateWindow("Supraclient", "SupraclientCPPE https://www.EmuLinker.org", formProperties, xPos, yPos, 800, 600, NULL, NULL, hInstance, NULL);
+	//Create Child Window
+	form1 = CreateWindow("Supraclient", "SupraclientCE https://www.EmuLinker.org", formProperties, xPos, yPos, 800, 600, NULL, NULL, hInstance, NULL);
 
-		kailleraInit();
-		createChatroom();
-		createInitialWindow();
+	kailleraInit();
+	createChatroom();
+	createInitialWindow();
 
-		Serverlist3DAdditem("Right Click to get EmuLinker Server List."  , NULL, NULL, NULL, NULL, NULL, NULL);
-		kServerlistAdditem( "Right Click to get Kaillera Server List."   , NULL, NULL, NULL, NULL, NULL, NULL);
-		waitinglistAdditem( "Right Click to get EmuLinker Waiting Games.", NULL, NULL, NULL, NULL, NULL, NULL);
+	Serverlist3DAdditem("Right Click to get EmuLinker Server List."  , NULL, NULL, NULL, NULL, NULL, NULL);
+	kServerlistAdditem( "Right Click to get Kaillera Server List."   , NULL, NULL, NULL, NULL, NULL, NULL);
+	waitinglistAdditem( "Right Click to get EmuLinker Waiting Games.", NULL, NULL, NULL, NULL, NULL, NULL);
 
-		//Adjust Parent Window
-		EnableWindow(parent, FALSE);
-		ShowWindow(parent, SW_HIDE);
+	//Adjust Parent Window
+	EnableWindow(parent, FALSE);
+	ShowWindow(parent, SW_HIDE);
 
-		//Start Winsock
-		WSACleanup();
-		WSAStartup(MAKEWORD(2,0), &startupInfo);
+	//Start Winsock
+	WSACleanup();
+	WSAStartup(MAKEWORD(2,0), &startupInfo);
 
-		//Show GUI
-		ShowWindow(form1, SW_SHOWNORMAL);
-		UpdateWindow(form1);
+	//Show GUI
+	ShowWindow(form1, SW_SHOWNORMAL);
+	UpdateWindow(form1);
 
-		//This is the message pump that retrieve all
-        //message from the calling thread's message queue
-		BOOL bRet;
-		while ((bRet = GetMessage(&msg, NULL, 0, 0)) != 0){
-			if (bRet != -1){
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);//Dispatches the message to our WndProc
-			}
-			else{
-				MessageBox(
-                    parent,
-                    "Error in Message Loop",
-                    "Message Loop Error!",
-                    0
-                );
-				break;
-			}
-		}
+	//This is the message pump that retrieve all
+    //message from the calling thread's message queue
+	BOOL bRet;
+	while ((bRet = GetMessage(&msg, NULL, 0, 0)) != 0){
+		if (bRet != -1){
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);//Dispatches the message to our WndProc
+		} else {
+            MessageBox(
+                parent,
+                "Error in Message Loop",
+                "Message Loop Error!",
+                0
+            );
+			break;
+        }
+    }
 
     return msg.wParam; //return exit code to the OS
 }
@@ -807,85 +789,84 @@ DLLEXP kailleraModifyPlayValues(void *values, int size) {
 	int i;
 	long w;
 
-		//Exit Block
-		if(sizeOfEinput == -1){
+    //Exit Block
+	if(sizeOfEinput == -1){
+		Sleep(1);
+		return sizeOfEinput;
+	}
+	//Game has Loaded. Wait Until Everyone is Ready.
+	else if(stage == 0){
+		inputSize = size;
+		gameInit();
+	}
+
+	//Get Input from Emulator
+	memcpy(&vInput[lastPosFrameSend], values, size);
+	lastPosFrameSend += size;
+
+	//Send Data
+	frameSend++;
+	if(frameSend == connectionType){
+		frameSend = 0;
+		lastPosFrameSend = 3;
+		gameDataSend();
+	}
+
+	//Initial Delay Setup
+	frameRecv++;
+
+	//Tweak for Spectating Mode
+	if(totalPlayers == 0){
+		returnInputSize = true;
+	}
+	//After Initial Delay Setup
+	else if(frameRecv == inputFrame){
+		frameRecv = 0;
+		i = GetTickCount();
+		w = 0;
+		//Wait for Game Data if none is available
+		while(frameCount < connectionType){
+			//Exit Block
+			if (sizeOfEinput == -1){
+				return sizeOfEinput;
+			}
+			else if(GetTickCount() - i >= 1000){
+				w = w + 1;
+				i = GetTickCount();
+				constructPacket(0, 0, 0x00);
+			}
+			else if(w == 15 && returnInputSize == true){
+				sizeOfEinput = -1;
+				MessageBox(form1, "Game Ended!  Didn't receive a response for 15s.", "Game Ended!", 0);
+				return sizeOfEinput;
+			}
+			DoEvents();
 			Sleep(1);
-			return sizeOfEinput;
 		}
-		//Game has Loaded. Wait Until Everyone is Ready.
-		else if(stage == 0){
-			inputSize = size;
-			gameInit();
-		}
+		inputFrame = connectionType;
+		returnInputSize = true;
+	}
 
-		//Get Input from Emulator
-		memcpy(&vInput[lastPosFrameSend], values, size);
-		lastPosFrameSend += size;
-
-		//Send Data
-		frameSend++;
-		if(frameSend == connectionType){
-			frameSend = 0;
-			lastPosFrameSend = 3;
-			gameDataSend();
-		}
-
-		//Initial Delay Setup
-		frameRecv++;
-
-		//Tweak for Spectating Mode
-		if(totalPlayers == 0){
-			returnInputSize = true;
-		}
-		//After Initial Delay Setup
-		else if(frameRecv == inputFrame){
-			frameRecv = 0;
-			i = GetTickCount();
-			w = 0;
-			//Wait for Game Data if none is available
-			while(frameCount < connectionType){
-				//Exit Block
-				if (sizeOfEinput == -1){
-					return sizeOfEinput;
-				}
-				else if(GetTickCount() - i >= 1000){
-					w = w + 1;
-					i = GetTickCount();
-					constructPacket(0, 0, 0x00);
-				}
-				else if(w == 15 && returnInputSize == true){
-					sizeOfEinput = -1;
-					MessageBox(form1, "Game Ended!  Didn't receive a response for 15s.", "Game Ended!", 0);
-					return sizeOfEinput;
-				}
-				DoEvents();
-				Sleep(1);
+	if(returnInputSize == true){
+		//Return Values for Current Frame to Emulator
+		//ex). MAME32k is 2 bytes of input/frame.  If there are 4 players, return 8 bytes
+		for(i = 0; i < sizeOfEinput; i++){
+			((char*)values)[i] = eInput[lastPosFrameRecv];
+			lastPosFrameRecv++;
+			if(lastPosFrameRecv == eSize) {
+				lastPosFrameRecv = 0;
 			}
-			inputFrame = connectionType;
-			returnInputSize = true;
 		}
 
-		if(returnInputSize == true){
-			//Return Values for Current Frame to Emulator
-			//ex). MAME32k is 2 bytes of input/frame.  If there are 4 players, return 8 bytes
-			for(i = 0; i < sizeOfEinput; i++){
-				((char*)values)[i] = eInput[lastPosFrameRecv];
-				lastPosFrameRecv++;
-				if(lastPosFrameRecv == eSize){
-					lastPosFrameRecv = 0;
-				}
-			}
+		//Just used a frame.
+		frameCount--;
 
+		//Return Size of Input for ALL Players for ONE frame.
+		//ex). MAME32k is 2 bytes of input/frame.  If there are 4 players, return 8 bytes.
+		return sizeOfEinput;
+	}
 
-			//Just used a frame.
-			frameCount--;
-
-			//Return Size of Input for ALL Players for ONE frame.
-			//ex). MAME32k is 2 bytes of input/frame.  If there are 4 players, return 8 bytes.
-			return sizeOfEinput;
-		}
-
-		//During Initial Delay Setup
+	//During Initial Delay Setup
     return 0;
 }
 
@@ -926,8 +907,9 @@ long CALLBACK SubProcTxtMaxPing(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
 	static bool controlKey = false;
 
 	switch(message){
-		case WM_KEYDOWN:{
-			switch(LOWORD(wParam)){
+		case WM_KEYDOWN:
+        {
+			switch(LOWORD(wParam)) {
 				case VK_RETURN:{
 					//Max Ping
 					GetWindowText(txtMaxPing, maxPingG, GetWindowTextLength(txtMaxPing) + 1);
@@ -958,7 +940,6 @@ long CALLBACK SubProcTxtMaxPing(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
 				}
 			}
 		}
-
 		case WM_KEYUP:{
 			switch(LOWORD(wParam)){
 				case VK_CONTROL:{
@@ -988,7 +969,8 @@ long CALLBACK SubProcTxtMaxUsers(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 	switch(message){
 		case WM_KEYDOWN:{
 			switch(LOWORD(wParam)){
-				case VK_RETURN:{
+				case VK_RETURN:
+                {
 					//Max Users
 					GetWindowText(txtMaxUsers, maxUsersG, GetWindowTextLength(txtMaxUsers) + 1);
 					if(atoi(maxUsersG) < 1 || atoi(maxUsersG) > 100){
@@ -1146,7 +1128,8 @@ long CALLBACK SubProcTxtQuit(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 //Chatroom Subclass
 long CALLBACK SubProcTxtChatroom(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam){
 	switch(message){
-		case WM_RBUTTONUP:{
+		case WM_RBUTTONUP:
+        {
 			popupMenu(9);
 			return 0;
 		}
@@ -1204,7 +1187,8 @@ long CALLBACK SubProcTxtGameChat(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 	static bool controlKey = false;
 
 	switch(message){
-		case WM_KEYDOWN:{
+		case WM_KEYDOWN:
+        {
 			switch(LOWORD(wParam)){
 				case VK_RETURN:{
 					gameChatRequest();
@@ -1223,7 +1207,8 @@ long CALLBACK SubProcTxtGameChat(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 				}
 			}
 		}
-		case WM_KEYUP:{
+		case WM_KEYUP:
+        {
 			switch(LOWORD(wParam)){
 				case VK_CONTROL:{
 					controlKey = false;
@@ -1258,13 +1243,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 	LVITEM b;
 	LVFINDINFO c;
 
-	switch(message){
-		case WM_COMMAND:{
+	switch(message) {
+		case WM_COMMAND:
+        {
 			switch(wParam){
 				case BN_CLICKED:{
 					if(hwndCtl == btnLogin){
-						if (loggedIn == true)
-							break;
+						if (loggedIn == true) break;
 
 						loginToServer();
 
@@ -1746,7 +1731,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
             }
 
 			//lstGameUserlist
-            if((pnmh->hwndFrom == lstGameUserlist) && (pnmh->code == LVN_ITEMACTIVATE) && imOwner){
+            if((pnmh->hwndFrom == lstGameUserlist) && (pnmh->code == LVN_ITEMACTIVATE) && imOwner) {
                 //kickRequest();
                 return 0;
             }
@@ -4807,10 +4792,8 @@ void displayStats(){
 
 int saveConfig(){
 
-	// ofstream config("supraclient.ini", ios::out);    // CPP
-	// FILE *fopen(char *nombre, char *modo);
-	FILE* config;                                        // C
-	config = fopen( "supraclient.ini", "w" );           // C
+	FILE* config;
+	config = fopen( "supraclient.ini", "w" );
 
 	char temp[2048];
 
@@ -4821,9 +4804,8 @@ int saveConfig(){
 		return 1;
 	}
 
-	// int fputs(const char *cadena, FILE *stream);
 	// config << "[SupraclientCPPE Config File]" << "\n\n";
-    fputs( "[SupraclientCPPE Config File]", config );
+    fputs( "[SupraclientCE Config File]", config );
     fputc( '\n', config ); fputc( '\n', config );
 
 	//Server
@@ -5106,9 +5088,7 @@ int saveConfig(){
 	// config << "Version=" << myVersion << endl;
 	fputs( "Version=", config ); fputs( myVersion, config ); fputc( '\n', config );
 
-	// config.close();              // CPP
-    // int fclose(FILE *fichero);   // C
-    fclose( config );               // C
+    fclose( config );
 
 	return 0;
 }
@@ -6185,215 +6165,205 @@ void gamelistAdditem(char *game, char *version, char *owner, char *status, char 
 }
 
 void showRecentlist(){
-		chatroom = false;
-		ShowWindow(lstGamelist, SW_HIDE);
-		ShowWindow(txtGameChatroom, SW_HIDE);
-		ShowWindow(txtChatroom, SW_HIDE);
-		ShowWindow(lstUserlist, SW_HIDE);
-		ShowWindow(btnChat, SW_HIDE);
-		ShowWindow(txtChat, SW_HIDE);
-		ShowWindow(lstGameUserlist, SW_HIDE);
-		ShowWindow(txtGameChat, SW_HIDE);
-		ShowWindow(btnGameChat, SW_HIDE);
-		ShowWindow(btnGameStart, SW_HIDE);
-		ShowWindow(btnGameKick, SW_HIDE);
-		ShowWindow(btnGameLeave, SW_HIDE);
-		ShowWindow(txtGame, SW_HIDE);
-		ShowWindow(btnCreate, SW_HIDE);
-		ShowWindow(btnJoin, SW_HIDE);
-		ShowWindow(btnAway, SW_HIDE);
+	chatroom = false;
+	ShowWindow(lstGamelist, SW_HIDE);
+	ShowWindow(txtGameChatroom, SW_HIDE);
+	ShowWindow(txtChatroom, SW_HIDE);
+	ShowWindow(lstUserlist, SW_HIDE);
+	ShowWindow(btnChat, SW_HIDE);
+	ShowWindow(txtChat, SW_HIDE);
+	ShowWindow(lstGameUserlist, SW_HIDE);
+	ShowWindow(txtGameChat, SW_HIDE);
+	ShowWindow(btnGameChat, SW_HIDE);
+	ShowWindow(btnGameStart, SW_HIDE);
+	ShowWindow(btnGameKick, SW_HIDE);
+	ShowWindow(btnGameLeave, SW_HIDE);
+	ShowWindow(txtGame, SW_HIDE);
+	ShowWindow(btnCreate, SW_HIDE);
+	ShowWindow(btnJoin, SW_HIDE);
+	ShowWindow(btnAway, SW_HIDE);
 
-		ShowWindow(lstRecentList, SW_SHOW);
-		ShowWindow(lstWaitingList, SW_HIDE);
-		ShowWindow(lstFavoriteList, SW_HIDE);
-		ShowWindow(lstServerListK, SW_HIDE);
-		ShowWindow(lstServerList3D, SW_HIDE);
-		ShowWindow(sTab, SW_SHOW);
+	ShowWindow(lstRecentList, SW_SHOW);
+	ShowWindow(lstWaitingList, SW_HIDE);
+	ShowWindow(lstFavoriteList, SW_HIDE);
+	ShowWindow(lstServerListK, SW_HIDE);
+	ShowWindow(lstServerList3D, SW_HIDE);
+	ShowWindow(sTab, SW_SHOW);
 
-		if(pingingK == true || pinging3D == true)
-			return;
+	if(pingingK == true || pinging3D == true) return;
 
-		int num;
-		char str[1024];
-		num = SendMessage(lstRecentList, LVM_GETITEMCOUNT, 0, 0);
-		if(num < 1){
-			SetWindowText(form1, "SupraclientCPPE https://www.EmuLinker.org");
-		}
-		else{
-			wsprintf(str, "%i Recent Servers", num);
-			SetWindowText(form1, str);
-		}
+	int num;
+	char str[1024];
+	num = SendMessage(lstRecentList, LVM_GETITEMCOUNT, 0, 0);
+	if(num < 1){
+		SetWindowText(form1, "SupraclientCE https://www.EmuLinker.org");
+	} else {
+		wsprintf(str, "%i Recent Servers", num);
+		SetWindowText(form1, str);
+	}
 }
 
 
 void showWaitinglist(){
-		chatroom = false;
-		ShowWindow(lstGamelist, SW_HIDE);
-		ShowWindow(txtGameChatroom, SW_HIDE);
-		ShowWindow(txtChatroom, SW_HIDE);
-		ShowWindow(lstUserlist, SW_HIDE);
-		ShowWindow(btnChat, SW_HIDE);
-		ShowWindow(txtChat, SW_HIDE);
-		ShowWindow(lstGameUserlist, SW_HIDE);
-		ShowWindow(txtGameChat, SW_HIDE);
-		ShowWindow(btnGameChat, SW_HIDE);
-		ShowWindow(btnGameStart, SW_HIDE);
-		ShowWindow(btnGameKick, SW_HIDE);
-		ShowWindow(btnGameLeave, SW_HIDE);
-		ShowWindow(txtGame, SW_HIDE);
-		ShowWindow(btnCreate, SW_HIDE);
-		ShowWindow(btnJoin, SW_HIDE);
-		ShowWindow(btnAway, SW_HIDE);
+	chatroom = false;
+	ShowWindow(lstGamelist, SW_HIDE);
+	ShowWindow(txtGameChatroom, SW_HIDE);
+	ShowWindow(txtChatroom, SW_HIDE);
+	ShowWindow(lstUserlist, SW_HIDE);
+	ShowWindow(btnChat, SW_HIDE);
+	ShowWindow(txtChat, SW_HIDE);
+	ShowWindow(lstGameUserlist, SW_HIDE);
+	ShowWindow(txtGameChat, SW_HIDE);
+	ShowWindow(btnGameChat, SW_HIDE);
+	ShowWindow(btnGameStart, SW_HIDE);
+	ShowWindow(btnGameKick, SW_HIDE);
+	ShowWindow(btnGameLeave, SW_HIDE);
+	ShowWindow(txtGame, SW_HIDE);
+	ShowWindow(btnCreate, SW_HIDE);
+	ShowWindow(btnJoin, SW_HIDE);
+	ShowWindow(btnAway, SW_HIDE);
 
-		ShowWindow(lstRecentList, SW_HIDE);
-		ShowWindow(lstWaitingList, SW_SHOW);
-		ShowWindow(lstFavoriteList, SW_HIDE);
-		ShowWindow(lstServerListK, SW_HIDE);
-		ShowWindow(lstServerList3D, SW_HIDE);
-		ShowWindow(sTab, SW_SHOW);
+	ShowWindow(lstRecentList, SW_HIDE);
+	ShowWindow(lstWaitingList, SW_SHOW);
+	ShowWindow(lstFavoriteList, SW_HIDE);
+	ShowWindow(lstServerListK, SW_HIDE);
+	ShowWindow(lstServerList3D, SW_HIDE);
+	ShowWindow(sTab, SW_SHOW);
 
-		if(pingingK == true || pinging3D == true)
-			return;
+	if(pingingK == true || pinging3D == true) return;
 
-		int num;
-		char str[1024];
-		num = SendMessage(lstWaitingList, LVM_GETITEMCOUNT, 0, 0);
-		if(num < 2){
-			SetWindowText(form1, "SupraclientCPPE https://www.EmuLinker.org");
-		}
-		else{
-			wsprintf(str, "%i Waiting Games", num);
-			SetWindowText(form1, str);
-		}
+	int num;
+	char str[1024];
+	num = SendMessage(lstWaitingList, LVM_GETITEMCOUNT, 0, 0);
+	if(num < 2){
+		SetWindowText(form1, "SupraclientCE https://www.EmuLinker.org");
+	} else {
+		wsprintf(str, "%i Waiting Games", num);
+		SetWindowText(form1, str);
+	}
 }
 
 
 void showFavoritelist(){
-		chatroom = false;
-		ShowWindow(lstGamelist, SW_HIDE);
-		ShowWindow(txtGameChatroom, SW_HIDE);
-		ShowWindow(txtChatroom, SW_HIDE);
-		ShowWindow(lstUserlist, SW_HIDE);
-		ShowWindow(btnChat, SW_HIDE);
-		ShowWindow(txtChat, SW_HIDE);
-		ShowWindow(lstGameUserlist, SW_HIDE);
-		ShowWindow(txtGameChat, SW_HIDE);
-		ShowWindow(btnGameChat, SW_HIDE);
-		ShowWindow(btnGameStart, SW_HIDE);
-		ShowWindow(btnGameKick, SW_HIDE);
-		ShowWindow(btnGameLeave, SW_HIDE);
-		ShowWindow(txtGame, SW_HIDE);
-		ShowWindow(btnCreate, SW_HIDE);
-		ShowWindow(btnJoin, SW_HIDE);
-		ShowWindow(btnAway, SW_HIDE);
+	chatroom = false;
+	ShowWindow(lstGamelist, SW_HIDE);
+	ShowWindow(txtGameChatroom, SW_HIDE);
+	ShowWindow(txtChatroom, SW_HIDE);
+	ShowWindow(lstUserlist, SW_HIDE);
+	ShowWindow(btnChat, SW_HIDE);
+	ShowWindow(txtChat, SW_HIDE);
+	ShowWindow(lstGameUserlist, SW_HIDE);
+	ShowWindow(txtGameChat, SW_HIDE);
+	ShowWindow(btnGameChat, SW_HIDE);
+	ShowWindow(btnGameStart, SW_HIDE);
+	ShowWindow(btnGameKick, SW_HIDE);
+	ShowWindow(btnGameLeave, SW_HIDE);
+	ShowWindow(txtGame, SW_HIDE);
+	ShowWindow(btnCreate, SW_HIDE);
+	ShowWindow(btnJoin, SW_HIDE);
+	ShowWindow(btnAway, SW_HIDE);
 
-		ShowWindow(lstRecentList, SW_HIDE);
-		ShowWindow(lstWaitingList, SW_HIDE);
-		ShowWindow(lstFavoriteList, SW_SHOW);
-		ShowWindow(lstServerList3D, SW_HIDE);
-		ShowWindow(lstServerListK, SW_HIDE);
-		ShowWindow(sTab, SW_SHOW);
+	ShowWindow(lstRecentList, SW_HIDE);
+	ShowWindow(lstWaitingList, SW_HIDE);
+	ShowWindow(lstFavoriteList, SW_SHOW);
+	ShowWindow(lstServerList3D, SW_HIDE);
+	ShowWindow(lstServerListK, SW_HIDE);
+	ShowWindow(sTab, SW_SHOW);
 
-		if(pingingK == true || pinging3D == true)
-			return;
+	if(pingingK == true || pinging3D == true) return;
 
-		int num;
-		char str[1024];
-		num = SendMessage(lstFavoriteList, LVM_GETITEMCOUNT, 0, 0);
-		if(num < 1){
-			SetWindowText(form1, "SupraclientCPPE https://www.EmuLinker.org");
-		}
-		else{
-			wsprintf(str, "%i Favorite Servers", num);
-			SetWindowText(form1, str);
-		}
+	int num;
+	char str[1024];
+	num = SendMessage(lstFavoriteList, LVM_GETITEMCOUNT, 0, 0);
+	if(num < 1){
+		SetWindowText(form1, "SupraclientCE https://www.EmuLinker.org");
+	} else {
+		wsprintf(str, "%i Favorite Servers", num);
+		SetWindowText(form1, str);
+	}
 }
 
 void showServerlistK(){
-		chatroom = false;
-		ShowWindow(lstGamelist, SW_HIDE);
-		ShowWindow(txtGameChatroom, SW_HIDE);
-		ShowWindow(txtChatroom, SW_HIDE);
-		ShowWindow(lstUserlist, SW_HIDE);
-		ShowWindow(btnChat, SW_HIDE);
-		ShowWindow(txtChat, SW_HIDE);
-		ShowWindow(lstGameUserlist, SW_HIDE);
-		ShowWindow(txtGameChat, SW_HIDE);
-		ShowWindow(btnGameChat, SW_HIDE);
-		ShowWindow(btnGameStart, SW_HIDE);
-		ShowWindow(btnGameKick, SW_HIDE);
-		ShowWindow(btnGameLeave, SW_HIDE);
-		ShowWindow(txtGame, SW_HIDE);
-		ShowWindow(btnCreate, SW_HIDE);
-		ShowWindow(btnJoin, SW_HIDE);
-		ShowWindow(btnAway, SW_HIDE);
+	chatroom = false;
+	ShowWindow(lstGamelist, SW_HIDE);
+	ShowWindow(txtGameChatroom, SW_HIDE);
+	ShowWindow(txtChatroom, SW_HIDE);
+	ShowWindow(lstUserlist, SW_HIDE);
+	ShowWindow(btnChat, SW_HIDE);
+	ShowWindow(txtChat, SW_HIDE);
+	ShowWindow(lstGameUserlist, SW_HIDE);
+	ShowWindow(txtGameChat, SW_HIDE);
+	ShowWindow(btnGameChat, SW_HIDE);
+	ShowWindow(btnGameStart, SW_HIDE);
+	ShowWindow(btnGameKick, SW_HIDE);
+	ShowWindow(btnGameLeave, SW_HIDE);
+	ShowWindow(txtGame, SW_HIDE);
+	ShowWindow(btnCreate, SW_HIDE);
+	ShowWindow(btnJoin, SW_HIDE);
+	ShowWindow(btnAway, SW_HIDE);
 
-		ShowWindow(lstRecentList, SW_HIDE);
-		ShowWindow(lstWaitingList, SW_HIDE);
-		ShowWindow(lstFavoriteList, SW_HIDE);
-		ShowWindow(lstServerListK, SW_SHOW);
-		ShowWindow(lstServerList3D, SW_HIDE);
-		ShowWindow(sTab, SW_SHOW);
+	ShowWindow(lstRecentList, SW_HIDE);
+	ShowWindow(lstWaitingList, SW_HIDE);
+	ShowWindow(lstFavoriteList, SW_HIDE);
+	ShowWindow(lstServerListK, SW_SHOW);
+	ShowWindow(lstServerList3D, SW_HIDE);
+	ShowWindow(sTab, SW_SHOW);
 
-		if(pingingK == true || pinging3D == true)
-			return;
+	if(pingingK == true || pinging3D == true) return;
 
-		int num;
-		char str[1024];
-		num = SendMessage(lstServerListK, LVM_GETITEMCOUNT, 0, 0);
-		if(num < 2){
-			SetWindowText(form1, "SupraclientCPPE https://www.EmuLinker.org");
-		}
-		else{
-			wsprintf(str, "%i Kaillera Servers", num);
-			SetWindowText(form1, str);
-		}
+	int num;
+	char str[1024];
+	num = SendMessage(lstServerListK, LVM_GETITEMCOUNT, 0, 0);
+	if(num < 2){
+		SetWindowText(form1, "SupraclientCE https://www.EmuLinker.org");
+	} else {
+		wsprintf(str, "%i Kaillera Servers", num);
+		SetWindowText(form1, str);
+	}
 }
 
 void showServerlist3D(){
-		chatroom = false;
-		ShowWindow(lstGamelist, SW_HIDE);
-		ShowWindow(txtGameChatroom, SW_HIDE);
-		ShowWindow(txtChatroom, SW_HIDE);
-		ShowWindow(lstUserlist, SW_HIDE);
-		ShowWindow(btnChat, SW_HIDE);
-		ShowWindow(txtChat, SW_HIDE);
-		ShowWindow(lstGameUserlist, SW_HIDE);
-		ShowWindow(txtGameChat, SW_HIDE);
-		ShowWindow(btnGameChat, SW_HIDE);
-		ShowWindow(btnGameStart, SW_HIDE);
-		ShowWindow(btnGameKick, SW_HIDE);
-		ShowWindow(btnGameLeave, SW_HIDE);
-		ShowWindow(txtGame, SW_HIDE);
-		ShowWindow(btnCreate, SW_HIDE);
-		ShowWindow(btnJoin, SW_HIDE);
-		ShowWindow(btnAway, SW_HIDE);
+	chatroom = false;
+	ShowWindow(lstGamelist, SW_HIDE);
+	ShowWindow(txtGameChatroom, SW_HIDE);
+	ShowWindow(txtChatroom, SW_HIDE);
+	ShowWindow(lstUserlist, SW_HIDE);
+	ShowWindow(btnChat, SW_HIDE);
+	ShowWindow(txtChat, SW_HIDE);
+	ShowWindow(lstGameUserlist, SW_HIDE);
+	ShowWindow(txtGameChat, SW_HIDE);
+	ShowWindow(btnGameChat, SW_HIDE);
+	ShowWindow(btnGameStart, SW_HIDE);
+	ShowWindow(btnGameKick, SW_HIDE);
+	ShowWindow(btnGameLeave, SW_HIDE);
+	ShowWindow(txtGame, SW_HIDE);
+	ShowWindow(btnCreate, SW_HIDE);
+	ShowWindow(btnJoin, SW_HIDE);
+	ShowWindow(btnAway, SW_HIDE);
 
-		ShowWindow(lstRecentList, SW_HIDE);
-		ShowWindow(lstWaitingList, SW_HIDE);
-		ShowWindow(lstFavoriteList, SW_HIDE);
-		ShowWindow(lstServerListK, SW_HIDE);
-		ShowWindow(lstServerList3D, SW_SHOW);
-		ShowWindow(sTab, SW_SHOW);
+	ShowWindow(lstRecentList, SW_HIDE);
+	ShowWindow(lstWaitingList, SW_HIDE);
+	ShowWindow(lstFavoriteList, SW_HIDE);
+	ShowWindow(lstServerListK, SW_HIDE);
+	ShowWindow(lstServerList3D, SW_SHOW);
+	ShowWindow(sTab, SW_SHOW);
 
-		if(pinging3D == true || pingingK == true)
-			return;
+	if(pinging3D == true || pingingK == true) return;
 
-		int num;
-		char str[1024];
-		num = SendMessage(lstServerList3D, LVM_GETITEMCOUNT, 0, 0);
-		if(num < 2){
-			SetWindowText(form1, "SupraclientCPPE https://www.EmuLinker.org");
-		}
-		else{
-			wsprintf(str, "%i EmuLinker Servers", num);
-			SetWindowText(form1, str);
-		}
+	int num;
+	char str[1024];
+	num = SendMessage(lstServerList3D, LVM_GETITEMCOUNT, 0, 0);
+	if(num < 2){
+		SetWindowText(form1, "SupraclientCE https://www.EmuLinker.org");
+	} else {
+        wsprintf(str, "%i EmuLinker Servers", num);
+		SetWindowText(form1, str);
+    }
 }
 
 
 void showChatroom(bool show){
-	if(show == true){
+	if(show == true) {
 		ShowWindow(lstServerListK, SW_HIDE);
 		ShowWindow(lstServerList3D, SW_HIDE);
 		ShowWindow(lstWaitingList, SW_HIDE);
@@ -6414,8 +6384,7 @@ void showChatroom(bool show){
 		SetWindowText(btnChatroom, "Servers");
 		SetWindowText(form1, myServer);
 		chatroom = true;
-	}
-	else{
+	} else {
 		ShowWindow(lstGamelist, SW_HIDE);
 		ShowWindow(txtGameChatroom, SW_HIDE);
 		ShowWindow(txtChatroom, SW_HIDE);
@@ -6437,16 +6406,11 @@ void showChatroom(bool show){
 		ShowWindow(sTab, SW_SHOW);
 		SendMessage(sTab, TCM_SETCURSEL, (WPARAM) lastTabServer, 0);
 
-		if(lastTabServer == 0)
-			showServerlistK();
-		else if(lastTabServer == 1)
-			showServerlist3D();
-		else if(lastTabServer == 2)
-			showRecentlist();
-		else if(lastTabServer == 3)
-			showFavoritelist();
-		else if(lastTabServer == 4)
-			showWaitinglist();
+		if     (lastTabServer == 0) showServerlistK();
+		else if(lastTabServer == 1) showServerlist3D();
+		else if(lastTabServer == 2) showRecentlist();
+		else if(lastTabServer == 3) showFavoritelist();
+		else if(lastTabServer == 4) showWaitinglist();
 
 		SetWindowText(btnChatroom, "Chatroom");
 		chatroom = false;
@@ -6472,8 +6436,7 @@ void showGameroom(bool show){
 		SetWindowText(btnJoin, "Ad");
 		gameroom = true;
 		swapp = true;
-	}
-	else{
+	} else {
 		ShowWindow(lstGamelist, SW_SHOW);
 		ShowWindow(txtGameChatroom, SW_HIDE);
 		ShowWindow(lstGameUserlist, SW_HIDE);
@@ -6495,7 +6458,6 @@ void showGameroom(bool show){
 	}
 }
 
-
 unsigned long cStrToInt(char *str){
 	unsigned long num = 0;
     for (unsigned long i = 0; str[i] != '\0'; i++){
@@ -6515,7 +6477,6 @@ void userQuitNotification(unsigned short position, int slot){
 	short strSize;
 	short i;
 
-
 	i = position;
 	//Nick
     strSize = strlen(&myBuff[slot].myBuff[i]);
@@ -6531,7 +6492,6 @@ void userQuitNotification(unsigned short position, int slot){
     strSize = strlen(&myBuff[slot].myBuff[i]);
 	memcpy(quit, &myBuff[slot].myBuff[i], strSize + 1);
 
-
 	//Find UserID in Userlist
 	LVFINDINFO c;
 	c.psz = strUserID;
@@ -6542,7 +6502,6 @@ void userQuitNotification(unsigned short position, int slot){
 	if(pos > -1)
 		SendMessage(lstUserlist, LVM_DELETEITEM, (WPARAM) pos, 0);
 
-
 	//Previous (CRLF)
 	//<Nick> Message (CRLF)
 	strcpy(temp,"<");
@@ -6550,7 +6509,6 @@ void userQuitNotification(unsigned short position, int slot){
 	strcat(temp,"> Quit the Server: ");
 	strcat(temp, quit);
 	strcat(temp,"\r\n");
-
 
 	//Display
 	if(joinChatValue == BST_CHECKED)
@@ -6640,7 +6598,6 @@ void userJoined(unsigned short position, int slot){
 		memcpy(strConnectionType, "Bad\0", 4);
 	else
 		memcpy(strConnectionType, "ERROR\0", 5);
-
 
 	//Previous (CRLF)
 	//<Nick> Message (CRLF)
@@ -6773,8 +6730,7 @@ void serverStatus(unsigned short position, int slot){
 		//userlistAdditem(nick, strPing, strConnectionType, strUserID, strStatus);
     }
 
-
-//----GAMELIST----
+    //----GAMELIST----
 
     //For Each Game
     for(w = 0; w < numOfGames; w++){
@@ -6828,9 +6784,6 @@ void serverStatus(unsigned short position, int slot){
 	//displayStats();
 	displayChatroomAsServer( "Gathering Users and Games..." );
 }
-
-
-
 
 //0x05 - Server to Client ACK
 void serverToClientAck(){
@@ -6901,7 +6854,6 @@ void globalChatNotification(unsigned short position, int slot){
 	short strSize;
 	unsigned short i;
 
-
 	i = position;
 	//Nick
     strSize = strlen(&myBuff[slot].myBuff[i]);
@@ -6938,7 +6890,6 @@ void showOptions(char show){
 		ShowWindow(txtQuit, SW_HIDE);
 		ShowWindow(lblConnectionType, SW_HIDE);
 		ShowWindow(cmbConnectionType, SW_HIDE);
-
 
 		//ShowWindow(lblStats, SW_HIDE);
 		ShowWindow(btnLogoff, SW_SHOW);
@@ -7196,14 +7147,11 @@ void displayAndAutoScrollRichEdit(HWND rEdit, char *temp, COLORREF rgbColor){
 	SendMessage(rEdit, EM_SETTEXTEX, (WPARAM) &q, (LPARAM) temp);
 
 	//Height
-	if(rEdit == txtChatroom)
-		f = 260;
-	else
-		f = 115;
+	if(rEdit == txtChatroom)    f = 260;
+	else                        f = 115;
 
 	//Auto Scroll
-	if((i + f) >= max)
-		SendMessage(rEdit, WM_VSCROLL, SB_BOTTOM, 0);
+	if((i + f) >= max) SendMessage(rEdit, WM_VSCROLL, SB_BOTTOM, 0);
 }
 
 
@@ -7211,16 +7159,13 @@ void displayAndAutoScrollRichEdit(HWND rEdit, char *temp, COLORREF rgbColor){
 void globalChatRequest(){
 	char dataToBeSent[1024];
 
-	if(myUserID == -1)
-		return;
+	if(myUserID == -1) return;
 
 	dataToBeSent[0] = '\0';
 
-
 	int lenChat = SendMessage(txtChat, WM_GETTEXT, 255, (LPARAM) &dataToBeSent[1]);
 
-	if(lenChat < 1)
-		return;
+	if(lenChat < 1) return;
 
 	lenChat = lenChat + 1;
 
@@ -7278,7 +7223,6 @@ void gameChatNotification(unsigned short position, int slot){
 	//Log
 	saveGameroomLog(temp);
 }
-
 
 //0x08 - Game Chat Request
 void gameChatRequest(){
@@ -7371,7 +7315,6 @@ void createGameNotification(unsigned short position, int slot){
 	saveChatroomLog(temp);
 }
 
-
 //0x0A - Create Game Request
 void createGameRequest(){
 	char dataToBeSent[1024];
@@ -7403,7 +7346,6 @@ void createGameRequest(){
 	fixLastGameToPlay();
 	saveConfig();
 }
-
 
 //0x0B - Quit Game Notification
 void quitGameNotification(unsigned short position, int slot){
@@ -7460,7 +7402,6 @@ void quitGameNotification(unsigned short position, int slot){
 	saveGameroomLog(temp);
 }
 
-
 //0x0B - Quit Game Request
 void quitGameRequest(){
 	char dataToBeSent[3];
@@ -7477,7 +7418,6 @@ void quitGameRequest(){
 	showGameroom(false);
 	saveConfig();
 }
-
 
 //0x0C - Join Game Notification
 void joinGameNotification(unsigned short position, int slot){
@@ -7529,7 +7469,6 @@ void joinGameNotification(unsigned short position, int slot){
 		strcpy(strConnectionType, "Bad");
 	else
 		strcpy(strConnectionType, "ERROR");
-
 
 	//Previous (CRLF)
 	//<Nick> Message (CRLF)
@@ -7596,7 +7535,6 @@ void joinGameNotification(unsigned short position, int slot){
 			data[0] = '\0';
 			constructPacket(data, dLen, 0x08);
 
-
 			//Fake P2P
 			data[0] = 'd';
 			if(fakeP2PValue == BST_CHECKED)
@@ -7635,7 +7573,6 @@ void joinGameNotification(unsigned short position, int slot){
 	saveGameroomLog(temp);
 }
 
-
 //0x0C - Join Game Request
 void joinGameRequest(){
 	char dataToBeSent[13];
@@ -7648,13 +7585,11 @@ void joinGameRequest(){
 	char strStatus[1024];
 	char strGameID[1024];
 
-	if(myUserID == -1)
-		return;
+	if(myUserID == -1) return;
 
 	//Get Currently Selected item
 	iSelect = SendMessage(lstGamelist, LVM_GETNEXTITEM, -1, LVNI_FOCUSED);
-	if(iSelect < 0)
-		return;
+	if(iSelect < 0) return;
 
 	//Get GameID
 	LVITEM b;
@@ -7693,7 +7628,7 @@ void joinGameRequest(){
 	strcpy(gEmulator, strEmu);
 
 	//Check for Rom/Emulator
-	//if(SendMessage(chkShowError, BM_GETCHECK, 0, 0) == BST_CHECKED){
+	//if(SendMessage(chkShowError, BM_GETCHECK, 0, 0) == BST_CHECKED) {
 
 		//Get Status
 		b.mask = LVIF_TEXT;
@@ -7732,6 +7667,7 @@ void joinGameRequest(){
 			if(w == IDNO)
 				return;
 		}
+
 	//}
 
 	//Setup Packet
@@ -7820,7 +7756,6 @@ void playerInformation(unsigned short position, int slot){
     }
 }
 
-
 //0x0E - Update Game Status
 void updateGameStatus(unsigned short position, int slot){
 	int gameID;
@@ -7886,7 +7821,6 @@ void updateGameStatus(unsigned short position, int slot){
 		ListView_SortItemsEx(lstGamelist, lstGamelistCompareFunc, 0);
 	}
 }
-
 
 //0x0F - Kick Request
 void kickRequest(){
@@ -7972,7 +7906,6 @@ void closeGameNotification(unsigned short position, int slot){
 	}
 }
 
-
 //0x11 - Start Game Notification
 void startGameNotification(unsigned short position, int slot){
 	if(startedGame == true)
@@ -7998,7 +7931,6 @@ void startGameNotification(unsigned short position, int slot){
     gameThread = CreateThread(NULL, 0, callGameCallback, NULL, 0, NULL);
 }
 
-
 //0x11 - Start Game Request
 void startGameRequest(){
 	char dataToBeSent[5];
@@ -8018,7 +7950,6 @@ void testNum(long num){
 	//Display
 	displayAndAutoScrollRichEdit(txtChatroom, a, RGB(34, 139, 34));
 }
-
 
 //0x12 - Game Data Receive
 void gameDataRecv(unsigned short position, int slot){
@@ -8050,7 +7981,6 @@ void gameDataRecv(unsigned short position, int slot){
 	}
 }
 
-
 //0x12 - Game Data Send
 void gameDataSend(){
 	int i;
@@ -8081,14 +8011,12 @@ void gameDataSend(){
 		}
     }
 
-
 	vInput[0] = 0x00;
 	vInput[1] = sizeOfVinput & 255;
 	vInput[2]= (sizeOfVinput >> 8) & 255;
 
     constructPacket(vInput, 3 + sizeOfVinput, 0x12);
 }
-
 
 //0x13 - Game Cache Receive
 void gameCacheRecv(unsigned short position, int slot){
@@ -8512,10 +8440,10 @@ void getServerListK(){
 
 
 void saveChatroomLog(char text[]){
-	if(chatLogValue != BST_CHECKED)
-		return;
+	if(chatLogValue != BST_CHECKED) return;
 
-	// ofstream log("chatroom.log", ios::app); // CPP
+	FILE* file_log;
+	file_log = fopen( "chatroom.log", "w" );
 
 	char date [24];
 	char time [24];
@@ -8524,14 +8452,23 @@ void saveChatroomLog(char text[]){
 	_strdate(date);
 
 	// log << "[" << date << ": " << time << "] " << text;  // CPP
-	// log.close();                                         // CPP
+	fputc( '[',  file_log );
+	fputs( date, file_log );
+	fputs( ": ", file_log );
+	fputs( time, file_log );
+	fputs( "] ", file_log );
+	fputs( text, file_log );
+
+    fclose( file_log );
 }
 
 void saveGameroomLog(char text[]){
 	if(gameChatLogValue != BST_CHECKED)
 		return;
 
-	// ofstream log("gameroom.log", ios::app);  // CPP
+	FILE* file_log;
+	file_log = fopen( "gameroom.log", "w" );
+
 	char date [24];
 	char time [24];
 
@@ -8539,13 +8476,13 @@ void saveGameroomLog(char text[]){
 	_strdate(date);
 
 	// log << "[" << date << ": " << time << "] " << text;  // CPP
-	// log.close();                                         // CPP
+	fputc( '[',  file_log );
+	fputs( date, file_log );
+	fputs( ": ", file_log );
+	fputs( time, file_log );
+	fputs( "] ", file_log );
+	fputs( text, file_log );
+
+    fclose( file_log );
 }
-
-
-
-
-
-
-
 
