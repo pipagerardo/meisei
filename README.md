@@ -14,7 +14,7 @@ Now meise is compiled to 64 bits with GCC UCRT with English and Spanish versions
 
 (C) 2024 PipaGerardo, pipagerardo@gmail.com
 
-## INTERESTING WEBSITES:
+## Interesting Websites:
 
 MSX Bios Required:
 
