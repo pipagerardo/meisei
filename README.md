@@ -1,22 +1,44 @@
 # About meisei
-meisei 1.3.2 is a free and open-source MSX emulator for Microsoft Windows
+meisei 1.3.3 is a free and open-source MSX emulator for Microsoft Windows
 
-(C) 2005-2011 hap, http://tsk-tsk.net/
+The author of the original source code (hap) is missing in action, post-traumatic stress from hundreds of hours coding. The latest version is 1.3.2 and is 32-bit. 
 
-ti_ntsc 0.1.0 (C) 2005-2007 Shay Green, http://www.slack.net/~ant/
+Thanks to yksoft1 for finding and uploading the latest source code https://github.com/yksoft1/meisei to Github.
 
-zlib 1.2.3 (C) 1995-2005 Jean-loup Gailly and Mark Adler, http://www.zlib.net/
+Now meise is compiled to 64 bits with GCC UCRT with English and Spanish versions. Both Kaillera and Zlib have been updated, along with hundreds of compiler, pointer, and data type warnings. This new version should be more stable, lighter and faster.
 
-unzip 1.01e (C) 1998-2005 Gilles Vollant, http://www.winimage.com/zLibDll/minizip.html
+## Coders
+(C) 2005-2011 hap, mkoelew@yahoo.com
+(C) 2024 PipaGerardo, pipagerardo@gmail.com
 
-UI shared with Sega Li, (C) 2005-2011 hap, http://tsk-tsk.net/
+## INTERESTING WEBSITES:
 
-Please refer to meisei.txt for more information.
+MSX Bios Required:
+	https://download.file-hunter.com/System%20ROMs/machines/
+	http://fms.komkon.org/fMSX/#Downloads
 
-# About this repository
-Source backup of Meisei MSX emulator 1.3.2.
+Vincent DSK2ROM, required to load Floppy Disks:
+	https://github.com/joyrex2001/dsk2rom
 
-The author's site disappeared from the Internet long ago, and the source code of the last version (1.3.2) was also nowhere to find online. 
+Images MSX1 ROM Cartridges
+	https://download.file-hunter.com/Games/MSX1/ROM/
 
-Accidently I found this source code archive from one of my backup DVDs.
+CAS images of MSX1 tapes
+	https://download.file-hunter.com/Games/MSX1/CAS/
+	https://computeremuzone.com/msx/
+
+MSX1 Floppy Disk DSK Images
+	https://download.file-hunter.com/Games/MSX1/DSK/
+
+TSX images of MSX1 tapes
+	https://tsx.eslamejor.com/
+
+MSX CAS, DSK and ROM images
+	http://msxcas.webcindario.com/
+
+MSX covers:
+	https://computeremuzone.com/msx/extras/caratulas
+
+Maps and Solutions for games
+	http://msxsolutions.msxblue.com/index-2.html
 
