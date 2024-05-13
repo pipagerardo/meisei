@@ -26,87 +26,87 @@ el última construcción. El desarrollo continuará algún día.
 - Se agregó emulación básica del registro de deformación SCC.
 
 01-03-08: 1.1
-- gfx: fixed DDraw renderer border refresh bug
-- input: corrected keyboard matrix quirk
-- changed power-on timing, to prevent "A Life M36 Planet" from locking up
-- added movie time code view option on play/record (hh:mm:ss;ff)
-- VDP: you can now disable/enable sprite and tile layers
-- VDP: added unlimited sprites option. This eliminates sprite flickering on
-  most games, without affecting core accuracy: collision and overflow bits
-  still work the same. Games that use overflow as a trick to hide sprite
-  lines, like Athletic Land when falling into the water, will show glitches.
-- sound: added "triple buffering" to prevent overflows on longer frames
-- timing: speed up setting is now in percentage instead of integer multiply
+- gfx: se corrigió el error de actualización del borde del renderizador DDraw
+- input: peculiaridad de la matriz del teclado corregida
+- Se cambió el tiempo de encendido para evitar que "A Life M36 Planet" se bloquee.
+- Se agregó la opción de ver el código de tiempo de la película al reproducir/grabar (hh:mm:ss;ff)
+- VDP: ahora puedes habilitar/deshabilitar capas de sprites y mosaicos
+- VDP: opción agregada de sprites ilimitados. Esto elimina el parpadeo de los sprites.
+  la mayoría de los juegos, sin afectar la precisión central: bits de colisión y desbordamiento
+  sigue funcionando igual. Juegos que utilizan el desbordamiento como truco para ocultar sprites
+  Las líneas, como Athletic Land al caer al agua, mostrarán fallos.
+- sound: se agregó "triple almacenamiento en búfer" para evitar desbordamientos en fotogramas más largos
+- timing: la configuración de aceleración ahora es en porcentaje en lugar de multiplicación de números enteros
 - timing: added slowdown feature, working similar to speed up (default: F10)
-- gfx: auto save palette didn't work
-- input: added "invert" function for axes
-- input: limited the speed of DInput reads, instead of always at every vblank.
-  It sometimes returned wrong values in fast forward mode.
-- timing: added direct control over frame speed/reverse with an analogue axis,
-  by default mouse Y axis while holding F10 + F12. I call it DJ scratching,
-  since it kind of resembles that.
-- mappers: added AMD flash memory emulation, and Matra's INK mapper. One INK
-  cartridge died in the process (no, not inkjet), curses were heard as far
-  away as planet Gradius.
-- fixed crash when opening an SCC game by drag-dropping, while that same SCC
-  game was already running
+- timing: función de desaceleración agregada, que funciona de manera similar a acelerar (predeterminado: F10)
+- gfx: la paleta de guardado automático no funcionó
+- input: agregada función "invertir" para ejes
+- input: limitó la velocidad de las lecturas de DInput, en lugar de siempre en cada vblank.
+  A veces devolvía valores incorrectos en el modo de avance rápido.
+- timing: control directo agregado sobre la velocidad del fotograma/retroceso con un eje analógico,
+  de forma predeterminada, eje Y del mouse mientras mantiene presionado F10 + F12. Yo lo llamo DJ scratching,
+  ya que se parece un poco a eso.
+- mappers: se agregó emulación de memoria flash AMD y mapeador INK de Matra. Una tinta
+  El cartucho murió en el proceso (no, no de inyección de tinta), se escucharon maldiciones hasta el momento.
+  de distancia como el planeta Gradius.
+- Se corrigió el error al abrir un juego SCC arrastrando y soltando, mientras que el mismo SCC
+  el juego ya estaba funcionando
 
 02-03-08: 1.1.1
-- mappers: AMD flash erase sector/chip command didn't work properly
-- changed default video format to PAL, per default C-BIOS region code
-- gfx: fullscreen setting is now saved, so it's possible to start meisei in
-  full screen
+- mappers: el comando de chip/sector de borrado de flash de AMD no funcionó correctamente
+- Se cambió el formato de vídeo predeterminado a PAL, según el código de región C-BIOS predeterminado.
+- gfx: la configuración de pantalla completa ahora está guardada, por lo que es posible iniciar meisei en
+   pantalla completa
 
 29-03-08: 1.1.2
-- fixed movie timecode setting always saving as "no"
-- added support for movie subtitles, it's even possible to create things like:
-  http://www.youtube.com/watch?v=VW4BR4Yy4m4
-- mappers: traded meisei SRAM support for a nice picture of Audrey Tautou from
-  AuroraMSX. Added ASCII 8 + SRAM, ASCII 16 + SRAM, Koei, Konami Game Master 2,
-  Manuel Mega Flash ROM SCC, and Panasonic PAC mapper types.
-- PSG: fixed noise period of 0 being able to go negative
-- Z80: IRQ timing was 1 cycle off
-
+- Se corrigió la configuración del código de tiempo de la película que siempre se guarda como "no"
+- Se agregó soporte para subtítulos de películas, incluso es posible crear cosas como:
+   http://www.youtube.com/watch?v=VW4BR4Yy4m4
+- mappers: se cambió el soporte de SRAM meisei por una bonita imagen de Audrey Tautou de
+   AuroraMSX. Se agregó ASCII 8 + SRAM, ASCII 16 + SRAM, Koei, Konami Game Master 2,
+   Tipos de mapeadores Manuel Mega Flash ROM SCC y Panasonic PAC.
+- PSG: periodo de ruido fijo de 0 pudiendo pasar a negativo
+- Z80: La sincronización IRQ tenía 1 ciclo de retraso
 
 31-08-08: 1.2
-meisei's website moved to http://hap.samor.nl/
+El sitio web de Meisei se trasladó a http://hap.samor.nl/
 
-- input: fixed keyboard matrix ghosting on more than 2 rows
-- input: fixed DirectInput lag
-- fixed possible memory leak with on-screen messages
-- moved enable/disable on-screen messages to the GUI menu (previously, it was
-  just in the .ini file)
-- mappers: added Korean bootleg multicarts: 80-in-1, 90-in-1, and 126-in-1
-- mappers: bought and reverse engineered Cross Blaim and Harry Fox mappers,
-  their emulation should be almost completely accurate now
-- mappers: added Konami Sound Cartridge, SCC-I with 128KB RAM
-- mappers: fixed stupid crash when loading savestates with SRAM mappers
-- mappers: added preliminary support for Zemina ZMB hardware
-- PSG: added emulation of pin 6/7 mask quirk
-- input: added Konami HyperShot controller emulation
-- input: added Torikeshi/Jikkou keys, available on some Panasonic MSXes
-- input: added support for Sony's hardware pause key
-- mappers: fixed SCC power-on state, the music in Nerlaska's Monster Hunter
-  was broken
-- gfx: fixed a few NTSC renderer bugs and made S-Video the default video
-  signal, if it's too slow for you, change it to RGB
-- added a powerful tile viewer, with support for loading/saving tables or SCx
-  files, and a built-in editor similar to Wolf's Polka
-- added a sprite viewer, with similar features to the tile viewer, like changing
-  the Indian's expression to http://hap.samor.nl/meisei_archive/magdance.gif
-- added custom savestate/movie slot, allowing any filename instead of the
-  numbered defaults
-- added support for saving screenshots
-- PSG: added support for AY8910 (only configurable in the .ini file for now)
-- added a PSG logger, allowing you to to log raw, MIDI, or YM files. YM files can
-  be played back, on eg. Ay_Emul ( http://bulba.untergrund.net/emulator_e.htm ).
-  http://hap.samor.nl/meisei_archive/Infinite%20-%20Universe%20Unknown.zip , and
-  http://hap.samor.nl/meisei_archive/Konami%20-%20Usas.zip for example.
-- PSG: added output viewer, with currently played notes on a piano bar
-- PSG: added support for substituting simple waveforms with the default
-  squarewaves, including many presets by Wolf, and a wave editor
-- gfx: made the palette editor easier to use, and included a few more presets
-- included yet another game by Infinite, Montana John and the Templar's Treasure
+- input: matriz de teclado fija con imágenes fantasma en más de 2 filas
+- input: retraso fijo de DirectInput
+- Se corrigió una posible pérdida de memoria con mensajes en pantalla.
+- Movió habilitar/deshabilitar mensajes en pantalla al menú GUI (anteriormente, era
+   solo en el archivo .ini)
+- mappers: se agregaron multicarros piratas coreanos: 80 en 1, 90 en 1 y 126 en 1
+- mappers: mapeadores Cross Blaim y Harry Fox comprados y con ingeniería inversa,
+   su emulación debería ser casi completamente precisa ahora
+- mappers: agregado cartucho de sonido Konami, SCC-I con 128 KB de RAM
+- mappers: solucionado un error estúpido al cargar estados guardados con mapeadores SRAM
+- mappers: soporte preliminar agregado para hardware Zemina ZMB
+- PSG: emulación añadida de la peculiaridad de la máscara pin 6/7
+- input: agregada emulación del controlador Konami HyperShot
+- input: teclas Torikeshi/Jikkou añadidas, disponibles en algunos MSX de Panasonic
+- input: soporte agregado para la tecla de pausa de hardware de Sony
+- mappers: estado de encendido fijo de SCC, la música en Monster Hunter de Nerlaska
+   estaba rota
+- gfx: se corrigieron algunos errores en el renderizador NTSC y se convirtió S-Video en el video predeterminado
+   señal, si es demasiado lenta para ti, cámbiala a RGB
+- se agregó un potente visor de mosaicos, con soporte para cargar/guardar tablas o SCx
+   archivos y un editor incorporado similar a Wolf's Polka
+- Se agregó un visor de sprites, con características similares al visor de mosaicos, como cambiar
+   la expresión del indio a http://hap.samor.nl/meisei_archive/magdance.gif
+- Se agregó una ranura personalizada para guardar estado/película, permitiendo cualquier nombre de archivo en lugar del
+   valores predeterminados numerados
+- soporte agregado para guardar capturas de pantalla
+- PSG: soporte agregado para AY8910 (solo configurable en el archivo .ini por ahora)
+- Se agregó un registrador PSG, que le permite registrar archivos sin formato, MIDI o YM. Los archivos YM pueden
+   reproducirse, por ej. Ay_Emul (http://bulba.untergrund.net/emulator_e.htm).
+   http://hap.samor.nl/meisei_archive/Infinite%20-%20Universe%20Unknown.zip, y
+   http://hap.samor.nl/meisei_archive/Konami%20-%20Usas.zip por ejemplo.
+- PSG: visor de salida agregado, con las notas tocadas actualmente en un piano bar
+- PSG: soporte añadido para sustituir formas de onda simples por las predeterminadas
+   ondas cuadradas, incluidos muchos ajustes preestablecidos de Wolf y un editor de ondas
+- gfx: hizo que el editor de paletas fuera más fácil de usar e incluyó algunos ajustes preestablecidos más
+- incluyó otro juego más de Infinite, Montana John and the Templar's Treasure
 
 03-09-08: 1.2.1
 En cuanto a películas, esta versión es totalmente compatible con 1.2.
