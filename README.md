@@ -10,7 +10,7 @@ Thanks to yksoft1 for finding and uploading the latest source code https://githu
 Now meise is compiled to 64 bits with GCC UCRT with English and Spanish versions. Both Kaillera and Zlib have been updated, along with hundreds of compiler, pointer, and data type warnings. This new version should be more stable, lighter and faster.
 
 ## Coders
-(C) 2005-2011 hap, mkoelew@yahoo.com
+(C) 2005-2011 hap, https://github.com/happppp
 
 (C) 2024 PipaGerardo, pipagerardo@gmail.com
 

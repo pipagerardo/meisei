@@ -1056,7 +1056,7 @@ BEGIN
 	LTEXT			VERSION_URL_S,IDC_ABOUT_URL,5,50,130,8  // 5,50,95,8
 	LTEXT			"A free and open source MSX emulator for Microsoft Windows.",IDC_STATIC,5,30,125,16
 	LTEXT			"© 2005-2011 hap", IDC_STATIC          ,20,65,120,8
-	LTEXT			VERSION_EMAIL_S,IDC_ABOUT_EMAIL        ,20,75,75,8
+	LTEXT			VERSION_EMAIL_S,IDC_STATIC             ,20,75,95,8
     LTEXT			"© 2024 PipaGerardo",   IDC_STATIC     ,20,90,75,8
     LTEXT			"pipagerardo@gmail.com",IDC_ABOUT_EMAIL,20,100,85,8
 END
