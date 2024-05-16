@@ -1168,7 +1168,7 @@ void z80_execute(int border)
 
 
 	/* dd/fd */
-	case 0xfd: op^=2;
+	case 0xfd: op^=2; // warning: this statement may fall through [-Wimplicit-fallthrough=]
 	case 0xdd: {
 		int i=op&2;
 		op=R8(PC); PC++; R++;

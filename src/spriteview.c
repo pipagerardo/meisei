@@ -305,11 +305,31 @@ static int spriteedit_apply(HWND dialog,const int ok)
 	memcpy(p,spriteedit.p,0x20);
 
 	if (is16!=spriteedit.is16) {
-		int i=MessageBox(dialog,"Sprite size is different.\nApply changes anyway?","meisei",MB_ICONEXCLAMATION|(ok?(MB_YESNOCANCEL|MB_DEFBUTTON3):(MB_YESNO|MB_DEFBUTTON2)));
+		int i=MessageBox(
+            dialog,
+        #ifdef MEISEI_ESP
+            "El tamaño del sprite es diferente.\n"
+            "¿Aplicar cambios de todos modos?",
+        #else
+            "Sprite size is different.\n"
+            "Apply changes anyway?",
+        #endif
+            "meisei",
+            MB_ICONEXCLAMATION|(ok?(MB_YESNOCANCEL|MB_DEFBUTTON3):(MB_YESNO|MB_DEFBUTTON2))
+        );
 		if (i!=IDYES) return i;
 	}
 
-	if (!vdp_upload(sgo|spriteedit.cell<<3,p,8<<(spriteedit.is16<<1))) LOG_ERROR_WINDOW(dialog,"Couldn't upload VDP data!");
+	if (!vdp_upload(sgo|spriteedit.cell<<3,p,8<<(spriteedit.is16<<1))) {
+        LOG_ERROR_WINDOW(
+            dialog,
+        #ifdef MEISEI_ESP
+            "¡No se pudieron cargar datos de VDP!"
+        #else
+            "Couldn't upload VDP data!"
+        #endif // MEISEI_ESP
+        );
+	}
 
 	return IDYES;
 }
@@ -407,7 +427,8 @@ static BOOL CALLBACK spriteedit_sub_zoom(HWND wnd,UINT msg,WPARAM wParam,LPARAM 
 			break;
 		}
 
-		default: break;
+		default:
+        break;
 	}
 
 	return DefWindowProc(wnd,msg,wParam,lParam);
@@ -535,8 +556,14 @@ static INT_PTR CALLBACK spriteview_editor_dialog( HWND dialog, UINT msg, WPARAM 
 
 				/* load pattern */
 				case IDC_SPRITEEDIT_OPEN: {
+                #ifdef MEISEI_ESP
+					const char* filter="Archivos de Patrón (*.pattern)\0*.pattern\0Todos los Archivos (*.*)\0*.*\0\0";
+					const char* title="Abrir Patrones";
+                #else
 					const char* filter="Pattern Files (*.pattern)\0*.pattern\0All Files (*.*)\0*.*\0\0";
 					const char* title="Open Pattern";
+                #endif // MEISEI_ESP
+
 					char fn[STRING_SIZE]={0};
 					OPENFILENAME of;
 					int shift;
@@ -626,11 +653,28 @@ static INT_PTR CALLBACK spriteview_editor_dialog( HWND dialog, UINT msg, WPARAM 
 							if (strlen(fn+of.nFileOffset)&&(of.nFileExtension-1)>of.nFileOffset) {
 								char wintitle[STRING_SIZE]={0};
 								fn[of.nFileExtension-1]=0;
-								sprintf(wintitle,"Sprite Editor - %s",fn+of.nFileOffset);
+								sprintf(
+                                    wintitle,
+                                #ifdef MEISEI_ESP
+                                    "Editor de Sprite - %s",
+                                #else
+                                    "Sprite Editor - %s",
+                                #endif // MEISEI_ESP
+                                    fn+of.nFileOffset
+                                );
 								SetWindowText(dialog,wintitle);
 							}
 						}
-						else LOG_ERROR_WINDOW(dialog,"Couldn't load pattern!");
+						else {
+                            LOG_ERROR_WINDOW(
+                                dialog,
+                            #ifdef MEISEI_ESP
+                                "¡No se pudo cargar el patrón!"
+                            #else
+                                "Couldn't load pattern!"
+                            #endif // MEISEI_ESP
+                            );
+						}
 
 						if (strlen(fn)&&of.nFileOffset) {
 							fn[of.nFileOffset]=0; strcpy(spriteedit_dir,fn);
@@ -645,9 +689,16 @@ static INT_PTR CALLBACK spriteview_editor_dialog( HWND dialog, UINT msg, WPARAM 
 
 				/* save pattern */
 				case IDC_SPRITEEDIT_SAVE: {
+                #ifdef MEISEI_ESP
+                	const char* filter="Archivo de Patrones (*.pattern)\0*.pattern\0Todos los Archivos (*.*)\0*.*\0\0";
+					const char* title="Guardar Patrones Como";
+                #else
 					const char* filter="Pattern File (*.pattern)\0*.pattern\0All Files (*.*)\0*.*\0\0";
-					const char* defext="\0\0\0\0";
 					const char* title="Save Pattern As";
+                #endif // MEISEI_ESP
+
+					const char* defext="\0\0\0\0";
+
 					char fn[STRING_SIZE]={0};
 					OPENFILENAME of;
 
@@ -704,11 +755,27 @@ static INT_PTR CALLBACK spriteview_editor_dialog( HWND dialog, UINT msg, WPARAM 
 							}
 						}
 
-						if (!strlen(fn)||!file_save_custom(&fd,fn)||!file_write_custom(fd,data,size)) LOG_ERROR_WINDOW(dialog,"Couldn't save pattern!");
-						else if (strlen(fn+of.nFileOffset)&&(of.nFileExtension-1)>of.nFileOffset) {
+						if (!strlen(fn)||!file_save_custom(&fd,fn)||!file_write_custom(fd,data,size)) {
+                            LOG_ERROR_WINDOW(
+                                dialog,
+                            #ifdef MEISEI_ESP
+                                "¡No se pudo guardar el patrón!"
+                            #else
+                                "Couldn't save pattern!"
+                            #endif // MEISEI_ESP
+                            );
+						} else if (strlen(fn+of.nFileOffset)&&(of.nFileExtension-1)>of.nFileOffset) {
 							char wintitle[STRING_SIZE]={0};
 							fn[of.nFileExtension-1]=0;
-							sprintf(wintitle,"Sprite Editor - %s",fn+of.nFileOffset);
+							sprintf(
+                                wintitle,
+                            #ifdef MEISEI_ESP
+                                "Editor de Sprite - %s",
+                            #else
+                                "Sprite Editor - %s",
+                            #endif // MEISEI_ESP
+                                fn+of.nFileOffset
+                            );
 							SetWindowText(dialog,wintitle);
 						}
 
@@ -1322,7 +1389,14 @@ INT_PTR CALLBACK spriteview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM
 			ReleaseDC(d_wnd,d_dc);
 
 			spriteview.dclick=FALSE;
-			sprintf(t,"Click on a sprite to show.");
+			sprintf(
+                t,
+            #ifdef MEISEI_ESP
+                "Haga clic en un sprite para mostrarlo."
+            #else
+                "Click on a sprite to show."
+            #endif // MEISEI_ESP
+            );
 			SetDlgItemText(dialog,IDC_SPRITEVIEW_SDETAILS,t);
 
 			/* init spritemap */
@@ -1522,8 +1596,13 @@ INT_PTR CALLBACK spriteview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM
 
 				/* load sprite patterns */
 				case IDC_SPRITEVIEW_OPEN: {
+                #ifdef MEISEI_ESP
+					const char* filter="Todos los Archivos Soportados\0*.spgt;*.spat\0SPGT Dumps (*.spgt)\0*.spgt\0SPAT Dumps (*.spat)\0*.spat\0Todos los Archivos (*.*)\0*.*\0\0";
+					const char* title="Abrir datos de Sprites";
+                #else
 					const char* filter="All Supported Files\0*.spgt;*.spat\0SPGT Dumps (*.spgt)\0*.spgt\0SPAT Dumps (*.spat)\0*.spat\0All Files (*.*)\0*.*\0\0";
 					const char* title="Open Sprite Data";
+                #endif // MEISEI_ESP
 					char fn[STRING_SIZE]={0};
 					OPENFILENAME of;
 
@@ -1582,25 +1661,66 @@ INT_PTR CALLBACK spriteview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM
 								switch (fi) {
 									/* spat */
 									case 2:
-										if (!vdp_upload(vdp_regs[5]<<7&0x3fff,data,128)) LOG_ERROR_WINDOW(dialog,"Couldn't load sprite attributes!");
-										else success=TRUE;
+										if (!vdp_upload(vdp_regs[5]<<7&0x3fff,data,128)) {
+                                            LOG_ERROR_WINDOW(
+                                                dialog,
+                                            #ifdef MEISEI_ESP
+                                                "¡No se pudieron cargar los atributos del sprite!"
+                                            #else
+                                                "Couldn't load sprite attributes!"
+                                            #endif // MEISEI_ESP
+                                            );
+										} else success=TRUE;
 										break;
 
 									/* spgt */
 									default:
-										if (!vdp_upload(vdp_regs[6]<<11&0x3fff,data,0x800)) LOG_ERROR_WINDOW(dialog,"Couldn't load sprite patterns!");
-										else success=TRUE;
+										if (!vdp_upload(vdp_regs[6]<<11&0x3fff,data,0x800)) {
+                                            LOG_ERROR_WINDOW(
+                                                dialog,
+                                            #ifdef MEISEI_ESP
+                                                "¡No se pudieron cargar los patrones de sprites!"
+                                            #else
+                                                "Couldn't load sprite patterns!"
+                                            #endif // MEISEI_ESP
+                                            );
+										} else success=TRUE;
 										break;
 								}
 							}
-							else LOG_ERROR_WINDOW(dialog,"Couldn't load sprite data!");
+							else {
+                                LOG_ERROR_WINDOW(
+                                    dialog,
+                                #ifdef MEISEI_ESP
+                                    "¡No se pudieron cargar los datos del sprite!"
+                                #else
+                                    "Couldn't load sprite data!"
+                                #endif // MEISEI_ESP
+                                );
+							}
+						} else {
+                            LOG_ERROR_WINDOW(
+                                dialog,
+                            #ifdef MEISEI_ESP
+                                "¡No se pudieron cargar los datos del sprite!"
+                            #else
+                                "Couldn't load sprite data!"
+                            #endif // MEISEI_ESP
+                            );
 						}
-						else LOG_ERROR_WINDOW(dialog,"Couldn't load sprite data!");
 
 						file_close_custom(fd);
 						if (success&&strlen(fn+of.nFileOffset)) {
 							char wintitle[STRING_SIZE]={0};
-							sprintf(wintitle,"Sprite Viewer - %s",fn+of.nFileOffset);
+							sprintf(
+                                wintitle,
+                            #ifdef MEISEI_ESP
+                                "Visor de Sprite - %s",
+                            #else
+                                "Sprite Viewer - %s",
+                            #endif // MEISEI_ESP
+                                fn+of.nFileOffset
+                            );
 							SetWindowText(dialog,wintitle);
 						}
 						if (strlen(fn)&&of.nFileOffset) {
@@ -1621,9 +1741,14 @@ INT_PTR CALLBACK spriteview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM
 					u8 spgt[0x800];
 					u8 dibdata[0x800]; /* 128/8*128 */
 					const int pal[2]={0,0xffffff};
+                #ifdef MEISEI_ESP
+					const char* filter="Imagen PNG (*.png)\0*.png\0SPGT Dump (*.spgt)\0*.spgt\0SPAT Dump (*.spat)\0*.spat\0\0";
+					const char* title="Guardar Datos de Sprite Como";
+                #else
 					const char* filter="PNG Image (*.png)\0*.png\0SPGT Dump (*.spgt)\0*.spgt\0SPAT Dump (*.spat)\0*.spat\0\0";
-					const char* defext="spgt";
 					const char* title="Save Sprite Data As";
+                #endif // MEISEI_ESP
+					const char* defext="spgt";
 					char fn[STRING_SIZE]={0};
 					OPENFILENAME of;
 
@@ -1668,19 +1793,44 @@ INT_PTR CALLBACK spriteview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM
 						switch (spriteview_save_fi) {
 							/* spgt */
 							case 2:
-								if (!strlen(fn)||!file_save_custom(&fd,fn)||!file_write_custom(fd,spgt,0x800)) LOG_ERROR_WINDOW(dialog,"Couldn't save sprite patterns!");
-								else success=TRUE;
+								if (!strlen(fn)||!file_save_custom(&fd,fn)||!file_write_custom(fd,spgt,0x800)) {
+                                    LOG_ERROR_WINDOW(
+                                        dialog,
+                                    #ifdef MEISEI_ESP
+                                        "¡No se pudieron guardar los patrones de sprite!"
+                                    #else
+                                        "Couldn't save sprite patterns!"
+                                    #endif // MEISEI_ESP
+                                    );
+								} else success=TRUE;
 								break;
 
 							/* spat */
 							case 3:
-								if (!strlen(fn)||!file_save_custom(&fd,fn)||!file_write_custom(fd,spat,128)) LOG_ERROR_WINDOW(dialog,"Couldn't save sprite attributes!");
-								else success=TRUE;
+								if (!strlen(fn)||!file_save_custom(&fd,fn)||!file_write_custom(fd,spat,128)) {
+                                    LOG_ERROR_WINDOW(
+                                        dialog,
+                                    #ifdef MEISEI_ESP
+                                        "¡No se pudieron guardar los atributos del sprite!"
+                                    #else
+                                        "Couldn't save sprite attributes!"
+                                    #endif // MEISEI_ESP
+                                    );
+								} else success=TRUE;
 								break;
 
 							/* png */
 							default:
-								if (!screenshot_save(128,128,SCREENSHOT_TYPE_1BPP_INDEXED,(void*)dibdata,(void*)pal,fn)) LOG_ERROR_WINDOW(dialog,"Couldn't save screenshot!");
+								if (!screenshot_save(128,128,SCREENSHOT_TYPE_1BPP_INDEXED,(void*)dibdata,(void*)pal,fn)) {
+                                    LOG_ERROR_WINDOW(
+                                        dialog,
+                                    #ifdef MEISEI_ESP
+                                        "¡No se pudo guardar la captura de pantalla!"
+                                    #else
+                                        "Couldn't save screenshot!"
+                                    #endif // MEISEI_ESP
+                                    );
+								}
 								/* no "success" */
 								break;
 						}
@@ -1688,7 +1838,15 @@ INT_PTR CALLBACK spriteview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM
 						file_close_custom(fd);
 						if (success&&strlen(fn+of.nFileOffset)) {
 							char wintitle[STRING_SIZE]={0};
-							sprintf(wintitle,"Sprite Viewer - %s",fn+of.nFileOffset);
+							sprintf(
+                                wintitle,
+                            #ifdef MEISEI_ESP
+                                "Visor de Sprite - %s",
+                            #else
+                                "Sprite Viewer - %s",
+                            #endif // MEISEI_ESP
+                                fn+of.nFileOffset
+                            );
 							SetWindowText(dialog,wintitle);
 						}
 						if (strlen(fn)&&of.nFileOffset) {
@@ -1778,7 +1936,6 @@ INT_PTR CALLBACK spriteview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM
 				}
 			}
 
-
 			/* draw highlight */
 			if (cell>=0) {
 				char t[0x1000];
@@ -1793,9 +1950,7 @@ INT_PTR CALLBACK spriteview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM
 						spriteview.h.screen[i<<2]=vdp_ram[sg|i];
 						spriteview.h.screen[i<<2|1]=vdp_ram[sg|i|16];
 					}
-				}
-
-				else {
+				} else {
 					/* 8*8 */
 					i=8; sg=sgo|cell<<3;
 					while (i--) spriteview.h.screen[i<<2]=vdp_ram[sg|i];
@@ -2186,7 +2341,16 @@ INT_PTR CALLBACK spriteview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM
 					memcpy(spriteview.copy_data,spriteedit.vdp_ram+((spriteedit.vdp_regs[6]<<11&0x3fff)|(wParam<<3&0x7ff)),8<<(wParam>>8&2));
 
 					memset(s_e,0,0x20);
-					if (!vdp_upload((spriteedit.vdp_regs[6]<<11&0x3fff)|(wParam<<3&0x7ff),s_e,8<<(spriteedit.vdp_regs[1]&2))) LOG_ERROR_WINDOW(dialog,"Couldn't cut sprite pattern!");
+					if (!vdp_upload((spriteedit.vdp_regs[6]<<11&0x3fff)|(wParam<<3&0x7ff),s_e,8<<(spriteedit.vdp_regs[1]&2))) {
+                        LOG_ERROR_WINDOW(
+                            dialog,
+                        #ifdef MEISEI_ESP
+                            "¡No se pudo cortar el patrón del sprite!"
+                        #else
+                            "Couldn't cut sprite pattern!"
+                        #endif // MEISEI_ESP
+                        );
+					}
 
 					break;
 				}
@@ -2201,7 +2365,16 @@ INT_PTR CALLBACK spriteview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM
 				case IDM_SPRITEVIEW_PASTE:
 					if (gray_paste||wParam&0x100) break;
 
-					if (!vdp_upload((spriteedit.vdp_regs[6]<<11&0x3fff)|(wParam<<3&0x7ff),spriteview.copy_data,8<<(spriteedit.vdp_regs[1]&2))) LOG_ERROR_WINDOW(dialog,"Couldn't paste sprite pattern!");
+					if (!vdp_upload((spriteedit.vdp_regs[6]<<11&0x3fff)|(wParam<<3&0x7ff),spriteview.copy_data,8<<(spriteedit.vdp_regs[1]&2))) {
+                        LOG_ERROR_WINDOW(
+                            dialog,
+                        #ifdef MEISEI_ESP
+                            "¡No se pudo pegar el patrón de sprites!"
+                        #else
+                            "Couldn't paste sprite pattern!"
+                        #endif // MEISEI_ESP
+                        );
+					}
 					break;
 
 				/* change spat value */
@@ -2211,7 +2384,16 @@ INT_PTR CALLBACK spriteview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM
 
 					spriteview.spatc=lParam&0x1f;
 					spriteview.ext_dialog=IDD_SPRITEVIEW_CHANGESPAT;
-					if (DialogBox(MAIN->module,MAKEINTRESOURCE(IDD_SPRITEVIEW_CHANGESPAT),dialog,(DLGPROC)spriteview_changespat_dialog)==1) LOG_ERROR_WINDOW(dialog,"Couldn't change SPAT!");
+					if (DialogBox(MAIN->module,MAKEINTRESOURCE(IDD_SPRITEVIEW_CHANGESPAT),dialog,(DLGPROC)spriteview_changespat_dialog)==1) {
+                        LOG_ERROR_WINDOW(
+                            dialog,
+                        #ifdef MEISEI_ESP
+                            "¡No se pudo cambiar SPAT!"
+                        #else
+                            "Couldn't change SPAT!"
+                        #endif // MEISEI_ESP
+                        );
+					}
 					spriteview.ext_dialog=0;
 
 					break;

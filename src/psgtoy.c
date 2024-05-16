@@ -110,7 +110,6 @@ static struct {
 
 } psgtoy;
 
-
 static int act_notepos_lut[0x1000];
 static int cdefgabc_bri_lut[17][32];	/* piano bar brightness table */
 static int cdefgabc_pos_lut[13][7];		/* piano bar coordinates table */
@@ -238,18 +237,32 @@ static void stop_psglog(HWND dialog,int save)
 	switch (s) {
 		case 1:
 			psgtoy.logging=FALSE;
-			LOG_ERROR_WINDOW(dialog,"Couldn't save PSG log!");
-			break;
+			LOG_ERROR_WINDOW(
+                dialog,
+            #ifdef MEISEI_ESP
+                "¡No se pudo guardar el registro del PSG!"
+            #else
+                "Couldn't save PSG log!"
+            #endif // MEISEI_ESP
+            );
+        break;
 
 		case 2:
 			psgtoy.logging=FALSE;
-			LOG_ERROR_WINDOW(dialog,"PSG log silence out of bounds!");
-			break;
+			LOG_ERROR_WINDOW(
+                dialog,
+            #ifdef MEISEI_ESP
+                "¡El PSG registra el silencio fuera de los límites!"
+            #else
+                "PSG log silence out of bounds!"
+            #endif // MEISEI_ESP
+            );
+		break;
 
 		default:
 			psgtoy.logging=FALSE;
 			psgtoy.log_frames=s;
-			break;
+		break;
 	}
 }
 
@@ -630,7 +643,11 @@ INT_PTR CALLBACK psgtoy_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM lPa
 
 				/* stop psglogger */
 				if (psgtoy.logging) {
-					int i=MessageBox(dialog,"Save PSG log before closing?","meisei",MB_ICONEXCLAMATION|(tool_is_quitting()?MB_YESNO:(MB_YESNOCANCEL|MB_DEFBUTTON3)));
+                #ifdef MEISEI_ESP
+                    int i=MessageBox(dialog,"¿Guardar el registro del PSG antes de cerrar?","meisei",MB_ICONEXCLAMATION|(tool_is_quitting()?MB_YESNO:(MB_YESNOCANCEL|MB_DEFBUTTON3)));
+                #else
+                    int i=MessageBox(dialog,"Save PSG log before closing?","meisei",MB_ICONEXCLAMATION|(tool_is_quitting()?MB_YESNO:(MB_YESNOCANCEL|MB_DEFBUTTON3)));
+                #endif // MEISEI_ESP
 					if (i==IDCANCEL) return 1; /* don't close dialog */
 					stop_psglog(dialog,i==IDYES);
 				}
@@ -721,9 +738,15 @@ INT_PTR CALLBACK psgtoy_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM lPa
 				}
 
 				/* load waveform */
-				case IDC_PSGTOY_OPEN: {
+				case IDC_PSGTOY_OPEN:
+                {
+				#ifdef MEISEI_ESP
+				    const char* filter="Todos los Archivos Soportados\0*.cw;*.cw3;*.wav\0Archivos Forma Onda de Canal (*.cw)\0*.cw\0Archivos Forma Onda de Canal (todos los canales, *.cw3)\0*.cw3\0Archivos WAV (8-bit mono PCM, *.wav)\0*.wav\0Todos los archivos (*.*)\0*.*\0\0";
+				    const char* title="Abre Forma de Onda";
+                #else
 					const char* filter="All Supported Files\0*.cw;*.cw3;*.wav\0Channel Waveform Files (*.cw)\0*.cw\0Channel Waveform Files (all channels, *.cw3)\0*.cw3\0WAV Files (8-bit mono PCM, *.wav)\0*.wav\0All Files (*.*)\0*.*\0\0";
 					const char* title="Open Waveform";
+                #endif // MEISEI_ESP
 					char fn[STRING_SIZE]={0};
 					OPENFILENAME of;
 
@@ -814,7 +837,16 @@ INT_PTR CALLBACK psgtoy_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM lPa
 						file_close_custom(fd);
 
 						if (success) psgtoy.opened=1+(fi==2);
-						else LOG_ERROR_WINDOW(dialog,"Couldn't load waveform!");
+						else {
+                            LOG_ERROR_WINDOW(
+                                dialog,
+                            #ifdef MEISEI_ESP
+                                "¡No se pudo cargar la forma de onda!"
+                            #else
+                                "Couldn't load waveform!"
+                            #endif // MEISEI_ESP
+                            );
+						}
 
 						if (strlen(fn)&&of.nFileOffset) {
 							fn[of.nFileOffset]=0; strcpy(psgtoy_dir,fn);
@@ -828,10 +860,17 @@ INT_PTR CALLBACK psgtoy_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM lPa
 				}
 
 				/* save waveform */
-				case IDC_PSGTOY_SAVE: {
+				case IDC_PSGTOY_SAVE:
+                {
+
+				#ifdef MEISEI_ESP
+				    const char* filter="Archivos Forma Onda de Canal (*.cw)\0*.cw\0Archivos Forma Onda de Canal (todos los canales, *.cw3)\0*.cw3\0Archivos WAV (8-bit mono PCM, *.wav)\0*.wav\0\0";
+				    const char* title="Guardar Forma de Onda Como";
+                #else
 					const char* filter="Channel Waveform File (*.cw)\0*.cw\0Channel Waveform File (all channels, *.cw3)\0*.cw3\0WAV File (8-bit mono PCM, *.wav)\0*.wav\0\0";
-					const char* defext="cw";
 					const char* title="Save Waveform As";
+                #endif // MEISEI_ESP
+					const char* defext="cw";
 					char fn[STRING_SIZE]={0};
 					OPENFILENAME of;
 

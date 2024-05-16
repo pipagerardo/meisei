@@ -356,7 +356,11 @@ void draw_create_text_mutex(void)
     {
         LOG(
             LOG_MISC|LOG_ERROR,
+        #ifdef MEISEI_ESP
+            "¡No se puede crear un mutex de dibujo de texto!\n"
+        #else
             "Can't create draw text mutex!\n"
+        #endif // MEISEI_ESP
         );
         exit(1);
     }
@@ -428,7 +432,11 @@ static void draw_switch_renderer(void)
 		(*drawdev_clean)();
 		LOG(
             LOG_MISC|LOG_WARNING,
+        #ifdef MEISEI_ESP
+            "Error D3D %d, cambiando a DirectDraw\n",
+        #else
             "D3D error %d, switching to DirectDraw\n",
+        #endif // MEISEI_ESP
             err
         );
 
@@ -451,7 +459,11 @@ int draw_init(void)
     {
         LOG(
             LOG_MISC|LOG_ERROR,
+        #ifdef MEISEI_ESP
+            "¡No se puede crear el mutex draw sc!\n"
+        #else
             "Can't create draw sc mutex!\n"
+        #endif // MEISEI_ESP
         );
         exit(1);
     }
@@ -459,7 +471,11 @@ int draw_init(void)
     {
         LOG(
             LOG_MISC|LOG_ERROR,
+        #ifdef MEISEI_ESP
+            "¡No se puede crear draw d mutex!\n"
+        #else
             "Can't create draw d mutex!\n"
+        #endif // MEISEI_ESP
         );
         exit(1);
     }
@@ -490,7 +506,11 @@ int draw_init(void)
 
 	LOG(
         LOG_VERBOSE,
+    #ifdef MEISEI_ESP
+        "dibujo inicializado\n"
+    #else
         "draw initialised\n"
+    #endif // MEISEI_ESP
     );
 
 	return TRUE;
@@ -567,7 +587,14 @@ void draw_clean(void)
 		if (draw.paledit_brush[i]) { DeleteObject(draw.paledit_brush[i]); draw.paledit_brush[i]=NULL; }
 	}
 
-	LOG(LOG_VERBOSE,"draw cleaned\n");
+	LOG(
+        LOG_VERBOSE,
+    #ifdef MEISEI_ESP
+        "dibujo limpio\n"
+    #else
+        "draw cleaned\n"
+    #endif // MEISEI_ESP
+    );
 }
 
 
@@ -698,7 +725,14 @@ void draw_init_settings(void)
 	if (c&&strlen(c)) {
 		for (i=0;i<DRAW_PALETTE_FILE;i++) if (stricmp(c,draw_get_palette_name(i))==0) break;
 		if (i==DRAW_PALETTE_FILE&&draw_load_palette(c,NULL)!=0) {
-			LOG(LOG_MISC|LOG_WARNING,"couldn't load palette\n");
+			LOG(
+                LOG_MISC|LOG_WARNING,
+            #ifdef MEISEI_ESP
+                "no se pudo cargar la paleta\n"
+            #else
+                "couldn't load palette\n"
+            #endif // MEISEI_ESP
+            );
 			i=DRAW_PALETTE_DEFAULT;
 		}
 	}
@@ -1000,10 +1034,35 @@ void draw_save_palette(void)
 
 	file_setfile(&file->palettedir,file->appname,"pal",NULL);
 	if (file_save()) {
-		if (file_write(p,16*3)) LOG(LOG_VERBOSE,"saved palette\n");
-		else LOG(LOG_MISC|LOG_WARNING,"palette write error\n");
+		if (file_write(p,16*3)) {
+            LOG(
+                LOG_VERBOSE,
+            #ifdef MEISEI_ESP
+                "paleta guardada\n"
+            #else
+                "saved palette\n"
+            #endif // MEISEI_ESP
+            );
+		} else {
+            LOG(
+                LOG_MISC|LOG_WARNING,
+            #ifdef MEISEI_ESP
+                "error de escritura de paleta\n"
+            #else
+                "palette write error\n"
+            #endif // MEISEI_ESP
+            );
+		}
+	} else {
+        LOG(
+            LOG_MISC|LOG_WARNING,
+        #ifdef MEISEI_ESP
+            "no se pudo guardar la paleta\n"
+        #else
+            "couldn't save palette\n"
+        #endif // MEISEI_ESP
+        );
 	}
-	else LOG(LOG_MISC|LOG_WARNING,"couldn't save palette\n");
 	file_close();
 }
 
@@ -1078,7 +1137,16 @@ void draw_set_window_size(void)
 	if (i<1) i=1;
 	if (draw.zoom==0) draw.zoom=i-(i>1);
 	if (draw.zoom>i) {
-		LOG(LOG_MISC|LOG_WARNING,"%dx size is out of bounds, set to %dx size\n",draw.zoom,i);
+		LOG(
+            LOG_MISC|LOG_WARNING,
+        #ifdef MEISEI_ESP
+            "El tamaño %dx está fuera de los límites, establecido en %dx size\n",
+        #else
+            "%dx size is out of bounds, set to %dx size\n",
+        #endif // MEISEI_ESP
+            draw.zoom,
+            i
+        );
 		draw.zoom=i;
 	}
 	draw.fzoom=draw.zoom/(draw.correct_aspect?2.0:1.0);
@@ -1943,8 +2011,16 @@ INT_PTR CALLBACK draw_palette_settings( HWND dialog, UINT msg, WPARAM wParam, LP
 						char fn[STRING_SIZE]={0};
 						file_setfile(&file->palettedir,draw.loadpalette,NULL,NULL);
 						strcpy(fn,file->filename);
-						if (draw_load_palette(fn,NULL)!=0) LOG_ERROR_WINDOW(dialog,"Couldn't reload palette!");
-						else draw_set_surface_change(DRAW_SC_PALETTE);
+						if (draw_load_palette(fn,NULL)!=0) {
+                            LOG_ERROR_WINDOW(
+                                dialog,
+                            #ifdef MEISEI_ESP
+                                "¡No se pudo recargar la paleta!"
+                            #else
+                                "Couldn't reload palette!"
+                            #endif // MEISEI_ESP
+                            );
+						} else draw_set_surface_change(DRAW_SC_PALETTE);
 					}
 
 					PostMessage(dialog,WM_NEXTDLGCTL,(WPARAM)GetDlgItem(dialog,IDOK),TRUE);
@@ -1961,8 +2037,13 @@ INT_PTR CALLBACK draw_palette_settings( HWND dialog, UINT msg, WPARAM wParam, LP
 						}
 						else {
 							/* file */
+                        #ifdef MEISEI_ESP
+							const char* filter="Archivos de Paleta (*.pal, *.zip)\0*.pal;*.zip\0Todos los Archivos\0*.*\0\0";
+							const char* title="Abrir Paleta";
+                        #else
 							const char* filter="Palette Files (*.pal, *.zip)\0*.pal;*.zip\0All Files\0*.*\0\0";
 							const char* title="Open Palette";
+                        #endif // MEISEI_ESP
 							char fn[STRING_SIZE]={0};
 							OPENFILENAME of;
 							int o=FALSE;
@@ -1990,7 +2071,16 @@ INT_PTR CALLBACK draw_palette_settings( HWND dialog, UINT msg, WPARAM wParam, LP
 
 							if (GetOpenFileName(&of)) {
 								o=(draw_load_palette(fn,NULL)==0);
-								if (!o) LOG_ERROR_WINDOW(dialog,"Couldn't load palette!");
+								if (!o) {
+                                    LOG_ERROR_WINDOW(
+                                        dialog,
+                                    #ifdef MEISEI_ESP
+                                        "¡No se pudo cargar la paleta!"
+                                    #else
+                                        "Couldn't load palette!"
+                                    #endif // MEISEI_ESP
+                                    );
+								}
 							}
 							draw.palette_fi=of.nFilterIndex;
 
@@ -2058,7 +2148,16 @@ INT_PTR CALLBACK draw_palette_settings( HWND dialog, UINT msg, WPARAM wParam, LP
 						char fn[STRING_SIZE];
 						file_setfile(&file->palettedir,draw.loadpalette,NULL,NULL);
 						strcpy(fn,file->filename);
-						if (draw_load_palette(fn,NULL)!=0) LOG(LOG_MISC|LOG_WARNING,"couldn't reload palette\n");
+						if (draw_load_palette(fn,NULL)!=0) {
+                            LOG(
+                                LOG_MISC|LOG_WARNING,
+                            #ifdef MEISEI_ESP
+                                "no se pudo recargar la paleta\n"
+                            #else
+                                "couldn't reload palette\n"
+                            #endif // MEISEI_ESP
+                            );
+						}
 					}
 
 					draw_set_surface_change(DRAW_SC_PALETTE);
@@ -2110,10 +2209,28 @@ static void draw_screenshot(void)
 
 	/* save */
 	if (snum<10000&&screenshot_save(draw.source_width,draw.source_height,SCREENSHOT_TYPE_8BPP_INDEXED,(void*)draw.screen,(void*)draw_palette_32,fn)) {
-		if (snum>0) LOG(LOG_MISC|LOG_COLOUR(LC_GREEN)|LOG_TYPE(LT_SCREENSHOT),"saved screenshot #%d     ",snum);
-		else LOG(LOG_MISC|LOG_COLOUR(LC_GREEN)|LOG_TYPE(LT_SCREENSHOT),"saved screenshot         ");
+		if (snum>0) {
+            LOG(
+                LOG_MISC|LOG_COLOUR(LC_GREEN)|LOG_TYPE(LT_SCREENSHOT),
+                "saved screenshot #%d     ",
+                snum
+            );
+		} else {
+            LOG(
+                LOG_MISC|LOG_COLOUR(LC_GREEN)|LOG_TYPE(LT_SCREENSHOT),
+                "saved screenshot         "
+            );
+		}
+	} else {
+        LOG(
+            LOG_MISC|LOG_WARNING,
+        #ifdef MEISEI_ESP
+            "no se pudo guardar la captura de pantalla\n"
+        #else
+            "couldn't save screenshot\n"
+        #endif // MEISEI_ESP
+        );
 	}
-	else LOG(LOG_MISC|LOG_WARNING,"couldn't save screenshot\n");
 }
 
 
@@ -2545,7 +2662,11 @@ static int d3d_init(void)
 	if (dynamic_err) {
         draw.softrender=TRUE;
         LOG( LOG_MISC | LOG_WARNING,
+        #ifdef MEISEI_ESP
+            "Las texturas dinámicas D3D no son compatibles\n"
+        #else
             "D3D dynamic textures unsupported\n"
+        #endif // MEISEI_ESP
         );
     }
 	d3d_flush_needed(); draw.reset_needed=TRUE;

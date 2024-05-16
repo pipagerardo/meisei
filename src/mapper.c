@@ -488,7 +488,6 @@ static INT_PTR CALLBACK mce_nm_dialog( HWND dialog, UINT msg, WPARAM wParam, LPA
 							sprintf(
                                 t,
                             #ifdef MEISEI_ESP
-                                "RAM block '%c' is unknown. Use 0-7 for mapped pages,\n"
                                 "Bloque de RAM '%c' desconocido. Usa 0-7 para páginas asignadas,\n"
                                 "y 'u' para secciones no asignadas. Para RAM < 8 KB, use\n"
                                 "'o' para 8 * 1KB, 'q' para 4 * 2KB y 'd' para 2 * 4KB.",
@@ -2308,7 +2307,14 @@ static INT_PTR CALLBACK mce_a_dialog( HWND dialog, UINT msg, WPARAM wParam, LPAR
 
 					i=GetDlgItemInt(dialog,IDC_MCE_A_SRAM,NULL,FALSE);
 					if (i!=0&&i!=1&&i!=2&&i!=4&&i!=8&&i!=16&&i!=32&&i!=64) {
-						LOG_ERROR_WINDOW(dialog,"Invalid SRAM size.");
+						LOG_ERROR_WINDOW(
+                            dialog,
+                        #ifdef MEISEI_ESP
+                            "Tamaño de SRAM no válido."
+                        #else
+                            "Invalid SRAM size."
+                        #endif
+                        );
 						return 0;
 					}
 					if (i) {
@@ -2316,7 +2322,15 @@ static INT_PTR CALLBACK mce_a_dialog( HWND dialog, UINT msg, WPARAM wParam, LPAR
 						b|=j<<A_SS_SHIFT;
 
 						if (~lutasciichip[mc].flags&A_MCF_SRAM) {
-							sprintf(t,"%s can't have SRAM.",lutasciichip[mc].name);
+							sprintf(
+                                t,
+                            #ifdef MEISEI_ESP
+                                "%s no puede tener SRAM.",
+                            #else
+                                "%s can't have SRAM.",
+                            #endif
+                                lutasciichip[mc].name
+                            );
 							LOG_ERROR_WINDOW(dialog,t);
 							return 0;
 						}
@@ -2325,7 +2339,14 @@ static INT_PTR CALLBACK mce_a_dialog( HWND dialog, UINT msg, WPARAM wParam, LPAR
 					j=0;
 					GetDlgItemText(dialog,IDC_MCE_A_WRITE,t,10);
 					if (strlen(t)!=8) {
-						LOG_ERROR_WINDOW(dialog,"Write bitmask must be 8 characters.");
+						LOG_ERROR_WINDOW(
+                            dialog,
+                        #ifdef MEISEI_ESP
+                            "La máscara de escritura de bits debe tener 8 caracteres."
+                        #else
+                            "Write bitmask must be 8 characters."
+                        #endif // MEISEI_ESP
+                        );
 						return 0;
 					}
 					for (i=0;i<8;i++)
@@ -2336,35 +2357,76 @@ static INT_PTR CALLBACK mce_a_dialog( HWND dialog, UINT msg, WPARAM wParam, LPAR
 						/* sram bit */
 						case 's': case 'S':
 							if (j++) {
-								LOG_ERROR_WINDOW(dialog,"Only one 's' allowed in write bitmask.");
+								LOG_ERROR_WINDOW(
+                                    dialog,
+                                #ifdef MEISEI_ESP
+                                    "Solo una 's' permitida en la escritura de máscara de bits."
+                                #else
+                                    "Only one 's' allowed in write bitmask."
+                                #endif
+                                );
 								return 0;
 							}
-							t[i]='5'; break;
+							t[i]='5';
+                        break;
 
 						/* write-protect bit */
 						case 'p': case 'P':
 							if (~lutasciichip[mc].flags&A_MCF_PROTECT) {
-								sprintf(t,"%s can't have write-protect.",lutasciichip[mc].name);
+								sprintf(
+                                    t,
+                                #ifdef MEISEI_ESP
+                                    "%s no puede tener protección contra escritura.",
+                                #else
+                                    "%s can't have write-protect.",
+                                #endif // MEISEI_ESP
+                                    lutasciichip[mc].name
+                                );
 								LOG_ERROR_WINDOW(dialog,t);
 								return 0;
 							}
 
 							if (b&A_SP_MASK) {
-								LOG_ERROR_WINDOW(dialog,"Only one 'p' allowed in write bitmask.");
+								LOG_ERROR_WINDOW(
+                                    dialog,
+                                #ifdef MEISEI_ESP
+                                    "Sólo una 'p' permitida en la escritura de máscara de bits."
+                                #else
+                                    "Only one 'p' allowed in write bitmask."
+                                #endif // MEISEI_ESP
+                                );
 								return 0;
 							}
 
 							b|=((i^7)+1)<<A_SP_SHIFT;
-							t[i]='e'; break;
+							t[i]='e';
+                        break;
 
 						default:
-							sprintf(t,"Write bit '%c' is unknown. Use 'u' for unmapped bits, 'x' for\ndon't care bits, 's' for SRAM bit, and 'p' for write-protect bit.",t[i]);
+							sprintf(
+                                t,
+                            #ifdef MEISEI_ESP
+                                "Bit de escritura '%c' desconocido. Use 'u' para bits no asignados, 'x' para\n"
+                                "no importan los bits, 's' para el bit SRAM y 'p' para el bit de protección de escritura.",
+                            #else
+                                "Write bit '%c' is unknown. Use 'u' for unmapped bits, 'x' for\n"
+                                "don't care bits, 's' for SRAM bit, and 'p' for write-protect bit.",
+                            #endif
+                                t[i]
+                            );
 							LOG_ERROR_WINDOW(dialog,t);
-							return 0;
+                        return 0;
 					}
 
 					if ((!j&&b&A_SS_MASK)||(j&&!(b&A_SS_MASK))||(!j&&b&A_SP_MASK)) {
-						LOG_ERROR_WINDOW(dialog,"Write bitmask SRAM conflict.");
+						LOG_ERROR_WINDOW(
+                            dialog,
+                        #ifdef MEISEI_ESP
+                            "Conflicto escribiendo la máscara de bits SRAM."
+                        #else
+                            "Write bitmask SRAM conflict."
+                        #endif
+                        );
 						return 0;
 					}
 
@@ -2605,16 +2667,21 @@ int mapper_get_uid_type(u32 uid)
 
 	/* look in deprecated list (only accessed from msx.c) */
 	switch (uid) {
-		case DEPRECATED_START0000: case DEPRECATED_START4000: case DEPRECATED_START8000: case DEPRECATED_STARTC000: return CARTTYPE_NOMAPPER;
-		case DEPRECATED_ASCII8: case DEPRECATED_ASCII16: return CARTTYPE_ASCII;
-		case DEPRECATED_ZEMINAZMB: return CARTTYPE_KONAMIVRC;
+		case DEPRECATED_START0000:  case DEPRECATED_START4000:
+        case DEPRECATED_START8000:  case DEPRECATED_STARTC000:
+            return CARTTYPE_NOMAPPER;
+		case DEPRECATED_ASCII8:     case DEPRECATED_ASCII16:
+		    return CARTTYPE_ASCII;
+		case DEPRECATED_ZEMINAZMB:
+		    return CARTTYPE_KONAMIVRC;
 
 		/* error if sram size is not the same */
 		case DEPRECATED_ASCII16_2: return CARTTYPE_ASCII|((ascii_board[slot]&A_SS_MASK)!=A_SS_02)<<30;
-		case DEPRECATED_ASCII8_8: return CARTTYPE_ASCII|((ascii_board[slot]&A_SS_MASK)!=A_SS_08)<<30;
+		case DEPRECATED_ASCII8_8:  return CARTTYPE_ASCII|((ascii_board[slot]&A_SS_MASK)!=A_SS_08)<<30;
 		case DEPRECATED_ASCII8_32: return CARTTYPE_ASCII|((ascii_board[slot]&A_SS_MASK)!=A_SS_32)<<30;
 
-		default: break;
+		default:
+        break;
 	}
 
 	return CARTTYPE_NOMAPPER;
@@ -2966,8 +3033,7 @@ void mapper_init(void)
 
 	/* open default bios */
 	// file_setfile( &file->appdir, DEFAULT_BIOS, NULL, NULL );
-    // file_setfile( &file->appdir, DEFAULT_BIOS, NULL, "zip" );        // HEY BABY!
-    file_setfile( &file->biosdir, DEFAULT_BIOS, NULL, "zip" );          // HEY BABY!
+    file_setfile( &file->biosdir, DEFAULT_BIOS, NULL, "zip" );
 	if (!file_open()||file->size!=0x8000||!file_read(default_bios,0x8000)) {
 		file_close();
         LOG(
@@ -3193,10 +3259,29 @@ void mapper_update_bios_hack(void)
 /* carts */
 int mapper_open_cart(int slot,const char* f,int auto_patch)
 {
-	#define ROM_CLOSE(x)					\
-		file_patch_close(); file_close();	\
-		if (!x) LOG(LOG_MISC|LOG_WARNING,"slot %d: couldn't open file\n",slot+1); \
+#ifdef MEISEI_ESP
+	#define ROM_CLOSE(x)					                \
+		file_patch_close(); file_close();	                \
+		if (!x) {                                           \
+            LOG(                                            \
+                LOG_MISC|LOG_WARNING,                       \
+                "slot %d: el archivo no se pudo abrir\n",   \
+                slot+1                                      \
+            );                                              \
+		}                                                   \
 		return x
+#else
+	#define ROM_CLOSE(x)					                \
+		file_patch_close(); file_close();	                \
+		if (!x) {                                           \
+            LOG(                                            \
+                LOG_MISC|LOG_WARNING,                       \
+                "slot %d: couldn't open file\n",            \
+                slot+1                                      \
+            );                                              \
+		}                                                   \
+		return x
+#endif // MEISEI_ESP
 
 	int i=TRUE;
 	u32 crc,crc_p=0;
@@ -3205,7 +3290,7 @@ int mapper_open_cart(int slot,const char* f,int auto_patch)
 	slot&=1;
 
 	/* open file, just to get checksum before patching */
-	file_setfile(NULL,f,NULL,"rom");
+	file_setfile( NULL, f, NULL, "rom" );
 	if (!file_open()) { ROM_CLOSE(FALSE); }
 	crc=file->crc32;
 	file_close();
@@ -3221,14 +3306,27 @@ int mapper_open_cart(int slot,const char* f,int auto_patch)
 		}
 		crc_p=file->crc32;
 		if (i&(crc_p!=crc)) {
-			LOG(LOG_MISC,"slot %d: applying patch (%sIPS)\n",slot+1,file->is_zip?"zipped ":"");
+			LOG(
+                LOG_MISC,
+            #ifdef MEISEI_ESP
+                "slot %d: parche aplicado (%sIPS)\n",
+            #else
+                "slot %d: applying patch (%sIPS)\n",
+            #endif // MEISEI_ESP
+                slot+1,
+            #ifdef MEISEI_ESP
+                file->is_zip?"comprimido ":""
+            #else
+                file->is_zip?"zipped ":""
+            #endif // MEISEI_ESP
+            );
 			if (!file_patch_init()) { file_patch_close(); crc_p=0; }
 		}
 		else crc_p=0;
 		file_close();
 
 		/* set to rom file again */
-		file_setfile(NULL,f,NULL,"rom");
+		file_setfile( NULL, f, NULL, "rom" );
 	}
 
 	if (file_open()) {
@@ -3585,7 +3683,14 @@ static int sram_load(int slot,u8** d,u32 size,const char* fnc,u8 fill)
 
 	if (netplay_is_active()) {
 		/* don't load (or save) if netplay */
-		LOG(LOG_MISC|LOG_WARNING|LOG_TYPE(LT_NETPLAYSRAM),"SRAM is volatile during netplay");
+		LOG(
+            LOG_MISC|LOG_WARNING|LOG_TYPE(LT_NETPLAYSRAM),
+        #ifdef MEISEI_ESP
+            "La SRAM es volátil durante el netplay"
+        #else
+            "SRAM is volatile during netplay"
+        #endif // MEISEI_ESP
+        );
 		sram_netplay[slot]=TRUE;
 		return FALSE;
 	}
@@ -3599,12 +3704,30 @@ static int sram_load(int slot,u8** d,u32 size,const char* fnc,u8 fill)
 
 	if (!file_accessible()) {
 		/* SRAM file didn't exist yet */
-		if (!file_save()||!file_write(*d,size)) LOG(LOG_MISC|LOG_WARNING,"couldn't init slot %d battery backed SRAM\n",slot+1);
+		if (!file_save()||!file_write(*d,size)) {
+            LOG(
+                LOG_MISC|LOG_WARNING,
+            #ifdef MEISEI_ESP
+                "no se pudo iniciar la ranura %d SRAM respaldada por batería\n",
+            #else
+                "couldn't init slot %d battery backed SRAM\n",
+            #endif // MEISEI_ESP
+                slot+1
+            );
+		}
 	}
 
 	/* load */
 	else if (!file_open()||file->size!=size||!file_read(*d,size)) {
-		LOG(LOG_MISC|LOG_WARNING,"couldn't load slot %d battery backed SRAM\n",slot+1);
+		LOG(
+            LOG_MISC|LOG_WARNING,
+        #ifdef MEISEI_ESP
+            "no se pudo cargar la ranura %d SRAM respaldada por batería\n",
+        #else
+            "couldn't load slot %d battery backed SRAM\n",
+        #endif // MEISEI_ESP
+            slot+1
+        );
 		memset(*d,fill,size);
 	}
 
@@ -3639,7 +3762,17 @@ static void sram_save(int slot,u8* d,u32 size,const char* fnc)
 	}
 
 	/* save */
-	if (!file_save()||!file_write(d,size)) LOG(LOG_MISC|LOG_WARNING,"couldn't save slot %d battery backed SRAM\n",slot+1);
+	if (!file_save()||!file_write(d,size)) {
+        LOG(
+            LOG_MISC|LOG_WARNING,
+        #ifdef MEISEI_ESP
+            "No se pudo guardar la ranura %d SRAM respaldada por batería\n",
+        #else
+            "couldn't save slot %d battery backed SRAM\n",
+        #endif // MEISEI_ESP
+            slot+1
+        );
+	}
 	file_close();
 
 	/* clean */

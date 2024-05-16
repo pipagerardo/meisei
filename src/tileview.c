@@ -253,7 +253,6 @@ static char tileedit_dir[STRING_SIZE]={0};
 static int tileedit_fi; /* 1: .pattern, 2: any */
 static int tileedit_allblocks;
 
-
 /* helper functions */
 static void tileedit_download(void)
 {
@@ -266,15 +265,18 @@ static void tileedit_download(void)
 	/* fill pattern */
 	if (mode&2) pg=(tileedit.block_orig<<11&pg)|(pg&0x2000);
 	memcpy(tileedit.p,tileedit.vdp_ram+(pg|tileedit.pattern_orig<<3),8);
+	/* screen 3 */
 	if (mode&4) {
-		/* screen 3 */
 		memset(tileedit.p,0xf0,8);
 		for (i=0;i<4;i++) tileedit.c[i]=tileedit.vdp_ram[pg|tileedit.pattern_orig<<3|tileedit.row_orig<<1];
 		for (i=4;i<8;i++) tileedit.c[i]=tileedit.vdp_ram[pg|tileedit.pattern_orig<<3|tileedit.row_orig<<1|1];
 	}
-	else if (mode==2) memcpy(tileedit.c,tileedit.vdp_ram+(((ct&0x2000)|(tileedit.block_orig<<11&0x1800)|tileedit.pattern_orig<<3)&(ct|0x3f)),8); /* screen 2 */
-	else if (mode&1) for (i=0;i<8;i++) tileedit.c[i]=tileedit.vdp_regs[7]; /* screen 0 */
-	else for (i=0;i<8;i++) tileedit.c[i]=tileedit.vdp_ram[ct|tileedit.pattern_orig>>3]; /* screen 1 */
+	/* screen 2 */
+	else if (mode==2) memcpy(tileedit.c,tileedit.vdp_ram+(((ct&0x2000)|(tileedit.block_orig<<11&0x1800)|tileedit.pattern_orig<<3)&(ct|0x3f)),8);
+	/* screen 0 */
+	else if (mode&1) for (i=0;i<8;i++) tileedit.c[i]=tileedit.vdp_regs[7];
+	/* screen 1 */
+	else for (i=0;i<8;i++) tileedit.c[i]=tileedit.vdp_ram[ct|tileedit.pattern_orig>>3];
 
 	tileedit.mode=mode;
 }
@@ -288,31 +290,28 @@ static int tileedit_upload(int* reg_local,u8* p,u8* c,int allblocks,int s01c)
 	if (modeo&2) pgo=(tileedit.block_orig<<11&pgo)|(pgo&0x2000);
 
 	if (modeo&4) {
-		/* screen 3 */
+    /* screen 3 */
 		success&=vdp_upload(pgo|tileedit.pattern_orig<<3|tileedit.row_orig<<1,&c[3],2);
-	}
-	else {
+	} else {
 		/* upload pattern data */
 		pgo|=(tileedit.pattern_orig<<3);
 		if (allblocks&&modeo&2) {
 			pgo&=~0x1800;
 			for (i=0;i<0x1800;i+=0x800) success&=vdp_upload(pgo|i,p,8);
-		}
-		else success&=vdp_upload(pgo,p,8);
+		} else success&=vdp_upload(pgo,p,8);
 
 		/* upload colour data */
 		if (modeo==2) {
-			/* screen 2 */
+        /* screen 2 */
 			cto=((cto&0x2000)|(tileedit.block_orig<<11&0x1800)|tileedit.pattern_orig<<3)&(cto|0x3f);
 
 			if (allblocks) {
 				cto&=~0x1800;
 				for (i=0;i<0x1800;i+=0x800) success&=vdp_upload(cto|i,c,8);
-			}
-			else success&=vdp_upload(cto,c,8);
+			} else success&=vdp_upload(cto,c,8);
 		}
 		else if ((modeo&5)==0&&s01c) {
-			/* screen 1 */
+        /* screen 1 */
 			success&=vdp_upload(cto|tileedit.pattern_orig>>3,c,1);
 		}
 
@@ -434,12 +433,36 @@ static int tileedit_apply(HWND dialog,const int ok)
 
 	/* bogus mode */
 	if ((reg_local[1]&0x18)==0x18) {
-		return MessageBox(dialog,"Invalid mixed mode!\nChanges won't be applied.","I am Error.",MB_ICONEXCLAMATION|(ok?(MB_OKCANCEL|MB_DEFBUTTON2):MB_OK));
+		return MessageBox(
+            dialog,
+        #ifdef MEISEI_ESP
+            "¡Modo mixto no válido!\n"
+            "No se aplicarán los cambios.",
+            "Yo soy un Error.",
+        #else
+            "Invalid mixed mode!\n"
+            "Changes won't be applied.",
+            "I am Error.",
+        #endif
+            MB_ICONEXCLAMATION|(ok?(MB_OKCANCEL|MB_DEFBUTTON2):MB_OK)
+        );
 	}
 
 	/* screen 3 <-> not screen 3 */
 	if ((reg_local[1]>>3^tileedit.screen3)&1) {
-		return MessageBox(dialog,"Incompatible screen mode!\nChanges won't be applied.","I am Error.",MB_ICONEXCLAMATION|(ok?(MB_OKCANCEL|MB_DEFBUTTON2):MB_OK));
+		return MessageBox(
+            dialog,
+        #ifdef MEISEI_ESP
+            "¡Modo de pantalla incompatible!\n"
+            "No se aplicarán los cambios.",
+            "Yo soy un Error.",
+        #else
+            "Incompatible screen mode!\n"
+            "Changes won't be applied.",
+            "I am Error.",
+        #endif // MEISEI_ESP
+            MB_ICONEXCLAMATION|(ok?(MB_OKCANCEL|MB_DEFBUTTON2):MB_OK)
+        );
 	}
 
 	modeo=(reg_local[1]>>4&1)|(reg_local[1]>>1&4)|(reg_local[0]&2);
@@ -447,23 +470,91 @@ static int tileedit_apply(HWND dialog,const int ok)
 
 	/* mode changed */
 	if (modeo!=tileedit.mode) {
-		if ((s0=tileedit_screen0cdiff(modeo,c,reg_local[7]))) i=MessageBox(dialog,"Screen mode is different, with colour changes affecting\nthe entire surface. Apply anyway?","meisei",MB_ICONEXCLAMATION|(ok?(MB_YESNOCANCEL|MB_DEFBUTTON3):(MB_YESNO|MB_DEFBUTTON2)));
-		else if (tileedit_screen1cdiff(modeo,c,cto,ram_local)) i=MessageBox(dialog,"Screen mode is different, with colour changes affecting\nsurrounding tiles. Apply anyway?","meisei",MB_ICONEXCLAMATION|(ok?(MB_YESNOCANCEL|MB_DEFBUTTON3):(MB_YESNO|MB_DEFBUTTON2)));
-		else i=MessageBox(dialog,"Screen mode is different.\nApply changes anyway?","meisei",MB_ICONEXCLAMATION|(ok?(MB_YESNOCANCEL|MB_DEFBUTTON3):(MB_YESNO|MB_DEFBUTTON2)));
+		if ((s0=tileedit_screen0cdiff(modeo,c,reg_local[7]))) {
+            i=MessageBox(
+                dialog,
+            #ifdef MEISEI_ESP
+                "El modo de pantalla es diferente, con cambios de color\n"
+                "que afectan a toda la superficie. ¿Aplicar de todos modos?",
+            #else
+                "Screen mode is different, with colour changes affecting\n"
+                "the entire surface. Apply anyway?",
+            #endif // MEISEI_ESP
+                "meisei",
+                MB_ICONEXCLAMATION|(ok?(MB_YESNOCANCEL|MB_DEFBUTTON3):(MB_YESNO|MB_DEFBUTTON2))
+            );
+		} else if (tileedit_screen1cdiff(modeo,c,cto,ram_local)) {
+            i=MessageBox(
+                dialog,
+            #ifdef MEISEI_ESP
+                "El modo de pantalla es diferente y los cambios de color\n"
+                "afectan a las baldosas circundantes. ¿Aplicar de todos modos?",
+            #else
+                "Screen mode is different, with colour changes affecting\n"
+                "surrounding tiles. Apply anyway?",
+            #endif // MEISEI_ESP
+                "meisei",
+                MB_ICONEXCLAMATION|(ok?(MB_YESNOCANCEL|MB_DEFBUTTON3):(MB_YESNO|MB_DEFBUTTON2))
+            );
+		} else {
+            i=MessageBox(
+                dialog,
+            #ifdef MEISEI_ESP
+                "El modo de pantalla es diferente.\n"
+                "¿Aplicar cambios de todos modos?",
+            #else
+                "Screen mode is different.\n"
+                "Apply changes anyway?",
+            #endif // MEISEI_ESP
+                "meisei",
+                MB_ICONEXCLAMATION|(ok?(MB_YESNOCANCEL|MB_DEFBUTTON3):(MB_YESNO|MB_DEFBUTTON2))
+            );
+		}
 		if (i!=IDYES) return i;
 	}
 
 	/* global colour */
 	else if ((s0=tileedit_screen0cdiff(modeo,c,reg_local[7]))) {
-		i=MessageBox(dialog,"Colour changes will affect the entire screen.\nApply anyway?","meisei",MB_ICONEXCLAMATION|(ok?(MB_YESNOCANCEL|MB_DEFBUTTON3):(MB_YESNO|MB_DEFBUTTON2)));
+		i=MessageBox(
+            dialog,
+        #ifdef MEISEI_ESP
+            "Los cambios de color afectarán a toda la pantalla.\n"
+            "¿Aplicar de todos modos?",
+        #else
+            "Colour changes will affect the entire screen.\n"
+            "Apply anyway?",
+        #endif // MEISEI_ESP
+            "meisei",
+            MB_ICONEXCLAMATION|(ok?(MB_YESNOCANCEL|MB_DEFBUTTON3):(MB_YESNO|MB_DEFBUTTON2))
+        );
 		if (i!=IDYES) return i;
 	}
 	else if (tileedit_screen1cdiff(modeo,c,cto,ram_local)) {
-		i=MessageBox(dialog,"Colour changes will affect surrounding tiles too.\nApply anyway?","meisei",MB_ICONEXCLAMATION|(ok?(MB_YESNOCANCEL|MB_DEFBUTTON3):(MB_YESNO|MB_DEFBUTTON2)));
+		i=MessageBox(
+            dialog,
+        #ifdef MEISEI_ESP
+            "Los cambios de color afectarán a las baldosas circundantes.\n"
+            "¿Aplicar de todos modos?",
+        #else
+            "Colour changes will affect surrounding tiles too.\n"
+            "Apply anyway?",
+        #endif // MEISEI_ESP
+            "meisei",
+            MB_ICONEXCLAMATION|(ok?(MB_YESNOCANCEL|MB_DEFBUTTON3):(MB_YESNO|MB_DEFBUTTON2))
+        );
 		if (i!=IDYES) return i;
 	}
 
-	if (!tileedit_upload(reg_local,p,c,tileedit_allblocks,((modeo&5)==0)?TRUE:s0)) LOG_ERROR_WINDOW(dialog,"Couldn't upload VDP data!");
+	if (!tileedit_upload(reg_local,p,c,tileedit_allblocks,((modeo&5)==0)?TRUE:s0)) {
+        LOG_ERROR_WINDOW(
+            dialog,
+        #ifdef MEISEI_ESP
+            "¡No se pudieron cargar datos de VDP!"
+        #else
+            "Couldn't upload VDP data!"
+        #endif // MEISEI_ESP
+        );
+	}
 
 	for (i=0;i<8;i++) tileedit.vdp_regs[i]=reg_local[i];
 	if (tileedit.mode!=modeo) {
@@ -553,7 +644,7 @@ static BOOL CALLBACK tileedit_sub_zoom(HWND wnd,UINT msg,WPARAM wParam,LPARAM lP
 			}
         break;
 
-		case WM_LBUTTONUP:                              // Warning -Wimplicit-fallthrough
+		case WM_LBUTTONUP:                              // warning: this statement may fall through [-Wimplicit-fallthrough=]
 			if (tileedit.act==TILEEDIT_ACT_BG) break;
 			tileedit_action_done();
 			if (GetCapture()==wnd) ReleaseCapture();
@@ -622,9 +713,9 @@ static BOOL CALLBACK tileedit_sub_fg(HWND wnd,UINT msg,WPARAM wParam,LPARAM lPar
 			SetCursor(tileedit.cursor_cross);
         break;
 
-		case WM_RBUTTONDOWN:                            // Warning -Wimplicit-fallthrough
+		case WM_RBUTTONDOWN:                            // warning: this statement may fall through [-Wimplicit-fallthrough=]
 			tileedit.rclick=TRUE;
-		case WM_LBUTTONUP: case WM_RBUTTONUP:           // Warning -Wimplicit-fallthrough
+		case WM_LBUTTONUP: case WM_RBUTTONUP:           // warning: this statement may fall through [-Wimplicit-fallthrough=]
 			if (GetCapture()==wnd) ReleaseCapture();
 		case WM_CAPTURECHANGED:
 			tileedit_action_done();
@@ -881,8 +972,13 @@ static INT_PTR CALLBACK tileview_editor_dialog( HWND dialog, UINT msg, WPARAM wP
 				/* load pattern */
 				case IDC_TILEEDIT_OPEN:
                 {
+                #ifdef MEISEI_ESP
+                    const char* filter="Archivos de Patrones (*.pattern)\0*.pattern\0Todos los Archivos (*.*)\0*.*\0\0";
+					const char* title="Abrir Patrones";
+                #else
 					const char* filter="Pattern Files (*.pattern)\0*.pattern\0All Files (*.*)\0*.*\0\0";
 					const char* title="Open Pattern";
+				#endif // MEISEI_ESP
 					char fn[STRING_SIZE]={0};
 					OPENFILENAME of;
 
@@ -956,11 +1052,28 @@ static INT_PTR CALLBACK tileview_editor_dialog( HWND dialog, UINT msg, WPARAM wP
 							if (strlen(fn+of.nFileOffset)&&(of.nFileExtension-1)>of.nFileOffset) {
 								char wintitle[STRING_SIZE]={0};
 								fn[of.nFileExtension-1]=0;
-								sprintf(wintitle,"Tile Editor - %s",fn+of.nFileOffset);
+								sprintf(
+                                    wintitle,
+                                #ifdef MEISEI_ESP
+                                    "Editor de Baldosa - %s",
+                                #else
+                                    "Tile Editor - %s",
+                                #endif // MEISEI_ESP
+                                    fn+of.nFileOffset
+                                );
 								SetWindowText(dialog,wintitle);
 							}
 						}
-						else LOG_ERROR_WINDOW(dialog,"Couldn't load pattern!");
+						else {
+                            LOG_ERROR_WINDOW(
+                                dialog,
+                            #ifdef MEISEI_ESP
+                                "¡No se pudo cargar el patrón!"
+                            #else
+                                "Couldn't load pattern!"
+                            #endif // MEISEI_ESP
+                            );
+						}
 
 						if (strlen(fn)&&of.nFileOffset) {
 							fn[of.nFileOffset]=0; strcpy(tileedit_dir,fn);
@@ -974,9 +1087,14 @@ static INT_PTR CALLBACK tileview_editor_dialog( HWND dialog, UINT msg, WPARAM wP
 				/* save pattern */
 				case IDC_TILEEDIT_SAVE:
                 {
+                #ifdef MEISEI_ESP
+					const char* filter="Archivo de Patrón (*.pattern)\0*.pattern\0Todos los Archivos (*.*)\0*.*\0\0";
+					const char* title="Guardar Patrón Como";
+                #else
 					const char* filter="Pattern File (*.pattern)\0*.pattern\0All Files (*.*)\0*.*\0\0";
-					const char* defext="\0\0\0\0";
 					const char* title="Save Pattern As";
+                #endif // MEISEI_ESP
+					const char* defext="\0\0\0\0";
 					char fn[STRING_SIZE]={0};
 					OPENFILENAME of;
 
@@ -1020,11 +1138,27 @@ static INT_PTR CALLBACK tileview_editor_dialog( HWND dialog, UINT msg, WPARAM wP
 						memcpy(data,tileedit.p,8);
 						memcpy(data+8,tileedit.c,8);
 
-						if (!strlen(fn)||!file_save_custom(&fd,fn)||!file_write_custom(fd,data,0x10)) LOG_ERROR_WINDOW(dialog,"Couldn't save pattern!");
-						else if (strlen(fn+of.nFileOffset)&&(of.nFileExtension-1)>of.nFileOffset) {
+						if (!strlen(fn)||!file_save_custom(&fd,fn)||!file_write_custom(fd,data,0x10)) {
+                            LOG_ERROR_WINDOW(
+                                dialog,
+                            #ifdef MEISEI_ESP
+                                "¡No se pudo guardar el patrón!"
+                            #else
+                                "Couldn't save pattern!"
+                            #endif // MEISEI_ESP
+                            );
+						} else if (strlen(fn+of.nFileOffset)&&(of.nFileExtension-1)>of.nFileOffset) {
 							char wintitle[STRING_SIZE]={0};
 							fn[of.nFileExtension-1]=0;
-							sprintf(wintitle,"Tile Editor - %s",fn+of.nFileOffset);
+							sprintf(
+                                wintitle,
+                            #ifdef MEISEI_ESP
+                                "Editor de Baldosa - %s",
+                            #else
+                                "Tile Editor - %s",
+                            #endif // MEISEI_ESP
+                                fn+of.nFileOffset
+                            );
 							SetWindowText(dialog,wintitle);
 						}
 
@@ -1052,7 +1186,7 @@ static INT_PTR CALLBACK tileview_editor_dialog( HWND dialog, UINT msg, WPARAM wP
                 break;
 
 				/* close dialog */
-				case IDOK:              // Warning -Wimplicit-fallthrough
+				case IDOK:              // warning: this statement may fall through [-Wimplicit-fallthrough=]
 					if (netplay_is_active()||movie_get_active_state()||!tileview.ext_wnd||tileedit_apply(dialog,TRUE)==IDCANCEL) break;
 				case IDCANCEL:
 					if (!tileview.ext_wnd) break;
@@ -1309,7 +1443,7 @@ static INT_PTR CALLBACK tileview_editor_dialog( HWND dialog, UINT msg, WPARAM wP
 						i=8;
 						while (i--) c[i]=(c[i]&0xf)|tileedit.curpal<<4;
 					}
-					break;
+                break;
 
 				case TILEEDIT_ACT_BC:
 					if (!tileedit.in_bg) break;
@@ -1318,9 +1452,10 @@ static INT_PTR CALLBACK tileview_editor_dialog( HWND dialog, UINT msg, WPARAM wP
 						i=8;
 						while (i--) c[i]=(c[i]&0xf0)|tileedit.curpal;
 					}
-					break;
+                break;
 
-				default: break;
+				default:
+                break;
 			}
 
 			/* undo/redo */
@@ -1433,7 +1568,16 @@ static INT_PTR CALLBACK tileview_editor_dialog( HWND dialog, UINT msg, WPARAM wP
  ******************************************************************************/
 
 static const char* tileview_source_name[TILEVIEW_SOURCE_MAX]={
-	"Pattern Table",	"Name Table",		"Name Table + Overlay"
+#ifdef MEISEI_ESP
+	"Tabla de Patrones",
+	"Tabla de Nombres",
+	"Tabla de Nombres + Índices"
+
+#else
+	"Pattern Table",
+	"Name Table",
+	"Name Table + Overlay"
+#endif // MEISEI_ESP
 };
 
 const char* tileview_get_source_name(u32 i) { if (i>=TILEVIEW_SOURCE_MAX) return NULL; else return tileview_source_name[i]; }
@@ -1630,7 +1774,18 @@ static void tileview_ct_screen1to2(u8* data)
 static int tileview_save_nt(u8* dest,int ntsize,int ptsize,int isnt,HWND dialog)
 {
 	if (!isnt) {
-		int i=MessageBox(dialog,"Tile Viewer currently displays pattern table.\nSave name table as complete pattern list?","meisei",MB_ICONEXCLAMATION|MB_YESNOCANCEL|MB_DEFBUTTON2);
+		int i = MessageBox(
+            dialog,
+        #ifdef MEISEI_ESP
+            "Visor de Baldosas muestra actualmente la tabla de patrones.\n"
+            "¿Guardar la tabla de nombres como lista completa de patrones?",
+        #else
+            "Tile Viewer currently displays pattern table.\n"
+            "Save name table as complete pattern list?",
+        #endif
+            "meisei",
+            MB_ICONEXCLAMATION|MB_YESNOCANCEL|MB_DEFBUTTON2
+        );
 		if (i==IDCANCEL) return TRUE;
 		else isnt=i==IDNO;
 	}
@@ -1773,7 +1928,22 @@ static INT_PTR CALLBACK tileview_screeninfo_dialog( HWND dialog, UINT msg, WPARA
 				default: sprintf(table,"$0000-$07FF: PGT\r\n$0800-$0AFF: NT"); break; /* 3 */
 			}
 
-			sprintf(t,"%s\r\n\r\nTo view it on an MSX, save with BLOAD header, and type:\r\nCOLOR %d,%d,%d:SCREEN %d:BLOAD\"foo.sc%d\",S:A$=INPUT$(1)",table,tileview.vdp_regs[7]>>4,tileview.vdp_regs[7]&0xf,tileview.vdp_regs[7]&0xf,tileview.screenmode,tileview.screenmode);
+			sprintf(
+                t,
+                "%s\r\n\r\n"
+            #ifdef MEISEI_ESP
+                "Para verlo en un MSX, guárdalo con el encabezado BLOAD y escribe:\r\n"
+            #else
+                "To view it on an MSX, save with BLOAD header, and type:\r\n"
+            #endif // MEISEI_ESP
+                "COLOR %d,%d,%d:SCREEN %d:BLOAD\"foo.sc%d\",S:A$=INPUT$(1)",
+                table,
+                tileview.vdp_regs[7]>>4,
+                tileview.vdp_regs[7]&0xf,
+                tileview.vdp_regs[7]&0xf,
+                tileview.screenmode,
+                tileview.screenmode
+            );
 
 			main_parent_window(dialog,0,0,0,0,0);
 			SetFocus(dialog);
@@ -1821,8 +1991,11 @@ static UINT_PTR CALLBACK tileview_save_hook(HWND dialog,UINT msg,WPARAM wParam,L
 			if (tileview.validscreen) {
 				char t[0x100];
 
-				if (tileview.screenmode==0) sprintf(t,"      (TextColour: %d, BackDrop: %d)",tileview.vdp_regs[7]>>4,tileview.vdp_regs[7]&0xf);
-				else sprintf(t,"      (BackDrop: %d)",tileview.vdp_regs[7]&0xf);
+				if (tileview.screenmode==0) {
+                    sprintf(t,"      (TextColour: %d, BackDrop: %d)",tileview.vdp_regs[7]>>4,tileview.vdp_regs[7]&0xf);
+				} else {
+				    sprintf(t,"      (BackDrop: %d)",tileview.vdp_regs[7]&0xf);
+				}
 				EnableWindow(GetDlgItem(dialog,IDC_TILEVIEWSAVE_INFO),FALSE);
 				SetDlgItemText(dialog,IDC_TILEVIEWSAVE_INFO,t);
 			}
@@ -2005,10 +2178,11 @@ static void tileview_update_block_info(HWND dialog,UINT id,int n,int b)
 /* main window */
 INT_PTR CALLBACK tileview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM lParam )
 {
-	switch (msg) {
+    switch (msg) {
 
-		case WM_INITDIALOG: {
-			int i,j;
+        case WM_INITDIALOG:
+        {
+            int i,j;
 			HDC d_dc;
 			HWND d_wnd;
 			char t[0x100];
@@ -2054,7 +2228,14 @@ INT_PTR CALLBACK tileview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM l
 
 			ShowWindow(GetDlgItem(dialog,IDC_TILEVIEW_DETAILSC),SW_HIDE);
 			tileview.dinfo=tileview.dclick=FALSE;
-			sprintf(t,"Click on the tilemap to show.");
+			sprintf(
+                t,
+            #ifdef MEISEI_ESP
+                "Haga Clic en el mapa de baldosas"
+            #else
+                "Click on the tilemap to show."
+            #endif // MEISEI_ESP
+            );
 			SetDlgItemText(dialog,IDC_TILEVIEW_SDETAILS,t);
 
 			/* init tilemap */
@@ -2088,8 +2269,8 @@ INT_PTR CALLBACK tileview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM l
 			tileview.busy=FALSE;
 
 			return 1;
-			break;
 		}
+        break;
 
 		case WM_CLOSE:
 			if (tool_get_window(TOOL_WINDOW_TILEVIEW)) {
@@ -2119,16 +2300,14 @@ INT_PTR CALLBACK tileview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM l
 				DestroyWindow(dialog);
 				tool_reset_window(TOOL_WINDOW_TILEVIEW);
 			}
-
-			break;
+        break;
 
 		case WM_SIZING:
 			if (tileview.tv.wnd) {
 				InvalidateRect(dialog,NULL,FALSE);
 				return toolwindow_restrictresize(dialog,wParam,lParam,TILEVIEW_WIN_WIDTH,TILEVIEW_WIN_HEIGHT);
 			}
-
-			break;
+        break;
 
 		case WM_SIZE:
 			if (wParam!=SIZE_MINIMIZED&&tileview.tv.wnd) {
@@ -2196,7 +2375,7 @@ INT_PTR CALLBACK tileview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM l
 
 				InvalidateRect(dialog,NULL,FALSE);
 			}
-			break;
+        break;
 
 		case WM_COMMAND:
 
@@ -2236,9 +2415,15 @@ INT_PTR CALLBACK tileview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM l
 					break;
 
 				/* load tilemap */
-				case IDC_TILEVIEW_OPEN: {
+				case IDC_TILEVIEW_OPEN:
+                {
 					int i,j,screenmode,shift;
-					const char* title="Open Tile Data";
+					const char* title=
+					#ifdef MEISEI_ESP
+                        "Abrir Datos de Baldosa";
+					#else
+                        "Open Tile Data";
+					#endif // MEISEI_ESP
 					char filter[STRING_SIZE]={0};
 					char fn[STRING_SIZE]={0};
 					OPENFILENAME of;
@@ -2257,8 +2442,17 @@ INT_PTR CALLBACK tileview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM l
 					tileview.screenmode=screenmode;
 					tileview.validscreen=tileview_validscreen(tileview.vdp_regs);
 
-					memcpy(filter,"All Supported Files\0*.sc0;*.sc1;*.sc2;*.sc3;*.sc4;*.nt;*.pgt;*.ct\0Screen X Files (*.scX)\0*.scX\0NT Dumps (*.nt)\0*.nt\0PGT Dumps (*.pgt)\0*.pgt\0CT Dumps (*.ct)\0*.ct\0All Files (*.*)\0*.*\0\0                                                                             ",196);
-					filter[73]=filter[86]=filter[93]='0'+screenmode;
+					memcpy(
+                        filter,
+                    #ifdef MEISEI_ESP
+                        "Todos los Archivos \0*.sc0;*.sc1;*.sc2;*.sc3;*.sc4;*.nt;*.pgt;*.ct\0Screen X Arch. (*.scX)\0*.scX\0NT Dumps (*.nt)\0*.nt\0PGT Dumps (*.pgt)\0*.pgt\0CT Dumps (*.ct)\0*.ct\0Todos los Archivos (*.*)\0*.*\0\0                                ",
+                    #else
+                     // "All Supported Files\0*.sc0;*.sc1;*.sc2;*.sc3;*.sc4;*.nt;*.pgt;*.ct\0Screen X Files (*.scX)\0*.scX\0NT Dumps (*.nt)\0*.nt\0PGT Dumps (*.pgt)\0*.pgt\0CT Dumps (*.ct)\0*.ct\0All Files (*.*)\0*.*\0\0                                                                             ",
+                        "All Supported Files\0*.sc0;*.sc1;*.sc2;*.sc3;*.sc4;*.nt;*.pgt;*.ct\0Screen X Files (*.scX)\0*.scX\0NT Dumps (*.nt)\0*.nt\0PGT Dumps (*.pgt)\0*.pgt\0CT Dumps (*.ct)\0*.ct\0All Files (*.*)\0*.*\0\0                                         ",
+                    #endif // MEISEI_ESP
+                        196
+                    );
+					filter[73]=filter[86]=filter[93]='0'+screenmode; // <- OJO
 
 					of.lStructSize=sizeof(OPENFILENAME);
 					of.hwndOwner=dialog;
@@ -2282,30 +2476,24 @@ INT_PTR CALLBACK tileview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM l
 						int size=0;
 						u32 fi=of.nFilterIndex;
 						FILE* fd=NULL;
-
 						if (!tileview.tv.wnd) {
 							/* cleaned up already (check again since time passed) */
 							main_menu_enable(IDM_TILEVIEW,TRUE);
 							break;
 						}
-
 						tileview_open_fi=fi;
 						fi--; if (fi<1) fi=5; /* all supported == all files */
-
 						/* mode may have changed */
 						for (i=0;i<8;i++) tileview.vdp_regs[i]=vdp_regs[i];
 						screenmode=tileview_get_screenmode(tileview.vdp_regs);
 						tileview.validscreen=tileview_validscreen(tileview.vdp_regs);
-
 						pno=tileview.vdp_regs[2]<<10&0x3fff;
 						pgo=tileview.vdp_regs[4]<<11&0x3fff;
 						cto=tileview.vdp_regs[3]<<6;
-
 						if (!netplay_is_active()&&!movie_get_active_state()&&strlen(fn)&&(size=file_open_custom(&fd,fn))>10) {
 							u8 data[0x4010];
 							u8 datab[0x4000];
 							memset(data,0,0x4010);
-
 							if (size<0x4010&&file_read_custom(fd,data,size)) {
 								const int screen_source_lut[4][4]={
 									{0x0000,0x1800,0x1800,0x0800},	/* nt */
@@ -2313,13 +2501,10 @@ INT_PTR CALLBACK tileview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM l
 									{0x2000,0x2000,0x2000,0x2000},	/* ct */
 									{0x1000,0x2020,0x3800,0x0b00}	/* min size */
 								};
-
 								int screenmode_source=screenmode;
 								int realsize=size,offset=0;
-
 								file_close_custom(fd);
 								fd=NULL;
-
 								/* detect BLOAD header (skip with SHIFT) */
 								if (!((shift|GetAsyncKeyState(VK_SHIFT))&0x8000)) {
 									int sa=data[2]<<8|data[1];
@@ -2330,19 +2515,21 @@ INT_PTR CALLBACK tileview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM l
 										if (realsize>0x4000) realsize=0x4000;
 									}
 								}
-
 								if (((tileview.vdp_regs[0]&2)|(tileview.vdp_regs[1]&0x18))!=prevmode) {
-									if (MessageBox(dialog,"Mode was changed, load anyway?","meisei",MB_ICONEXCLAMATION|MB_YESNO|MB_DEFBUTTON2)==IDYES) {
-										if (fi==1) fi=5;
-									}
-									else fi=0;
+                                #ifdef MEISEI_ESP
+                                    if (MessageBox(dialog,"Se cambió el modo, ¿cargar de todos modos?","meisei",MB_ICONEXCLAMATION|MB_YESNO|MB_DEFBUTTON2)==IDYES)
+                                #else
+                                    if (MessageBox(dialog,"Mode was changed, load anyway?","meisei",MB_ICONEXCLAMATION|MB_YESNO|MB_DEFBUTTON2)==IDYES)
+                                #endif // MEISEI_ESP
+									{
+                                        if (fi==1) fi=5;
+									} else fi=0;
 								}
-
 								if (fi>4) {
 									i=of.nFileExtension;
-
-									switch (realsize) {
-										case 0x20: fi=4; break; /* screen 1 ct */
+									switch (realsize)
+									{
+                                        case 0x20: fi=4; break; /* screen 1 ct */
 										case 0x300: case 960: fi=2; break; /* nt */
 										case 0x800: fi=3; break; /* screen 0/1/3 pt */
 										case 0x1800: fi=3+(fn[i]=='c'); break; /* screen 2 pt/ct */
@@ -2378,20 +2565,25 @@ INT_PTR CALLBACK tileview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM l
 														screenmode_source=i;
 													}
 												}
-
-												fi=1;
-											}
-											else {
+                                                fi=1;
+											} else {
 												/* error */
-												LOG_ERROR_WINDOW(dialog,"Couldn't detect file type!");
+												LOG_ERROR_WINDOW(
+                                                    dialog,
+                                                #ifdef MEISEI_ESP
+                                                    "¡No se pudo detectar el tipo de archivo!"
+                                                #else
+                                                    "Couldn't detect file type!"
+                                                #endif // MEISEI_ESP
+                                                );
 												fi=0;
 											}
-
-											break;
-									}
+                                        break; // DEFAULT
+									} // END switch (realsize)
 								}
 
-								switch (fi) {
+								switch (fi)
+								{
 									/* scX */
 									case 1:
 										if (realsize>=screen_source_lut[3][screenmode_source]) {
@@ -2436,15 +2628,32 @@ INT_PTR CALLBACK tileview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM l
 												}
 											}
 										}
-										if (!success) LOG_ERROR_WINDOW(dialog,"Couldn't load tilemap!");
+										if (!success) {
+                                            LOG_ERROR_WINDOW(
+                                                dialog,
+                                            #ifdef MEISEI_ESP
+                                                "¡No se pudo cargar el mapa de baldosas!"
+                                            #else
+                                                "Couldn't load tilemap!"
+                                            #endif
+                                            );
+										}
 										success&=1;
 
 										break;
 
 									/* nt */
 									case 2:
-										if (!vdp_upload(pno,data+offset,(screenmode==0)?960:0x300)) LOG_ERROR_WINDOW(dialog,"Couldn't load name table!");
-										else success=TRUE;
+										if (!vdp_upload(pno,data+offset,(screenmode==0)?960:0x300)) {
+                                            LOG_ERROR_WINDOW(
+                                                dialog,
+                                            #ifdef MEISEI_ESP
+                                                "¡No se pudo cargar la tabla de nombres!"
+                                            #else
+                                                "Couldn't load name table!"
+                                            #endif // MEISEI_ESP
+                                            );
+										} else success=TRUE;
 										break;
 
 									/* pgt */
@@ -2459,7 +2668,16 @@ INT_PTR CALLBACK tileview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM l
 											success=vdp_upload(pgo&0x2000,data+offset,0x1800);
 										}
 										else success=vdp_upload(pgo,data+offset,0x800);
-										if (!success) LOG_ERROR_WINDOW(dialog,"Couldn't load pattern table!");
+										if (!success) {
+                                            LOG_ERROR_WINDOW(
+                                                dialog,
+                                            #ifdef MEISEI_ESP
+                                                "¡No se pudo cargar la tabla de patrones!"
+                                            #else
+                                                "Couldn't load pattern table!"
+                                            #endif // MEISEI_ESP
+                                            );
+										}
 										break;
 
 									/* ct */
@@ -2472,36 +2690,69 @@ INT_PTR CALLBACK tileview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM l
 											else success=FALSE;
 										}
 										else if (screenmode==1) success=vdp_upload(cto,data+offset,0x20);
-										if (!success) LOG_ERROR_WINDOW(dialog,"Couldn't load colour table!");
+										if (!success) {
+                                            LOG_ERROR_WINDOW(
+                                                dialog,
+                                            #ifdef MEISEI_ESP
+                                                "¡No se pudo cargar la tabla de colores!"
+                                            #else
+                                                "Couldn't load colour table!"
+                                            #endif // MEISEI_ESP
+                                            );
+										}
 										break;
 
 									default: break;
 								}
+							} else {
+                                LOG_ERROR_WINDOW(
+                                    dialog,
+                                #ifdef MEISEI_ESP
+                                    "¡No se pudo cargar el mapa de baldosas!"
+                                #else
+                                    "Couldn't load tilemap!"
+                                #endif
+                                );
 							}
-							else LOG_ERROR_WINDOW(dialog,"Couldn't load tilemap!");
+						} else {
+                            LOG_ERROR_WINDOW(
+                                dialog,
+                            #ifdef MEISEI_ESP
+                                "¡No se pudo cargar el mapa de baldosas!"
+                            #else
+                                "Couldn't load tilemap!"
+                            #endif // MEISEI_ESP
+                            );
 						}
-						else LOG_ERROR_WINDOW(dialog,"Couldn't load tilemap!");
-
 						file_close_custom(fd);
 						if (success&&strlen(fn+of.nFileOffset)) {
 							char wintitle[STRING_SIZE]={0};
-							sprintf(wintitle,"Tile Viewer - %s",fn+of.nFileOffset);
+							sprintf(
+                                wintitle,
+                            #ifdef MEISEI_ESP
+                                "Visor de Baldosa - %s",
+                            #else
+                                "Tile Viewer - %s",
+                            #endif // MEISEI_ESP
+                                fn+of.nFileOffset
+                            );
 							SetWindowText(dialog,wintitle);
 						}
 						if (strlen(fn)&&of.nFileOffset) {
 							fn[of.nFileOffset]=0; strcpy(tileview_dir,fn);
 						}
-					}
+					} // if (GetOpenFileName(&of)) {
 
 					tileview.ext_dialog=0;
 					PostMessage(dialog,WM_NEXTDLGCTL,(WPARAM)GetDlgItem(dialog,IDOK),TRUE);
 					main_menu_enable(IDM_TILEVIEW,TRUE);
 
 					break;
-				}
+				} // FIN case IDC_TILEVIEW_OPEN:
 
 				/* save tilemap */
-				case IDC_TILEVIEW_SAVE: {
+				case IDC_TILEVIEW_SAVE:
+                {
 					int i;
 
 					int* dibdata;
@@ -2509,7 +2760,11 @@ INT_PTR CALLBACK tileview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM l
 					int isnt=tileview.isnt;
 					int screenmode;
 					const char* defext="png";
+                #ifdef MEISEI_ESP
+                    const char* title="Guardar Datos de Baldosa Como";
+                #else
 					const char* title="Save Tile Data As";
+                #endif // MEISEI_ESP
 					char filter[STRING_SIZE]={0};
 					char fn[STRING_SIZE]={0};
 					OPENFILENAME of;
@@ -2532,8 +2787,17 @@ INT_PTR CALLBACK tileview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM l
 					tileview.screenmode=screenmode;
 					tileview.validscreen=tileview_validscreen(tileview.vdp_regs);
 
-					memcpy(filter,"PNG Image (*.png)\0*.png\0Screen X file (*.scX)\0*.scX\0NT Dump (*.nt)\0*.nt\0PGT Dump (*.pgt)\0*.pgt\0CT Dump (*.ct)\0*.ct\0\0                                                                                               ",130);
-					filter[31]=filter[43]=filter[50]='0'+screenmode;
+					memcpy(
+                        filter,
+                    #ifdef MEISEI_ESP
+                        "Imagen PNG(*.png)\0*.png\0Screen X Arch (*.scX)\0*.scX\0NT Dump (*.nt)\0*.nt\0PGT Dump (*.pgt)\0*.pgt\0CT Dump (*.ct)\0*.ct\0\0                          ",
+                    #else
+                    //  "PNG Image (*.png)\0*.png\0Screen X file (*.scX)\0*.scX\0NT Dump (*.nt)\0*.nt\0PGT Dump (*.pgt)\0*.pgt\0CT Dump (*.ct)\0*.ct\0\0                                                                                               ",
+                        "PNG Image (*.png)\0*.png\0Screen X file (*.scX)\0*.scX\0NT Dump (*.nt)\0*.nt\0PGT Dump (*.pgt)\0*.pgt\0CT Dump (*.ct)\0*.ct\0\0                           ",
+                    #endif // MEISEI_ESP
+                        130
+                    );
+					filter[31]=filter[43]=filter[50]='0'+screenmode; // <- OJO
 
 					of.lStructSize=sizeof(OPENFILENAME);
 					of.hwndOwner=dialog;
@@ -2661,8 +2925,16 @@ INT_PTR CALLBACK tileview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM l
 								if (cancel) break;
 
 								/* save */
-								if (!offset||!strlen(fn)||!file_save_custom(&fd,fn)||!file_write_custom(fd,data,offset)) LOG_ERROR_WINDOW(dialog,"Couldn't save tilemap!");
-								else success=TRUE;
+								if (!offset||!strlen(fn)||!file_save_custom(&fd,fn)||!file_write_custom(fd,data,offset)) {
+                                    LOG_ERROR_WINDOW(
+                                        dialog,
+                                    #ifdef MEISEI_ESP
+                                        "¡No se pudo guardar el mapa de baldosas!"
+                                    #else
+                                        "Couldn't save tilemap!"
+                                    #endif // MEISEI_ESP
+                                    );
+								} else success=TRUE;
 
 								break;
 							}
@@ -2671,8 +2943,16 @@ INT_PTR CALLBACK tileview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM l
 							case 3:
 								i=(screenmode==0)?960:0x300;
 								tileview_save_nt(data,i,i,TRUE,dialog);
-								if (!strlen(fn)||!file_save_custom(&fd,fn)||!file_write_custom(fd,data,i)) LOG_ERROR_WINDOW(dialog,"Couldn't save name table!");
-								else success=TRUE;
+								if (!strlen(fn)||!file_save_custom(&fd,fn)||!file_write_custom(fd,data,i)) {
+                                    LOG_ERROR_WINDOW(
+                                        dialog,
+                                    #ifdef MEISEI_ESP
+                                        "¡No se pudo guardar la tabla de nombres!"
+                                    #else
+                                        "Couldn't save name table!"
+                                    #endif // MEISEI_ESP
+                                    );
+								} else success=TRUE;
 
 								break;
 
@@ -2680,8 +2960,16 @@ INT_PTR CALLBACK tileview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM l
 							case 4:
 								if (screenmode==2) { i=0x1800; tileview_save_pt2(data); }
 								else { i=0x800; memcpy(data,tileview.vdp_ram+(tileview.vdp_regs[4]<<11&0x3fff),i); }
-								if (!strlen(fn)||!file_save_custom(&fd,fn)||!file_write_custom(fd,data,i)) LOG_ERROR_WINDOW(dialog,"Couldn't save pattern table!");
-								else success=TRUE;
+								if (!strlen(fn)||!file_save_custom(&fd,fn)||!file_write_custom(fd,data,i)) {
+                                    LOG_ERROR_WINDOW(
+                                        dialog,
+                                    #ifdef MEISEI_ESP
+                                        "¡No se pudo guardar la tabla de patrones!"
+                                    #else
+                                        "Couldn't save pattern table!"
+                                    #endif // MEISEI_ESP
+                                    );
+								} else success=TRUE;
 
 								break;
 
@@ -2689,14 +2977,31 @@ INT_PTR CALLBACK tileview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM l
 							case 5:
 								if (screenmode==2) { i=0x1800; tileview_save_ct2(data); }
 								else { i=0x20; memcpy(data,tileview.vdp_ram+(tileview.vdp_regs[3]<<6),i); }
-								if (screenmode==0||screenmode==3||!strlen(fn)||!file_save_custom(&fd,fn)||!file_write_custom(fd,data,i)) LOG_ERROR_WINDOW(dialog,"Couldn't save colour table!");
-								else success=TRUE;
+								if (screenmode==0||screenmode==3||!strlen(fn)||!file_save_custom(&fd,fn)||!file_write_custom(fd,data,i)) {
+                                    LOG_ERROR_WINDOW(
+                                        dialog,
+                                    #ifdef MEISEI_ESP
+                                        "¡No se pudo guardar la tabla de colores!"
+                                    #else
+                                        "Couldn't save colour table!"
+                                    #endif // MEISEI_ESP
+                                    );
+								} else success=TRUE;
 
 								break;
 
 							/* png */
 							default:
-								if (!screenshot_save(256,192,SCREENSHOT_TYPE_32BPP,(void*)dibdata,NULL,fn)) LOG_ERROR_WINDOW(dialog,"Couldn't save screenshot!");
+								if (!screenshot_save(256,192,SCREENSHOT_TYPE_32BPP,(void*)dibdata,NULL,fn)) {
+                                    LOG_ERROR_WINDOW(
+                                        dialog,
+                                    #ifdef MEISEI_ESP
+                                        "¡No se pudo guardar la captura de pantalla!"
+                                    #else
+                                        "Couldn't save screenshot!"
+                                    #endif
+                                    );
+								}
 								/* no "success" */
 								break;
 						}
@@ -2704,7 +3009,15 @@ INT_PTR CALLBACK tileview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM l
 						file_close_custom(fd);
 						if (success&&strlen(fn+of.nFileOffset)) {
 							char wintitle[STRING_SIZE]={0};
-							sprintf(wintitle,"Tile Viewer - %s",fn+of.nFileOffset);
+							sprintf(
+                                wintitle,
+                            #ifdef MEISEI_ESP
+                                "Visor de Balsosa - %s",
+                            #else
+                                "Tile Viewer - %s",
+                            #endif // MEISEI_ESP
+                                fn+of.nFileOffset
+                            );
 							SetWindowText(dialog,wintitle);
 						}
 						if (!cancel&&strlen(fn)&&of.nFileOffset) {
@@ -3028,10 +3341,11 @@ INT_PTR CALLBACK tileview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM l
 					break;
 				}
 
-				default: break;
-			}
+				default:
+                break;
+			} // switch (mode)
 
-			} /* big loop */
+            } // for (line=0;line<192;line++) {
 
 			#undef OSHIFT
 			#undef OMASK
@@ -3182,8 +3496,7 @@ INT_PTR CALLBACK tileview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM l
 							/* screen 2 colour */
 							j=7; /* ormask */
 							ct=((ct&0x2000)|(block<<11&0x1800)|tile<<3)&(ct|0x3f);
-						}
-						else {
+						} else {
 							/* screen 1 colour */
 							j=0;
 							ct=tile>>3|ct;
@@ -3481,7 +3794,14 @@ INT_PTR CALLBACK tileview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM l
 					memset(p_e,0,8); memset(c_e,0,8);
 					if (!tileedit_upload(tileedit.vdp_regs,p_e,c_e,0,0)) {
 						CLEAN_MENU(FALSE);
-						LOG_ERROR_WINDOW(dialog,"Couldn't cut tile!");
+						LOG_ERROR_WINDOW(
+                            dialog,
+                        #ifdef MEISEI_ESP
+                            "¡No se pudo cortar la baldosa!"
+                        #else
+                            "Couldn't cut tile!"
+                        #endif // MEISEI_ESP
+                        );
 					}
 
 					break;
@@ -3499,7 +3819,14 @@ INT_PTR CALLBACK tileview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM l
 					if (gray_paste||tileview.isnt) break;
 					if (!tileedit_upload(tileedit.vdp_regs,tileview.copy_p,tileview.copy_c,0,0)) {
 						CLEAN_MENU(FALSE);
-						LOG_ERROR_WINDOW(dialog,"Couldn't paste tile!");
+						LOG_ERROR_WINDOW(
+                            dialog,
+                        #ifdef MEISEI_ESP
+                            "¡No se pudo pegar la baldosa!"
+                        #else
+                            "Couldn't paste tile!"
+                        #endif
+                        );
 					}
 					break;
 
@@ -3526,7 +3853,14 @@ INT_PTR CALLBACK tileview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM l
 					if (gray_nthl||!tileview.isnt) break;
 					if (!tileview_nthl(lParam)) {
 						CLEAN_MENU(FALSE);
-						LOG_ERROR_WINDOW(dialog,"Couldn't set value!");
+						LOG_ERROR_WINDOW(
+                            dialog,
+                        #ifdef MEISEI_ESP
+                            "¡No se pudo establecer el valor!"
+                        #else
+                            "Couldn't set value!"
+                        #endif
+                        );
 					}
 					break;
 
@@ -3550,7 +3884,14 @@ INT_PTR CALLBACK tileview_window( HWND dialog, UINT msg, WPARAM wParam, LPARAM l
 
 					/* bogus mode */
 					if ((tileedit.vdp_regs[1]&0x18)==0x18) {
-						LOG_ERROR_WINDOW(dialog,"Invalid mixed mode!");
+						LOG_ERROR_WINDOW(
+                            dialog,
+                        #ifdef MEISEI_ESP
+                            "¡Modo mixto no válido!"
+                        #else
+                            "Invalid mixed mode!"
+                        #endif // MEISEI_ESP
+                        );
 						break;
 					}
 

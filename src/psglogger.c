@@ -133,9 +133,14 @@ static void psglogger_clean_frames(void)
 int psglogger_start(HWND dialog,HWND* dt)
 {
 	/* only called from psgtoy */
+#ifdef MEISEI_ESP
+	const char* filter="Flujo Binario (*.bin)\0*.bin\0Archivo MIDI (*.mid)\0*.mid\0Archivo YM (*.ym)\0*.ym\0\0";
+	const char* title="Iniciar el Registrador PSG";
+#else
 	const char* filter="Binary Stream (*.bin)\0*.bin\0MIDI File (*.mid)\0*.mid\0YM File (*.ym)\0*.ym\0\0";
-	const char* defext="ym";
 	const char* title="Start PSG Logger";
+#endif // MEISEI_ESP
+    const char* defext="ym";
 	char fn[STRING_SIZE]={0};
 	OPENFILENAME of;
 	int ret=0;
