@@ -382,6 +382,19 @@ DLLEXP kailleraSetInfos(kailleraInfos *infosp) {
 	//Favorite List Menu
 	favoritelistMenu = CreatePopupMenu();
 	favoritelistSubMenu = CreatePopupMenu();
+#ifdef MEISEI_ESP
+	AppendMenu(favoritelistMenu, MF_STRING | MF_POPUP, 0xFFD8, "Conectar");
+	AppendMenu(favoritelistMenu, MF_STRING | MF_POPUP, 0xFFD5, "Editar Entrada");
+	AppendMenu(favoritelistMenu, MF_SEPARATOR | MF_POPUP, 0, 0 );
+	AppendMenu(favoritelistMenu, MF_STRING | MF_POPUP, 0xFFD9, "Eliminar");
+	AppendMenu(favoritelistMenu, MF_STRING | MF_POPUP, 0xFFDA, "Eliminar Todo");
+	AppendMenu(favoritelistMenu, MF_SEPARATOR | MF_POPUP, 0, 0 );
+	AppendMenu(favoritelistMenu, MF_STRING | MF_POPUP, (UINT_PTR)favoritelistSubMenu, "Copiar");
+	AppendMenu(favoritelistSubMenu, MF_STRING, 0xFFDB, "Nombre del Servidor");
+	AppendMenu(favoritelistSubMenu, MF_STRING, 0xFFDC, "Dirección IP");
+	AppendMenu(favoritelistSubMenu, MF_STRING, 0xFFDD, "Ubicación");
+	AppendMenu(favoritelistSubMenu, MF_STRING, 0xFFDE, "Comentarios");
+#else
 	AppendMenu(favoritelistMenu, MF_STRING | MF_POPUP, 0xFFD8, "Connect");
 	AppendMenu(favoritelistMenu, MF_STRING | MF_POPUP, 0xFFD5, "Edit Entry");
 	AppendMenu(favoritelistMenu, MF_SEPARATOR | MF_POPUP, 0, 0 );
@@ -393,10 +406,24 @@ DLLEXP kailleraSetInfos(kailleraInfos *infosp) {
 	AppendMenu(favoritelistSubMenu, MF_STRING, 0xFFDC, "IP Address");
 	AppendMenu(favoritelistSubMenu, MF_STRING, 0xFFDD, "Location");
 	AppendMenu(favoritelistSubMenu, MF_STRING, 0xFFDE, "Comments");
+#endif // MEISEI_ESP
 
 	//Recent List Menu
 	recentlistMenu = CreatePopupMenu();
 	recentlistSubMenu = CreatePopupMenu();
+#ifdef MEISEI_ESP
+	AppendMenu(recentlistMenu, MF_STRING | MF_POPUP, 0xFFE1, "Agregar a Favoritos");
+	AppendMenu(recentlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0 );
+	AppendMenu(recentlistMenu, MF_STRING | MF_POPUP, 0xFFE2, "Conectar");
+    AppendMenu(recentlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0 );
+	AppendMenu(recentlistMenu, MF_STRING | MF_POPUP, 0xFFE3, "Eliminar");
+	AppendMenu(recentlistMenu, MF_STRING | MF_POPUP, 0xFFE0, "Eliminar Todo");
+	AppendMenu(recentlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0 );
+	AppendMenu(recentlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)recentlistSubMenu, "Copiar");
+	AppendMenu(recentlistSubMenu, MF_STRING, 0xFFE4, "Nombre del Servidor");
+	AppendMenu(recentlistSubMenu, MF_STRING, 0xFFE5, "Dirección IP");
+	AppendMenu(recentlistSubMenu, MF_STRING, 0xFFE6, "Ubicación");
+#else
 	AppendMenu(recentlistMenu, MF_STRING | MF_POPUP, 0xFFE1, "Add to Favorites");
 	AppendMenu(recentlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0 );
 	AppendMenu(recentlistMenu, MF_STRING | MF_POPUP, 0xFFE2, "Connect");
@@ -408,10 +435,26 @@ DLLEXP kailleraSetInfos(kailleraInfos *infosp) {
 	AppendMenu(recentlistSubMenu, MF_STRING, 0xFFE4, "Server Name");
 	AppendMenu(recentlistSubMenu, MF_STRING, 0xFFE5, "IP Address");
 	AppendMenu(recentlistSubMenu, MF_STRING, 0xFFE6, "Location");
+#endif
 
 	//Waiting List Menu
 	waitinglistMenu = CreatePopupMenu();
 	waitinglistSubMenu = CreatePopupMenu();
+#ifdef MEISEI_ESP
+	AppendMenu(waitinglistMenu, MF_STRING | MF_POPUP, 0xFFDF, "Agregar a Favoritos");
+	AppendMenu(waitinglistMenu, MF_SEPARATOR | MF_POPUP, 0, 0 );
+	AppendMenu(waitinglistMenu, MF_STRING | MF_POPUP, 0xFFE7, "Actualizar Juegos en Espera");
+	AppendMenu(waitinglistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(waitinglistMenu, MF_STRING | MF_POPUP, 0xFFE8, "Conectar");
+	AppendMenu(waitinglistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(waitinglistMenu, MF_STRING | MF_POPUP, (UINT_PTR)waitinglistSubMenu, "Copiar");
+	AppendMenu(waitinglistSubMenu, MF_STRING, 0xFFE9, "Nombre del Juego");
+	AppendMenu(waitinglistSubMenu, MF_STRING, 0xFFEA, "Emulador");
+	AppendMenu(waitinglistSubMenu, MF_STRING, 0xFFEB, "Nombre de Usuario");
+	AppendMenu(waitinglistSubMenu, MF_STRING, 0xFFEC, "Nombre de Servidor");
+	AppendMenu(waitinglistSubMenu, MF_STRING, 0xFFED, "Dirección IP");
+	AppendMenu(waitinglistSubMenu, MF_STRING, 0xFFEE, "Ubicación");
+#else
 	AppendMenu(waitinglistMenu, MF_STRING | MF_POPUP, 0xFFDF, "Add to Favorites");
 	AppendMenu(waitinglistMenu, MF_SEPARATOR | MF_POPUP, 0, 0 );
 	AppendMenu(waitinglistMenu, MF_STRING | MF_POPUP, 0xFFE7, "Refresh Waiting Games");
@@ -425,10 +468,26 @@ DLLEXP kailleraSetInfos(kailleraInfos *infosp) {
 	AppendMenu(waitinglistSubMenu, MF_STRING, 0xFFEC, "Server Name");
 	AppendMenu(waitinglistSubMenu, MF_STRING, 0xFFED, "IP Address");
 	AppendMenu(waitinglistSubMenu, MF_STRING, 0xFFEE, "Location");
+#endif // MEISEI_ESP
 
 	//Server List Menu
 	serverlistMenu = CreatePopupMenu();
 	serverlistSubMenu = CreatePopupMenu();
+#ifdef MEISEI_ESP
+	AppendMenu(serverlistMenu, MF_STRING | MF_POPUP, 0xFFE6, "Agregar a Favoritos");
+	AppendMenu(serverlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(serverlistMenu, MF_STRING | MF_POPUP, 0xFFEF, "Actualizar Lista de Servidores");
+	AppendMenu(serverlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(serverlistMenu, MF_STRING | MF_POPUP, 0xFFD7, "Ping");
+	AppendMenu(serverlistMenu, MF_STRING | MF_POPUP, 0xFFD6, "Parar");
+	AppendMenu(serverlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(serverlistMenu, MF_STRING | MF_POPUP, 0xFFF0, "Conectar");
+	AppendMenu(serverlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(serverlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)serverlistSubMenu, "Copiar");
+	AppendMenu(serverlistSubMenu, MF_STRING, 0xFFF1, "Nombre de Servidor");
+	AppendMenu(serverlistSubMenu, MF_STRING, 0xFFF2, "Dirección IP");
+	AppendMenu(serverlistSubMenu, MF_STRING, 0xFFF3, "Ubicación");
+#else
 	AppendMenu(serverlistMenu, MF_STRING | MF_POPUP, 0xFFE6, "Add to Favorites");
 	AppendMenu(serverlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
 	AppendMenu(serverlistMenu, MF_STRING | MF_POPUP, 0xFFEF, "Refresh Server List");
@@ -442,10 +501,25 @@ DLLEXP kailleraSetInfos(kailleraInfos *infosp) {
 	AppendMenu(serverlistSubMenu, MF_STRING, 0xFFF1, "Server Name");
 	AppendMenu(serverlistSubMenu, MF_STRING, 0xFFF2, "IP Address");
 	AppendMenu(serverlistSubMenu, MF_STRING, 0xFFF3, "Location");
+#endif // MEISEI_ESP
 
 	//Gamelist Menu
 	gamelistMenu = CreatePopupMenu();
 	gamelistSubMenu = CreatePopupMenu();
+#ifdef MEISEI_ESP
+	AppendMenu(gamelistMenu, MF_STRING | MF_POPUP, 0xFFF7, "Unirse");
+	AppendMenu(gamelistMenu, MF_STRING | MF_POPUP, 0xDDD9, "Cerrar Juego");
+	if(kInfo.moreInfosCallback != NULL){
+		AppendMenu(gamelistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+		AppendMenu(gamelistMenu, MF_STRING | MF_POPUP, 0xFFF8, "Más Información");
+	}
+	AppendMenu(gamelistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(gamelistMenu, MF_STRING | MF_POPUP, (UINT_PTR)gamelistSubMenu, "Copiar");
+	AppendMenu(gamelistSubMenu, MF_STRING, 0xFFF9, "Juego ID");
+	AppendMenu(gamelistSubMenu, MF_STRING, 0xFFFA, "Juego");
+	AppendMenu(gamelistSubMenu, MF_STRING, 0xFFFB, "Emulador");
+	AppendMenu(gamelistSubMenu, MF_STRING, 0xFFFC, "Dueño");
+#else
 	AppendMenu(gamelistMenu, MF_STRING | MF_POPUP, 0xFFF7, "Join");
 	AppendMenu(gamelistMenu, MF_STRING | MF_POPUP, 0xDDD9, "Close Game");
 	if(kInfo.moreInfosCallback != NULL){
@@ -458,6 +532,7 @@ DLLEXP kailleraSetInfos(kailleraInfos *infosp) {
 	AppendMenu(gamelistSubMenu, MF_STRING, 0xFFFA, "Game");
 	AppendMenu(gamelistSubMenu, MF_STRING, 0xFFFB, "Emulator");
 	AppendMenu(gamelistSubMenu, MF_STRING, 0xFFFC, "Owner");
+#endif // MEISEI_ESP
 
 	//Game Userlist Menu
 	gameUserlistMenu = CreatePopupMenu();
@@ -748,9 +823,15 @@ DLLEXP kailleraSelectServerDialog(HWND parent) {
 	createChatroom();
 	createInitialWindow();
 
+#ifdef MEISEI_ESP
+	Serverlist3DAdditem("Clic Derecho para Lista de Servidores EmuLinker.", NULL, NULL, NULL, NULL, NULL, NULL);
+	kServerlistAdditem( "Clic Derecho para Lista de Servidores Kaillera." , NULL, NULL, NULL, NULL, NULL, NULL);
+	waitinglistAdditem( "Clic Derecho para Lista de Juegos en Espera de EmuLinker.", NULL, NULL, NULL, NULL, NULL, NULL);
+#else
 	Serverlist3DAdditem("Right Click to get EmuLinker Server List."  , NULL, NULL, NULL, NULL, NULL, NULL);
 	kServerlistAdditem( "Right Click to get Kaillera Server List."   , NULL, NULL, NULL, NULL, NULL, NULL);
 	waitinglistAdditem( "Right Click to get EmuLinker Waiting Games.", NULL, NULL, NULL, NULL, NULL, NULL);
+#endif // MEISEI
 
 	//Adjust Parent Window
 	EnableWindow(parent, FALSE);
@@ -774,8 +855,13 @@ DLLEXP kailleraSelectServerDialog(HWND parent) {
 		} else {
             MessageBox(
                 parent,
+            #ifdef MEISEI_ESP
+                "Error en el bucle de mensajes",
+                "¡Error de bucle de mensaje!",
+            #else
                 "Error in Message Loop",
                 "Message Loop Error!",
+            #endif // MEISEI_ESP
                 0
             );
 			break;
@@ -837,7 +923,17 @@ DLLEXP kailleraModifyPlayValues(void *values, int size) {
 			}
 			else if(w == 15 && returnInputSize == true){
 				sizeOfEinput = -1;
-				MessageBox(form1, "Game Ended!  Didn't receive a response for 15s.", "Game Ended!", 0);
+				MessageBox(
+                    form1,
+                #ifdef MEISEI_ESP
+                    "¡El juego terminó! No recibí respuesta durante 15 segundos.",
+                    "¡Juego terminado!",
+                #else
+                    "Game Ended!  Didn't receive a response for 15s.",
+                    "Game Ended!",
+                #endif // MEISEI_ESP
+                    0
+                );
 				return sizeOfEinput;
 			}
 			DoEvents();
@@ -1593,16 +1689,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 			if((pnmh->hwndFrom == tTab) && (pnmh->code == TCN_SELCHANGE )){
 				i = TabCtrl_GetCurSel(tTab);
 
-				if(i == 0)
-					showOptions(1);
-				else if(i == 1)
-					showOptions(0);
-				else if(i == 2)
-					showOptions(2);
-				else if(i == 3)
-					showOptions(3);
-				else if(i == 4)
-					showOptions(4);
+				if     (i == 0) showOptions(1);
+				else if(i == 1) showOptions(0);
+				else if(i == 2) showOptions(2);
+				else if(i == 3) showOptions(3);
+				else if(i == 4) showOptions(4);
 				return 0;
 			}
 
@@ -1610,18 +1701,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 			if((pnmh->hwndFrom == sTab) && (pnmh->code == TCN_SELCHANGE )){
 				i = TabCtrl_GetCurSel(sTab);
 
-				if(i == 0){
-					showServerlistK();
-				}
-				else if(i == 1){
-					showServerlist3D();
-				}
-				else if(i == 2)
-					showRecentlist();
-				else if(i == 3)
-					showFavoritelist();
-				else if(i == 4)
-					showWaitinglist();
+				if     (i == 0) showServerlistK();
+				else if(i == 1) showServerlist3D();
+				else if(i == 2) showRecentlist();
+				else if(i == 3) showFavoritelist();
+				else if(i == 4) showWaitinglist();
 
 				lastTabServer = SendMessage(sTab, TCM_GETCURSEL, 0, 0);
 				return 0;
@@ -1654,8 +1738,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
             if((pnmh->hwndFrom == lstUserlist) && (pnmh->code == LVN_ITEMACTIVATE)){
 				//Get Currently Selected item
 				iSelect = SendMessage(lstUserlist, LVM_GETNEXTITEM, -1, LVNI_FOCUSED);
-				if(iSelect < 0)
-					return 0;
+				if(iSelect < 0) return 0;
 
 				//Get UserID
 				b.mask = LVIF_TEXT;
@@ -1698,10 +1781,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
                 // The user clicked on one of the columns.  Here we will save
                 // the index of the subitem that the column refers to.  Then
                 // call ListView_SortItemsEx() to sort the list items.
-				if(userlistSwitch == false)
-					userlistSwitch = true;
-				else
-					userlistSwitch = false;
+				if(userlistSwitch == false) userlistSwitch = true;
+				else                        userlistSwitch = false;
                 lstUserlistColumn = pnmlv->iSubItem;
                 ListView_SortItemsEx(lstUserlist, lstUserlistCompareFunc, 0);
                 return 0;
@@ -1901,10 +1982,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
                 // the index of the subitem that the column refers to.  Then
                 // call ListView_SortItemsEx() to sort the list items.
 				if (!pinging3D) {
-					if (anti3DSwitch == false)
-						anti3DSwitch = true;
-					else
-						anti3DSwitch = false;
+					if (anti3DSwitch == false) anti3DSwitch = true;
+					else                       anti3DSwitch = false;
 					lstServerlist3DColumn = pnmlv->iSubItem;
 					ListView_SortItemsEx(lstServerList3D, lstServerlist3DCompareFunc, 0);
 				}
@@ -1933,7 +2012,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
                     }
                 }
             }
-
 
 			//lstWaitingList
             if((pnmh->hwndFrom == lstWaitingList) && (pnmh->code == LVN_ITEMACTIVATE)){
@@ -1975,10 +2053,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
                 // The user clicked on one of the columns.  Here we will save
                 // the index of the subitem that the column refers to.  Then
                 // call ListView_SortItemsEx() to sort the list items.
-				if(waitingSwitch == false)
-					waitingSwitch = true;
-				else
-					waitingSwitch = false;
+				if(waitingSwitch == false) waitingSwitch = true;
+				else                       waitingSwitch = false;
                 lstWaitinglistColumn = pnmlv->iSubItem;
                 ListView_SortItemsEx(lstWaitingList, lstWaitinglistCompareFunc, 0);
                 return 0;
@@ -2243,9 +2319,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 }
 //*******************************************************************
 
-
-
-
 void createInitialWindow(){
 	LVCOLUMN LvCol;
 	TCITEM v;
@@ -2385,6 +2458,18 @@ void createInitialWindow(){
 	SendMessage(sTab, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	v.mask = TCIF_TEXT | TCIF_IMAGE;
 	v.iImage = -1;
+#ifdef MEISEI_ESP
+	v.pszText = "Lista de Servidores Kaillera";
+	TabCtrl_InsertItem(sTab, 0, &v);
+	v.pszText = "Lista de Servidores EmuLinker";
+	TabCtrl_InsertItem(sTab, 1, &v);
+	v.pszText = "Lista Reciente";
+	TabCtrl_InsertItem(sTab, 2, &v);
+	v.pszText = "Lista Favoritos";
+	TabCtrl_InsertItem(sTab, 3, &v);
+	v.pszText = "Lista Juegos en Espera EmuLinker";
+	TabCtrl_InsertItem(sTab, 4, &v);
+#else
 	v.pszText = "Kaillera Server List";
 	TabCtrl_InsertItem(sTab, 0, &v);
 	v.pszText = "EmuLinker Server List";
@@ -2395,10 +2480,10 @@ void createInitialWindow(){
 	TabCtrl_InsertItem(sTab, 3, &v);
 	v.pszText = "EmuLinker Waiting Games List";
 	TabCtrl_InsertItem(sTab, 4, &v);
+#endif // MEISEI_ESP
 
+	if (atoi(maxUsersG) < 1 || atoi(maxUsersG) > 100) wsprintf(maxUsersG, "%i", 16);
 
-	if (atoi(maxUsersG) < 1 || atoi(maxUsersG) > 100)
-		wsprintf(maxUsersG, "%i", 16);
 	txtMaxUsers = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", maxUsersG, textboxProperties, 10, 520, 60, 25, form1, NULL, hInstance, NULL);
 	SendMessage(txtMaxUsers, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	lblMaxUsers = CreateWindowEx(controlStyles, "STATIC", "Max Users:", labelProperties, 10, 505, 60, 15, form1, NULL, hInstance, NULL);
@@ -2452,47 +2537,88 @@ void createInitialWindow(){
 
 
 
-	//Quit Textbox
+//Quit Textbox
 	txtQuit = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", quit, textboxProperties, 245, 530, 205, 25, form1, NULL, hInstance, NULL);
 	SendMessage(txtQuit, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	lblQuit = CreateWindowEx(controlStyles, "STATIC", "Quit msg:", labelProperties, 196, 535, 46, 15, form1, NULL, hInstance, NULL);
 	SendMessage(lblQuit, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
-	//Stats Label
+
+//Stats Label
 	lblStats = CreateWindowEx(controlStyles, "STATIC", cVersion, labelProperties, 510, 510, 270, 15, form1, NULL, hInstance, NULL);
 	SendMessage(lblStats, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
-	//Server IP Textbox
+
+//Server IP Textbox
 	txtServerIP = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", serverIP, textboxProperties, 40, 505, 150, 25, form1, NULL, hInstance, NULL);
 	SendMessage(txtServerIP, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	lblServerIP = CreateWindowEx(controlStyles, "STATIC", "IP:", labelProperties, 23, 510, 14, 15, form1, NULL, hInstance, NULL);
 	SendMessage(lblServerIP, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
-	//Username Textbox
+
+//Username Textbox
 	txtUsername = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", username, textboxProperties, 40, 530, 150, 25, form1, NULL, hInstance, NULL);
 	SendMessage(txtUsername, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	lblUsername = CreateWindowEx(controlStyles, "STATIC", "Nick:", labelProperties, 11, 535, 26, 15, form1, NULL, hInstance, NULL);
 	SendMessage(lblUsername, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
-	//Show Chatroom
-	btnChatroom = CreateWindowEx(controlStyles, "BUTTON", "Servers", buttonProperties, 590, 530, 60, 25, form1, NULL, hInstance, NULL);
+
+//Show Chatroom
+	btnChatroom = CreateWindowEx(
+        controlStyles, "BUTTON",
+    #ifdef MEISEI_ESP
+        "Servidores",
+    #else
+        "Servers",
+    #endif // MEISEI_ESP
+        buttonProperties, 590, 530, 60, 25, form1, NULL, hInstance, NULL
+    );
 	SendMessage(btnChatroom, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
-	//Login Button
-	btnLogin = CreateWindowEx(controlStyles, "BUTTON", "Login", buttonProperties, 655, 530, 60, 25, form1, NULL, hInstance, NULL);
+
+//Login Button
+	btnLogin = CreateWindowEx(
+        controlStyles, "BUTTON",
+    #ifdef MEISEI_ESP
+        "Entrar",
+    #else
+        "Login",
+    #endif // MEISEI_ESP
+        buttonProperties, 655, 530, 60, 25, form1, NULL, hInstance, NULL
+    );
 	SendMessage(btnLogin, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
-	//Logoff Button
-	btnLogoff = CreateWindowEx(controlStyles, "BUTTON", "Logoff", buttonProperties, 720, 530, 60, 25, form1, NULL, hInstance, NULL);
+
+//Logoff Button
+	btnLogoff = CreateWindowEx(
+        controlStyles, "BUTTON",
+    #ifdef MEISEI_ESP
+        "Salir",
+    #else
+        "Logoff",
+    #endif // MEISEI_ESP
+        buttonProperties, 720, 530, 60, 25, form1, NULL, hInstance, NULL
+    );
 	SendMessage(btnLogoff, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
-	//Connection Type Combobox
+
+//Connection Type Combobox
 	cmbConnectionType = CreateWindow("COMBOBOX", NULL, comboboxProperties, 495, 535, 90, 500, form1, NULL, hInstance, NULL);
 	SendMessage(cmbConnectionType, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
+
 	SendMessage(cmbConnectionType, CB_ADDSTRING, 0, (LPARAM)"LAN");
+#ifdef MEISEI_ESP
+	SendMessage(cmbConnectionType, CB_ADDSTRING, 0, (LPARAM)"Excelente");
+	SendMessage(cmbConnectionType, CB_ADDSTRING, 0, (LPARAM)"Buena");
+	SendMessage(cmbConnectionType, CB_ADDSTRING, 0, (LPARAM)"Normal");
+	SendMessage(cmbConnectionType, CB_ADDSTRING, 0, (LPARAM)"Baja");
+	SendMessage(cmbConnectionType, CB_ADDSTRING, 0, (LPARAM)"Mala");
+#else
 	SendMessage(cmbConnectionType, CB_ADDSTRING, 0, (LPARAM)"Excellent");
 	SendMessage(cmbConnectionType, CB_ADDSTRING, 0, (LPARAM)"Good");
 	SendMessage(cmbConnectionType, CB_ADDSTRING, 0, (LPARAM)"Average");
 	SendMessage(cmbConnectionType, CB_ADDSTRING, 0, (LPARAM)"Low");
 	SendMessage(cmbConnectionType, CB_ADDSTRING, 0, (LPARAM)"Bad");
+#endif // MEISEI_ESP
 	SendMessage(cmbConnectionType, CB_SETCURSEL, connectionType - 1, 0);
+
 	lblConnectionType = CreateWindowEx(controlStyles, "STATIC", "Type:", labelProperties, 462, 538, 30, 15, form1, NULL, hInstance, NULL);
 	SendMessage(lblConnectionType, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 
-	//Chatroom Options
+//Chatroom Options
 	chkJoinChat = CreateWindowEx(controlStyles, "BUTTON", "Show Join/Left Notifications?", checkProperties, 10, 505, 150, 25, form1, NULL, hInstance, NULL);
 	SendMessage(chkJoinChat, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	SendMessage(chkJoinChat, BM_SETCHECK, joinChatValue, 0);
@@ -2517,7 +2643,7 @@ void createInitialWindow(){
 	SendMessage(chkJoinDbl, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	SendMessage(chkJoinDbl, BM_SETCHECK, joinDblValue, 0);
 
-	//Gameroom Options
+//Gameroom Options
 	chkJoinChatGame = CreateWindowEx(controlStyles, "BUTTON", "Show Join/Left Notifications?", checkProperties, 10, 505, 170, 25, form1, NULL, hInstance, NULL);
 	SendMessage(chkJoinChatGame, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	SendMessage(chkJoinChatGame, BM_SETCHECK, joinChatGameValue, 0);
@@ -2546,13 +2672,13 @@ void createInitialWindow(){
 
 	int i;
 
-	//Recent
+//Recent
 	for (i = recentCount; i >= 0; i--) {
 		if (/*strlen(recentServers[i].server) > 0 && */strlen(recentServers[i].ip) > 0/* && strlen(recentServers[i].location) > 0*/)
 			recentlistAdditem(recentServers[i].server, recentServers[i].ip, recentServers[i].location);
 	}
 
-	//Favorites
+//Favorites
 	for (i = favoriteCount; i >= 0; i--) {
 		if (/*strlen(favoriteServers[i].server) > 0 && */strlen(favoriteServers[i].ip) > 0/* && strlen(favoriteServers[i].location) > 0*/)
 			favoritelistAdditem(favoriteServers[i].server, favoriteServers[i].ip, favoriteServers[i].location, favoriteServers[i].comments);
@@ -2585,17 +2711,15 @@ void createInitialWindow(){
 	SetWindowLongPtr(txtChatroom, GWLP_WNDPROC, (DWORD_PTR)SubProcTxtChatroom);
 }
 
-
-
 void popupAway(){
 	int i;
 	RECT b;
 
-	//Get Window Position
+//Get Window Position
 	GetWindowRect(form1, &b);
 
 
-	//Make List
+//Make List
 	awayMenu = CreatePopupMenu();
 	AppendMenu(awayMenu, MF_STRING | MF_POPUP, 0xFFFF, "Create/Remove Away Messages");
 	AppendMenu(awayMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
@@ -2850,24 +2974,32 @@ void createAwayWindow(){
 	RECT b;
 	LVCOLUMN LvCol;
 
-	//Get Window Position
+//Get Window Position
 	GetWindowRect(form1, &b);
 
-	frmAway = CreateWindow("Supraclient", "Create Away Message", formOtherProperties, b.left + 110, b.top + 80, 440, 340, form1, NULL, hInstance, NULL);
-	//Subject
+	frmAway = CreateWindow(
+        "Supraclient",
+        "Create Away Message",
+        formOtherProperties, b.left + 110, b.top + 80, 440, 340, form1, NULL, hInstance, NULL
+    );
+
+//Subject
 	txtAwayMessageSubject = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", "Enter Subject", textboxProperties, 5, 10, 250, 25, frmAway, NULL, hInstance, NULL);
 	SendMessage(txtAwayMessageSubject, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
-	//Message
+
+//Message
 	txtAwayMessage = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", "Enter Message", textboxProperties, 5, 40, 250, 25, frmAway, NULL, hInstance, NULL);
 	SendMessage(txtAwayMessage, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
-	//Create New
+
+//Create New
 	btnCreateAway = CreateWindowEx(controlStyles, "BUTTON", "Create", buttonProperties, 260, 40, 60, 25, frmAway, NULL, hInstance, NULL);
 	SendMessage(btnCreateAway, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
-	//Remove
+
+//Remove
 	btnRemoveAway = CreateWindowEx(controlStyles, "BUTTON", "Remove", buttonProperties, 325, 40, 60, 25, frmAway, NULL, hInstance, NULL);
 	SendMessage(btnRemoveAway, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 
-	//Create Away List
+//Create Away List
 	lstAway = CreateWindowEx(WS_EX_CLIENTEDGE, "SysListView32", NULL, listviewProperties, 5, 80, 420, 220, frmAway, NULL, hInstance, NULL);
 	SendMessage(lstAway, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	memset(&LvCol,0,sizeof(LvCol));
@@ -3011,7 +3143,11 @@ void parseWaitingGames(){
 	}
 
 	numWaiting = SendMessage(lstWaitingList, LVM_GETITEMCOUNT, 0, 0);
-	wsprintf(strWaiting, "%i Waiting Games Total", numWaiting);
+	wsprintf(
+        strWaiting,
+        "%i Waiting Games Total",
+        numWaiting
+    );
 	SetWindowText(form1, strWaiting);
 }
 
@@ -3030,7 +3166,6 @@ void parseServerList3D(){
 	char* s;
 	long total;
 
-
 	total = bytesRecvServerList3D;
 
 	//Contains Header for HTTP Request.
@@ -3045,7 +3180,6 @@ void parseServerList3D(){
 		s = &myBuffServerList3D[q];
 		total = total - q;
 	}
-
 
 	//Find First NULL.  Anything before this is the Waiting Games List
 	i = 0;
@@ -3119,7 +3253,11 @@ void parseServerList3D(){
 	}
 
 	numOfServers = SendMessage(lstServerList3D, LVM_GETITEMCOUNT, 0, 0);
-	wsprintf(strServers, "%i EmuLinker Servers Total", numOfServers);
+	wsprintf(
+        strServers,
+        "%i EmuLinker Servers Total",
+        numOfServers
+    );
 	SetWindowText(form1, strServers);
 
 }
@@ -3230,7 +3368,11 @@ void parseServerListK(){
 	}
 
 	numOfServers = SendMessage(lstServerListK, LVM_GETITEMCOUNT, 0, 0);
-	wsprintf(strServers, "%i Kaillera Servers Total", numOfServers);
+	wsprintf(
+        strServers,
+        "%i Kaillera Servers Total",
+        numOfServers
+    );
 	SetWindowText(form1, strServers);
 }
 
@@ -3398,11 +3540,21 @@ DWORD WINAPI ping3DServers(LPVOID lpParam){
 		bool sError = false;
 
 		if(lastTabServer == 1 && pingingK == true){
-			sprintf(str, "Pinging EmuLinker Server %i of %i", i + 1, total);
+			sprintf(
+                str,
+                "Pinging EmuLinker Server %i of %i",
+                i + 1,
+                total
+            );
 			SetWindowText(form1, str);
 		}
 		else if(pingingK == false){
-			sprintf(str, "Pinging EmuLinker Server %i of %i", i + 1, total);
+			sprintf(
+                str,
+                "Pinging EmuLinker Server %i of %i",
+                i + 1,
+                total
+            );
 			SetWindowText(form1, str);
 		}
 
@@ -3420,15 +3572,14 @@ DWORD WINAPI ping3DServers(LPVOID lpParam){
 
 		char* c = strstr(strAddress, ":");
 
-		if(c != NULL){
+		if(c != NULL) {
 			//Split Port
 			strcpy(strPort, c + 1);
 			//Split Address and Port
 			ZeroMemory(strIP, 1024);
 			strncpy(strIP, strAddress, (lenAddress - strlen(strPort) - 1));
 			port = (u_short)atoi(strPort);
-		}
-		else{
+		} else {
 			ZeroMemory(strIP, 1024);
 			strcpy(strIP, strAddress);
 			port = 27888;
@@ -3506,7 +3657,10 @@ DWORD WINAPI ping3DServers(LPVOID lpParam){
 	lstServerlist3DColumn = 4;
 	anti3DSwitch = true;
 
-	SetWindowText(form1, "EmuLinker Pinging Finished!");
+	SetWindowText(
+        form1,
+        "EmuLinker Pinging Finished!"
+    );
 	exitPing3DThread();
 	closesocket(mySocket3D);
 	return 0;
@@ -3578,11 +3732,16 @@ void gameInit(){
         if(GetAsyncKeyState(27) == -32767)
 			sizeOfEinput = -1;
         if(gameCount == 0 || sizeOfEinput == -1){
-			MessageBox(form1, "Never received ready signal. Game Ended!", "gameInit()", 0);
+			MessageBox(
+                form1,
+                "Never received ready signal. Game Ended!",
+                "gameInit()",
+                0
+            );
 			sizeOfEinput = -1;
             return;
         }
-        if(GetTickCount() - i >= 1000){
+        if(GetTickCount() - i >= 1000) {
 			w = w + 1;
             i = GetTickCount();
             gameCount--;
@@ -3721,13 +3880,25 @@ void createChatroom(){
 	txtChat = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", NULL, textboxProperties, 5, 270, 285, 25, form1, NULL, hInstance, NULL);
 	SendMessage(txtChat, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	//Chat Button
-	btnChat = CreateWindowEx(controlStyles, "BUTTON", "Chat", buttonProperties, 295, 270, 60, 25, form1, NULL, hInstance, NULL);
+	btnChat = CreateWindowEx(
+        controlStyles, "BUTTON",
+        "Chat",
+        buttonProperties, 295, 270, 60, 25, form1, NULL, hInstance, NULL
+    );
 	SendMessage(btnChat, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	//Create Button
-	btnCreate = CreateWindowEx(controlStyles, "BUTTON", "Create", buttonProperties, 360, 270, 60, 25, form1, NULL, hInstance, NULL);
+	btnCreate = CreateWindowEx(
+        controlStyles, "BUTTON",
+        "Create",
+        buttonProperties, 360, 270, 60, 25, form1, NULL, hInstance, NULL
+    );
 	SendMessage(btnCreate, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	//Join Button
-	btnJoin = CreateWindowEx(controlStyles, "BUTTON", "Join", buttonProperties, 425, 270, 60, 25, form1, NULL, hInstance, NULL);
+	btnJoin = CreateWindowEx(
+        controlStyles, "BUTTON",
+        "Join",
+        buttonProperties, 425, 270, 60, 25, form1, NULL, hInstance, NULL
+    );
 	SendMessage(btnJoin, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 
 
@@ -3745,33 +3916,27 @@ void fixLastGameToPlay(){
 		ModifyMenu(gameMenu, (UINT)0xFFFD, MF_BYCOMMAND, (UINT)0xFFFD, (LPCSTR)lastGameToPlay1);
 	}
 	else if(strcmp(lastGameToPlay2, "LastGameToPlay2") == 0){
-		if(strcmp(lastGameToPlay1, currentGame) == 0)
-			return;
+		if(strcmp(lastGameToPlay1, currentGame) == 0) return;
 		strcpy(lastGameToPlay2, lastGameToPlay1);
 		strcpy(lastGameToPlay1, currentGame);
 		ModifyMenu(gameMenu, (UINT)0xFFFD, MF_BYCOMMAND, (UINT)0xFFFD, (LPCSTR)lastGameToPlay1);
 		ModifyMenu(gameMenu, (UINT)0xFFFE, MF_BYCOMMAND, (UINT)0xFFFE, (LPCSTR)lastGameToPlay2);
 	}
 	else if(strcmp(lastGameToPlay3, "LastGameToPlay3") == 0){
-		if(strcmp(lastGameToPlay1, currentGame) == 0)
-			return;
-		else if(strcmp(lastGameToPlay2, currentGame) == 0)
-			return;
+		if     (strcmp(lastGameToPlay1, currentGame) == 0) return;
+		else if(strcmp(lastGameToPlay2, currentGame) == 0) return;
 		strcpy(lastGameToPlay3, lastGameToPlay2);
 		strcpy(lastGameToPlay2, lastGameToPlay1);
 		strcpy(lastGameToPlay1, currentGame);
 		ModifyMenu(gameMenu, (UINT)0xFFFD, MF_BYCOMMAND, (UINT)0xFFFD, (LPCSTR)lastGameToPlay1);
 		ModifyMenu(gameMenu, (UINT)0xFFFE, MF_BYCOMMAND, (UINT)0xFFFE, (LPCSTR)lastGameToPlay2);
 		ModifyMenu(gameMenu, (UINT)0xFFFF, MF_BYCOMMAND, (UINT)0xFFFF, (LPCSTR)lastGameToPlay3);
-	}
-	else{
-		if(strcmp(lastGameToPlay1, currentGame) == 0)
-			return;
+	} else {
+		if(strcmp(lastGameToPlay1, currentGame) == 0) return;
 		else if(strcmp(lastGameToPlay2, currentGame) == 0){
 			strcpy(lastGameToPlay2, lastGameToPlay1);
 			strcpy(lastGameToPlay1, currentGame);
-		}
-		else{
+		} else {
 			strcpy(lastGameToPlay3, lastGameToPlay2);
 			strcpy(lastGameToPlay2, lastGameToPlay1);
 			strcpy(lastGameToPlay1, currentGame);
@@ -3782,7 +3947,6 @@ void fixLastGameToPlay(){
 	}
 	DrawMenuBar(form1);
 }
-
 
 //Very Messy here. Good Luck!
 void popupMenu(char num){
@@ -3812,18 +3976,15 @@ void popupMenu(char num){
 			strcpy(currentGame, lastGameToPlay1);
 			createGameRequest();
 			imOwner = true;
-		}
-		else if(i == 0xFFFE && strcmp(lastGameToPlay2, "LastGameToPlay2") != 0){
+		} else if(i == 0xFFFE && strcmp(lastGameToPlay2, "LastGameToPlay2") != 0){
 			strcpy(currentGame, lastGameToPlay2);
 			createGameRequest();
 			imOwner = true;
-		}
-		else if(i == 0xFFFF && strcmp(lastGameToPlay3, "LastGameToPlay3") != 0){
+		} else if(i == 0xFFFF && strcmp(lastGameToPlay3, "LastGameToPlay3") != 0){
 			strcpy(currentGame, lastGameToPlay3);
 			createGameRequest();
 			imOwner = true;
-		}
-		else if(i > 0 && i <= totalGames){
+		} else if(i > 0 && i <= totalGames){
 			strcpy(currentGame, gameList[i - 1].game);
 			createGameRequest();
 			imOwner = true;
@@ -3836,15 +3997,12 @@ void popupMenu(char num){
 		i = TrackPopupMenu(userlistMenu, TPM_RETURNCMD, c.x, c.y, 0, form1, NULL);
 
 		//Error Check
-		if(i == 0)
-			return;
-		else if(SendMessage(lstUserlist, LVM_GETITEMCOUNT, 0, 0) == 0)
-			return;
+		if(i == 0) return;
+		else if(SendMessage(lstUserlist, LVM_GETITEMCOUNT, 0, 0) == 0) return;
 
 		//Get Currently Selected item
 		iSelect = SendMessage(lstUserlist, LVM_GETNEXTITEM, -1, LVNI_FOCUSED);
-		if(iSelect < 0)
-			return;
+		if(iSelect < 0) return;
 
 		//Get UserID
 		q.mask = LVIF_TEXT;
@@ -3853,7 +4011,6 @@ void popupMenu(char num){
 		q.pszText = ID;
 		q.cchTextMax = 1024;
 		SendMessage(lstUserlist, LVM_GETITEM, 0, (LPARAM) &q);
-
 
 		//Get Username
 		q.mask = LVIF_TEXT;
@@ -4151,10 +4308,9 @@ void popupMenu(char num){
 		}
 		//Get Server List
 		else if(i == 0xFFEF){
-			if(tempS == lstServerListK){
+			if(tempS == lstServerListK) {
 				getServerListK();
-			}
-			else{
+			} else{
 				getServerList3D();
 			}
 		}
@@ -4163,14 +4319,20 @@ void popupMenu(char num){
 			if (tempS == lstServerListK) {
 				if (pingingK == false) {
 					exitPingKThread();
-					SetWindowText(form1, "Pinging Kaillera Servers...");
+					SetWindowText(
+                        form1,
+                        "Pinging Kaillera Servers..."
+                    );
 					kailleraPingThread = CreateThread(NULL, 0, pingKailleraServers, NULL, 0, NULL);
 				}
 			}
 			else {
 				if (pinging3D == false) {
 					exitPing3DThread();
-					SetWindowText(form1, "Pinging EmuLinker Servers...");
+					SetWindowText(
+                        form1,
+                        "Pinging EmuLinker Servers..."
+                    );
 					ping3DThread = CreateThread(NULL, 0, ping3DServers, NULL, 0, NULL);
 				}
 			}
@@ -4179,11 +4341,17 @@ void popupMenu(char num){
 		else if(i == 0xFFD6){
 			if(tempS == lstServerListK){
 				exitPingKThread();
-				SetWindowText(form1, "Kaillera Pinging Stopped!");
+				SetWindowText(
+                    form1,
+                    "Kaillera Pinging Stopped!"
+                );
 			}
 			else{
 				exitPing3DThread();
-				SetWindowText(form1, "EmuLinker Pinging Stopped!");
+				SetWindowText(
+                    form1,
+                    "EmuLinker Pinging Stopped!"
+                );
 			}
 		}
 		//For Connect
@@ -4221,8 +4389,7 @@ void popupMenu(char num){
 		}
 		//COPY Server Name
 		else if(i == 0xFFF1){
-			if(iSelect < 0)
-				return;
+			if(iSelect < 0) return;
 			q.mask = LVIF_TEXT;
 			q.iItem = iSelect;
 			q.iSubItem = 0;
@@ -4234,8 +4401,7 @@ void popupMenu(char num){
 		}
 		//COPY IP Address
 		else if(i == 0xFFF2){
-			if(iSelect < 0)
-				return;
+			if(iSelect < 0) return;
 			q.mask = LVIF_TEXT;
 			q.iItem = iSelect;
 			q.iSubItem = 1;
@@ -4247,8 +4413,7 @@ void popupMenu(char num){
 		}
 		//COPY Location
 		else if(i == 0xFFF3){
-			if(iSelect < 0)
-				return;
+			if(iSelect < 0) return;
 			q.mask = LVIF_TEXT;
 			q.iItem = iSelect;
 			q.iSubItem = 3;
@@ -4266,24 +4431,20 @@ void popupMenu(char num){
 		i = TrackPopupMenu(waitinglistMenu, TPM_RETURNCMD, c.x, c.y, 0, form1, NULL);
 
 		//Error Check
-		if(i == 0)
-			return;
+		if(i == 0) return;
 
 		iSelect = SendMessage(lstWaitingList, LVM_GETNEXTITEM, -1, LVNI_FOCUSED);
 
 		if(SendMessage(lstWaitingList, LVM_GETITEMCOUNT, 0, 0) == 0){
-			if(i != 0xFFE7)
-				return;
+			if(i != 0xFFE7) return;
 		}
-
 		//Get Waiting Games
 		if(i == 0xFFE7){
 			getWaitingGames();
 		}
 		//Add to Favorites
 		else if(i == 0xFFDF){
-			if(iSelect < 0)
-				return;
+			if(iSelect < 0) return;
 			//Get IP Address
 			q.mask = LVIF_TEXT;
 			q.iItem = iSelect;
@@ -4307,8 +4468,7 @@ void popupMenu(char num){
 		else if(i == 0xFFE8){
 			//Get Currently Selected item
 			iSelect = SendMessage(lstWaitingList, LVM_GETNEXTITEM, -1, LVNI_FOCUSED);
-			if(iSelect < 0)
-				return;
+			if(iSelect < 0) return;
 			userQuitRequest();
 			//Get IP Address
 			q.mask = LVIF_TEXT;
@@ -4334,7 +4494,6 @@ void popupMenu(char num){
 
 			loginToServer();
 
-
 			q.iSubItem = 3;
 			SendMessage(lstWaitingList, LVM_GETITEM, 0, (LPARAM) &q);
 			//Display
@@ -4342,9 +4501,8 @@ void popupMenu(char num){
 			SetWindowText(form1, server);
 		}
 		//COPY Game Name
-		else if(i == 0xFFE9){
-			if(iSelect < 0)
-				return;
+		else if(i == 0xFFE9) {
+			if(iSelect < 0) return;
 			q.mask = LVIF_TEXT;
 			q.iItem = iSelect;
 			q.iSubItem = 0;
@@ -4355,9 +4513,8 @@ void popupMenu(char num){
 			return;
 		}
 		//COPY Emulator
-		else if(i == 0xFFEA){
-			if(iSelect < 0)
-				return;
+		else if(i == 0xFFEA) {
+			if(iSelect < 0) return;
 			q.mask = LVIF_TEXT;
 			q.iItem = iSelect;
 			q.iSubItem = 1;
@@ -4368,9 +4525,8 @@ void popupMenu(char num){
 			return;
 		}
 		//COPY Username
-		else if(i == 0xFFEB){
-			if(iSelect < 0)
-				return;
+		else if(i == 0xFFEB) {
+			if(iSelect < 0) return;
 			q.mask = LVIF_TEXT;
 			q.iItem = iSelect;
 			q.iSubItem = 2;
@@ -4381,9 +4537,8 @@ void popupMenu(char num){
 			return;
 		}
 		//COPY Server Name
-		else if(i == 0xFFEC){
-			if(iSelect < 0)
-				return;
+		else if(i == 0xFFEC) {
+			if(iSelect < 0) return;
 			q.mask = LVIF_TEXT;
 			q.iItem = iSelect;
 			q.iSubItem = 3;
@@ -4395,8 +4550,7 @@ void popupMenu(char num){
 		}
 		//COPY IP Address
 		else if(i == 0xFFED){
-			if(iSelect < 0)
-				return;
+			if(iSelect < 0) return;
 			q.mask = LVIF_TEXT;
 			q.iItem = iSelect;
 			q.iSubItem = 4;
@@ -4408,8 +4562,7 @@ void popupMenu(char num){
 		}
 		//COPY Location
 		else if(i == 0xFFEE){
-			if(iSelect < 0)
-				return;
+			if(iSelect < 0) return;
 			q.mask = LVIF_TEXT;
 			q.iItem = iSelect;
 			q.iSubItem = 5;
@@ -4427,10 +4580,8 @@ void popupMenu(char num){
 		i = TrackPopupMenu(recentlistMenu, TPM_RETURNCMD, c.x, c.y, 0, form1, NULL);
 
 		//Error Check
-		if(i == 0)
-			return;
-		else if(SendMessage(lstRecentList, LVM_GETITEMCOUNT, 0, 0) == 0)
-			return;
+		if(i == 0) return;
+		else if(SendMessage(lstRecentList, LVM_GETITEMCOUNT, 0, 0) == 0) return;
 
 		iSelect = SendMessage(lstRecentList, LVM_GETNEXTITEM, -1, LVNI_FOCUSED);
 
@@ -4438,8 +4589,7 @@ void popupMenu(char num){
 		if(i == 0xFFE1){
 			//Get Currently Selected item
 			iSelect = SendMessage(lstRecentList, LVM_GETNEXTITEM, -1, LVNI_FOCUSED);
-			if(iSelect < 0)
-				return;
+			if(iSelect < 0) return;
 			//Get IP Address
 			q.mask = LVIF_TEXT;
 			q.iItem = iSelect;
@@ -4461,8 +4611,7 @@ void popupMenu(char num){
 		}
 		//For Connect
 		else if(i == 0xFFE2){
-			if(iSelect < 0)
-				return;
+			if(iSelect < 0) return;
 			userQuitRequest();
 			//Get IP Address
 			q.mask = LVIF_TEXT;
@@ -4473,7 +4622,6 @@ void popupMenu(char num){
 			SendMessage(lstRecentList, LVM_GETITEM, 0, (LPARAM) &q);
 			//Display
 			SendMessage(txtServerIP, WM_SETTEXT, 0, (LPARAM) str);
-
 
 			q.iSubItem = 0;
 			SendMessage(lstRecentList, LVM_GETITEM, 0, (LPARAM) &q);
@@ -4487,7 +4635,6 @@ void popupMenu(char num){
 			q.iSubItem = 2;
 			q.pszText = location;
 			SendMessage(lstRecentList, LVM_GETITEM, 0, (LPARAM) &q);
-
 
 			SendMessage(lstRecentList, LVM_DELETEITEM, (WPARAM) i, 0);
 
@@ -4509,8 +4656,7 @@ void popupMenu(char num){
 		}
 		//Remove
 		else if(i == 0xFFE3){
-			if(iSelect < 0)
-				return;
+			if(iSelect < 0) return;
 			SendMessage(lstRecentList, LVM_DELETEITEM, (WPARAM) iSelect, 0);
 		}
 		//Remove ALL
@@ -4519,8 +4665,7 @@ void popupMenu(char num){
 		}
 		//COPY Server Name
 		else if(i == 0xFFE4){
-			if(iSelect < 0)
-				return;
+			if(iSelect < 0) return;
 			q.mask = LVIF_TEXT;
 			q.iItem = iSelect;
 			q.iSubItem = 1;
@@ -4532,8 +4677,7 @@ void popupMenu(char num){
 		}
 		//COPY IP Address
 		else if(i == 0xFFE5){
-			if(iSelect < 0)
-				return;
+			if(iSelect < 0) return;
 			q.mask = LVIF_TEXT;
 			q.iItem = iSelect;
 			q.iSubItem = 0;
@@ -4545,8 +4689,7 @@ void popupMenu(char num){
 		}
 		//COPY Location
 		else if(i == 0xFFE6){
-			if(iSelect < 0)
-				return;
+			if(iSelect < 0) return;
 			q.mask = LVIF_TEXT;
 			q.iItem = iSelect;
 			q.iSubItem = 2;
@@ -4564,14 +4707,11 @@ void popupMenu(char num){
 		i = TrackPopupMenu(favoritelistMenu, TPM_RETURNCMD, c.x, c.y, 0, form1, NULL);
 
 		//Error Check
-		if(i == 0)
-			return;
-		else if(SendMessage(lstFavoriteList, LVM_GETITEMCOUNT, 0, 0) == 0)
-			return;
+		if(i == 0) return;
+		else if(SendMessage(lstFavoriteList, LVM_GETITEMCOUNT, 0, 0) == 0) return;
 
 		iSelect = SendMessage(lstFavoriteList, LVM_GETNEXTITEM, -1, LVNI_FOCUSED);
-		if(iSelect < 0)
-			return;
+		if(iSelect < 0) return;
 
 		//For Connect
 		if(i == 0xFFD8){
@@ -4619,8 +4759,7 @@ void popupMenu(char num){
 		}
 		//Remove
 		else if(i == 0xFFD9){
-			if(iSelect < 0)
-				return;
+			if(iSelect < 0) return;
 			SendMessage(lstFavoriteList, LVM_DELETEITEM, (WPARAM) iSelect, 0);
 		}
 		//Remove ALL
@@ -4629,8 +4768,7 @@ void popupMenu(char num){
 		}
 		//COPY Server Name
 		else if(i == 0xFFDB){
-			if(iSelect < 0)
-				return;
+			if(iSelect < 0) return;
 			q.mask = LVIF_TEXT;
 			q.iItem = iSelect;
 			q.iSubItem = 1;
@@ -4642,8 +4780,7 @@ void popupMenu(char num){
 		}
 		//COPY IP Address
 		else if(i == 0xFFDC){
-			if(iSelect < 0)
-				return;
+			if(iSelect < 0) return;
 			q.mask = LVIF_TEXT;
 			q.iItem = iSelect;
 			q.iSubItem = 0;
@@ -4655,8 +4792,7 @@ void popupMenu(char num){
 		}
 		//COPY Location
 		else if(i == 0xFFDD){
-			if(iSelect < 0)
-				return;
+			if(iSelect < 0) return;
 			q.mask = LVIF_TEXT;
 			q.iItem = iSelect;
 			q.iSubItem = 2;
@@ -4668,8 +4804,7 @@ void popupMenu(char num){
 		}
 		//COPY Comments
 		else if(i == 0xFFDE){
-			if(iSelect < 0)
-				return;
+			if(iSelect < 0) return;
 			q.mask = LVIF_TEXT;
 			q.iItem = iSelect;
 			q.iSubItem = 2;
@@ -4687,8 +4822,7 @@ void popupMenu(char num){
 		i = TrackPopupMenu(txtChatroomMenu, TPM_RETURNCMD, c.x, c.y, 0, form1, NULL);
 
 		//Error Check
-		if(i == 0)
-			return;
+		if(i == 0) return;
 
 		//Msg Off
 		if(i == 0xDDD4){
@@ -4737,7 +4871,6 @@ void popupMenu(char num){
 		}
 	}
 }
-
 
 void copyToClipboard(LPSTR lpCmdLine){
 	HGLOBAL clipbuffer;
@@ -4788,8 +4921,6 @@ void displayStats(){
 	SendMessage(lblStats, WM_SETTEXT, 0, (LPARAM) temp);
 }
 
-
-
 int saveConfig(){
 
 	FILE* config;
@@ -4800,7 +4931,17 @@ int saveConfig(){
 	// if(!config.good()){       // CPP
 	// int feof(FILE *fichero);  // El valor de retorno es distinto de cero sólo si no se ha alcanzado el fin de fichero.
     if( !config && feof( config ) ) {    // C
-		MessageBox(form1, "Error occurred while saving to supraclient.ini", "Error Saving!", 0);
+		MessageBox(
+            form1,
+        #ifdef MEISEI_ESP
+            "Se produjo un error al guardar en supraclient.ini",
+            "¡Error al Guardar!",
+        #else
+            "Error occurred while saving to supraclient.ini",
+            "Error Saving!",
+        #endif // MEISEI_ESP
+            0
+        );
 		return 1;
 	}
 
@@ -6381,7 +6522,14 @@ void showChatroom(bool show){
 			showGameroom(true);
 		else
 			showGameroom(false);
-		SetWindowText(btnChatroom, "Servers");
+		SetWindowText(
+            btnChatroom,
+        #ifdef MEISEI_ESP
+            "Servidores"
+        #else
+            "Servers"
+        #endif
+        );
 		SetWindowText(form1, myServer);
 		chatroom = true;
 	} else {
@@ -6412,7 +6560,14 @@ void showChatroom(bool show){
 		else if(lastTabServer == 3) showFavoritelist();
 		else if(lastTabServer == 4) showWaitinglist();
 
-		SetWindowText(btnChatroom, "Chatroom");
+		SetWindowText(
+            btnChatroom,
+        #ifdef MEISEI_ESP
+            "Sala Chat"
+        #else
+            "Chatroom"
+        #endif
+        );
 		chatroom = false;
 	}
 }
@@ -6584,20 +6739,13 @@ void userJoined(unsigned short position, int slot){
 
 	//Connection Type
 	connectionType =  *(unsigned char *) &myBuff[slot].myBuff[i + 4];
-	if(connectionType == lan)
-		memcpy(strConnectionType, "LAN\0", 4);
-	else if(connectionType == excellent)
-		memcpy(strConnectionType, "Excellent\0", 10);
-	else if(connectionType == good)
-		memcpy(strConnectionType, "Good\0", 5);
-	else if(connectionType == average)
-		memcpy(strConnectionType, "Average\0", 8);
-	else if(connectionType == low)
-		memcpy(strConnectionType, "Low\0", 4);
-	else if(connectionType == bad)
-		memcpy(strConnectionType, "Bad\0", 4);
-	else
-		memcpy(strConnectionType, "ERROR\0", 5);
+	if     (connectionType == lan)          memcpy(strConnectionType, "LAN\0", 4);
+	else if(connectionType == excellent)    memcpy(strConnectionType, "Excellent\0", 10);
+	else if(connectionType == good)         memcpy(strConnectionType, "Good\0", 5);
+	else if(connectionType == average)      memcpy(strConnectionType, "Average\0", 8);
+	else if(connectionType == low)          memcpy(strConnectionType, "Low\0", 4);
+	else if(connectionType == bad)          memcpy(strConnectionType, "Bad\0", 4);
+	else                                    memcpy(strConnectionType, "ERROR\0", 5);
 
 	//Previous (CRLF)
 	//<Nick> Message (CRLF)
@@ -6688,14 +6836,10 @@ void serverStatus(unsigned short position, int slot){
         //Connection Status
         status = *(unsigned char *) &myBuff[slot].myBuff[i];
 		i = i + 1;
-		if(status == 0)
-			memcpy(strStatus,"Playing\0", 8); //Netsync
-		else if(status == 1)
-			memcpy(strStatus, "Idle\0", 5);
-		else if(status == 2)
-			memcpy(strStatus, "Playing\0", 8);
-		else
-			memcpy(strStatus, "ERROR\0", 6);
+		if     (status == 0)    memcpy(strStatus, "Playing\0", 8); //Netsync
+		else if(status == 1)    memcpy(strStatus, "Idle\0", 5);
+		else if(status == 2)    memcpy(strStatus, "Playing\0", 8);
+		else                    memcpy(strStatus, "ERROR\0", 6);
 
         //UserID
 		userID = *(unsigned short *) &myBuff[slot].myBuff[i];
@@ -6705,20 +6849,13 @@ void serverStatus(unsigned short position, int slot){
         //Connection Type
         connectionType = *(unsigned char *) &myBuff[slot].myBuff[i];
         i = i + 1;
-		if(connectionType == lan)
-			memcpy(strConnectionType, "LAN\0", 4);
-		else if(connectionType == excellent)
-			memcpy(strConnectionType, "Excellent\0", 10);
-		else if(connectionType == good)
-			memcpy(strConnectionType, "Good\0", 5);
-		else if(connectionType == average)
-			memcpy(strConnectionType, "Average\0", 8);
-		else if(connectionType == low)
-			memcpy(strConnectionType, "Low\0", 4);
-		else if(connectionType == bad)
-			memcpy(strConnectionType, "Bad\0", 4);
-		else
-			memcpy(strStatus, "ERROR", 5);
+		if     (connectionType == lan)          memcpy(strConnectionType, "LAN\0", 4);
+		else if(connectionType == excellent)    memcpy(strConnectionType, "Excellent\0", 10);
+		else if(connectionType == good)         memcpy(strConnectionType, "Good\0", 5);
+		else if(connectionType == average)      memcpy(strConnectionType, "Average\0", 8);
+		else if(connectionType == low)          memcpy(strConnectionType, "Low\0", 4);
+		else if(connectionType == bad)          memcpy(strConnectionType, "Bad\0", 4);
+		else                                    memcpy(strStatus,         "ERROR", 5);
 
 		//Add User
 		strcpy(tempUsers[tempUserCount].nick, nick);
@@ -6762,14 +6899,10 @@ void serverStatus(unsigned short position, int slot){
         //Status
         status = *(unsigned char *) &myBuff[slot].myBuff[i];
         i = i + 1;
-		if(status == 0)
-			memcpy(strStatus, "Waiting\0", 8);
-		else if(status == 1)
-			memcpy(strStatus, "Playing\0", 8);
-		else  if(status == 2)
-			memcpy(strStatus, "Playing\0", 8);//Netsync
-		else
-			memcpy(strStatus, "ERROR\0", 6);
+		if     (status == 0)    memcpy(strStatus, "Waiting\0", 8);
+		else if(status == 1)    memcpy(strStatus, "Playing\0", 8);
+		else if(status == 2)    memcpy(strStatus, "Playing\0", 8);//Netsync
+		else                    memcpy(strStatus, "ERROR\0", 6);
 
 		//Add Game
 		strcpy(tempGames[tempGameCount].game, game);
@@ -6872,15 +7005,15 @@ void globalChatNotification(unsigned short position, int slot){
 	strcat(temp,message);
 	strcat(temp,"\r\n");
 
-	//Display
+    //Display
 	displayAndAutoScrollRichEdit(txtChatroom, temp, RGB(0, 0, 0));
 
-	//Log
+    //Log
 	saveChatroomLog(temp);
 }
 
 void showOptions(char show){
-	//Chatroom Options
+//Chatroom Options
 	if(show == 0){
 		ShowWindow(lblServerIP, SW_HIDE);
 		ShowWindow(txtServerIP, SW_HIDE);
@@ -6928,7 +7061,7 @@ void showOptions(char show){
 		ShowWindow(btnP2PServer, SW_HIDE);
 		ShowWindow(btnP2PConnect, SW_HIDE);*/
 	}
-	//Login Info
+//Login Info
 	else if(show == 1){
 		ShowWindow(lblServerIP, SW_SHOW);
 		ShowWindow(txtServerIP, SW_SHOW);
@@ -6975,7 +7108,7 @@ void showOptions(char show){
 		ShowWindow(btnP2PServer, SW_HIDE);
 		ShowWindow(btnP2PConnect, SW_HIDE);*/
 	}
-	//Gameroom Options
+//Gameroom Options
 	else if(show == 2){
 		ShowWindow(lblServerIP, SW_HIDE);
 		ShowWindow(txtServerIP, SW_HIDE);
@@ -7022,7 +7155,7 @@ void showOptions(char show){
 		ShowWindow(btnP2PServer, SW_HIDE);
 		ShowWindow(btnP2PConnect, SW_HIDE);*/
 	}
-	//Emulinker Options
+//Emulinker Options
 	else if(show == 3){
 		ShowWindow(lblServerIP, SW_HIDE);
 		ShowWindow(txtServerIP, SW_HIDE);
@@ -7154,7 +7287,6 @@ void displayAndAutoScrollRichEdit(HWND rEdit, char *temp, COLORREF rgbColor){
 	if((i + f) >= max) SendMessage(rEdit, WM_VSCROLL, SB_BOTTOM, 0);
 }
 
-
 //0x07 - Global Chat Request
 void globalChatRequest(){
 	char dataToBeSent[1024];
@@ -7176,8 +7308,6 @@ void globalChatRequest(){
 
     constructPacket(dataToBeSent, (1 + lenChat), 0x07);
 }
-
-
 
 //0x08 - Game Chat Notification
 void gameChatNotification(unsigned short position, int slot){
@@ -7251,7 +7381,6 @@ void gameChatRequest(){
     constructPacket(dataToBeSent, (1 + lenChat), 0x08);
 }
 
-
 //0x09 - Client Keep Alive
 void clientKeepAlive(){
 	char dataToBeSent[1];
@@ -7259,7 +7388,6 @@ void clientKeepAlive(){
 	dataToBeSent[0] = 0;
 	constructPacket(dataToBeSent, 1, 0x09);
 }
-
 
 //0x0A - Create Game Notification
 void createGameNotification(unsigned short position, int slot){
@@ -7271,7 +7399,6 @@ void createGameNotification(unsigned short position, int slot){
 	unsigned long gameID;
 	short strSize;
 	short i;
-
 
 	i = position;
 	//Owner
@@ -7293,7 +7420,6 @@ void createGameNotification(unsigned short position, int slot){
     gameID = *(unsigned long*) &myBuff[slot].myBuff[i];
 	wsprintf(strGameID, "%i", gameID);
 
-
 	//Previous (CRLF)
 	//<Nick> Message (CRLF)
 	strcpy(temp, "<");
@@ -7308,7 +7434,7 @@ void createGameNotification(unsigned short position, int slot){
 		displayAndAutoScrollRichEdit(txtChatroom, temp, RGB(153, 51, 0));
 
 	//Add to Gamelist
-	gamelistAdditem(game, emulator, owner, "Waiting", "1/N", strGameID);
+	gamelistAdditem( game, emulator, owner, "Waiting", "1/N", strGameID );
 	displayStats();
 
 	//Log
@@ -7455,20 +7581,14 @@ void joinGameNotification(unsigned short position, int slot){
 
 	//Connection Type
 	connectionType = *(char *) &myBuff[slot].myBuff[i + 2];
-	if(connectionType == lan)
-		strcpy(strConnectionType, "LAN");
-	else if(connectionType == excellent)
-		strcpy(strConnectionType, "Excellent");
-	else if(connectionType == good)
-		strcpy(strConnectionType, "Good");
-	else if(connectionType == average)
-		strcpy(strConnectionType, "Average");
-	else if(connectionType == low)
-		strcpy(strConnectionType, "Low");
-	else if(connectionType == bad)
-		strcpy(strConnectionType, "Bad");
-	else
-		strcpy(strConnectionType, "ERROR");
+
+	if     (connectionType == lan)          strcpy(strConnectionType, "LAN");
+	else if(connectionType == excellent)    strcpy(strConnectionType, "Excellent");
+	else if(connectionType == good)         strcpy(strConnectionType, "Good");
+	else if(connectionType == average)      strcpy(strConnectionType, "Average");
+	else if(connectionType == low)          strcpy(strConnectionType, "Low");
+	else if(connectionType == bad)          strcpy(strConnectionType, "Bad");
+	else                                    strcpy(strConnectionType, "ERROR");
 
 	//Previous (CRLF)
 	//<Nick> Message (CRLF)
@@ -7643,7 +7763,17 @@ void joinGameRequest(){
 			if(strcmp(gameList[i].game, currentGame) == 0)
 				break;
 			else if(i == (totalGames - 1)){
-				w = MessageBox(form1, "Don't have Game!  Do you still want to join?", "Game Not Available!", MB_YESNO);
+				w = MessageBox(
+                    form1,
+                #ifdef MEISEI_ESP
+                    "¡No tienes juego! ¿Aún quieres unirte?",
+                    "¡Juego no disponible!",
+                #else
+                    "Don't have Game!  Do you still want to join?",
+                    "Game Not Available!",
+                #endif // MEISEI_ESP
+                    MB_YESNO
+                );
 				if(w == IDYES)
 					break;
 				else
@@ -7656,14 +7786,34 @@ void joinGameRequest(){
 
 		//Same Emulator?
 		if(strcmp(strEmu, emulator) != 0){
-			w = MessageBox(form1, "Different Emulators!  Do you still want to join?", "Emulator Not Compatible!", MB_YESNO);
+			w = MessageBox(
+                form1,
+            #ifdef MEISEI_ESP
+                "¡Diferentes emuladores! ¿Aún quieres unirte?",
+                "¡Emulador no compatible!",
+            #else
+                "Different Emulators!  Do you still want to join?",
+                "Emulator Not Compatible!",
+            #endif // MEISEI_ESP
+                MB_YESNO
+            );
 			if(w == IDNO)
 				return;
 		}
 
 		//Status Playing?
 		if(strcmp(strStatus, "Playing") == 0){
-			w = MessageBox(form1, "Currently Playing!  Do you still want to join?", "Game is Playing!", MB_YESNO);
+			w = MessageBox(
+                form1,
+            #ifdef MEISEI_ESP
+                "¡Actualmente jugando! ¿Aún quieres unirte?",
+                "¡El juego está jugando!",
+            #else
+                "Currently Playing!  Do you still want to join?",
+                "Game is Playing!",
+            #endif // MEISEI_ESP
+                MB_YESNO
+            );
 			if(w == IDNO)
 				return;
 		}
@@ -7694,7 +7844,6 @@ void joinGameRequest(){
 	saveConfig();
 
 }
-
 
 //0x0D - Player Information
 void playerInformation(unsigned short position, int slot){
@@ -7736,20 +7885,14 @@ void playerInformation(unsigned short position, int slot){
         //Connection Type
         connectionType = *(unsigned char *) &myBuff[slot].myBuff[i];
         i = i + 1;
-		if(connectionType == lan)
-			strcpy(strConnectionType, "LAN");
-		else if(connectionType == excellent)
-			strcpy(strConnectionType, "Excellent");
-		else if(connectionType == good)
-			strcpy(strConnectionType, "Good");
-		else if(connectionType == average)
-			strcpy(strConnectionType, "Average");
-		else if(connectionType == low)
-			strcpy(strConnectionType, "Low");
-		else if(connectionType == bad)
-			strcpy(strConnectionType, "Bad");
-		else
-			strcpy(strStatus, "ERROR");
+
+		if     (connectionType == lan)          strcpy(strConnectionType, "LAN");
+		else if(connectionType == excellent)    strcpy(strConnectionType, "Excellent");
+		else if(connectionType == good)         strcpy(strConnectionType, "Good");
+		else if(connectionType == average)      strcpy(strConnectionType, "Average");
+		else if(connectionType == low)          strcpy(strConnectionType, "Low");
+		else if(connectionType == bad)          strcpy(strConnectionType, "Bad");
+		else                                    strcpy(strStatus,         "ERROR");
 
 		//Add User
 		gameUserlistAdditem(nick, strPing, strConnectionType, strUserID);
@@ -7777,14 +7920,10 @@ void updateGameStatus(unsigned short position, int slot){
 
 	//Status
 	status = *(unsigned char *) &myBuff[slot].myBuff[i];
-	if(status == 0)
-		memcpy(strStatus, "Waiting\0", 8);
-	else if(status == 1)
-		memcpy(strStatus, "Playing\0", 8);
-	else  if(status == 2)
-		memcpy(strStatus, "Playing\0", 8);//Netsync
-	else
-		memcpy(strStatus, "ERROR\0", 6);
+	if     (status == 0)    memcpy(strStatus, "Waiting\0", 8);
+	else if(status == 1)    memcpy(strStatus, "Playing\0", 8);
+	else if(status == 2)    memcpy(strStatus, "Playing\0", 8);//Netsync
+	else                    memcpy(strStatus, "ERROR\0", 6);
 
 	//Users/Maxusers
 	users =  *(unsigned char *) &myBuff[slot].myBuff[i + 1];
@@ -7881,14 +8020,12 @@ void closeGameNotification(unsigned short position, int slot){
 		SendMessage(lstGamelist, LVM_GETITEM, 0, (LPARAM) &b);
 		SendMessage(lstGamelist, LVM_DELETEITEM, (LPARAM) pos, 0);
 
-
 		//Previous (CRLF)
 		//<Nick> Message (CRLF)
 		strcpy(temp,"<");
 		strcat(temp, owner);
 		strcat(temp, "> ");
 		strcat(temp,"Closed Game\r\n");
-
 
 		//Display
 		if(createValue == BST_CHECKED)
@@ -8132,7 +8269,16 @@ void connectionRejectedNotification(unsigned short position, int slot){
 	strncpy(message, &myBuff[slot].myBuff[i], strSize + 1);
 	i = i + strSize + 1;
 
-	MessageBox(form1, message, "Connection Rejected!", 0);
+	MessageBox(
+        form1,
+        message,
+    #ifdef MEISEI_ESP
+        "¡Conexión Rechazada!",
+    #else
+        "Connection Rejected!",
+    #endif // MEISEI_ESP
+        0
+    );
 	displayChatroomAsServer(message);
 	supraCleanup(0, 0);
 }
@@ -8362,7 +8508,15 @@ void getServerList3D(){
 		remoteHost = gethostbyname(anti3DServerList.host);
 		if (remoteHost == NULL) {
 			closesocket(mySocket3D);
-			MessageBox(form1, "Could not resolve Server List!  Server may be down", "Error Resolving Address!", 0);
+			MessageBox(
+                form1,
+            #ifdef MEISEI_ESP
+                "¡No se pudo resolver la lista de servidores! El servidor puede estar inactivo", "¡Error al resolver la dirección!",
+            #else
+                "Could not resolve Server List!  Server may be down", "Error Resolving Address!",
+            #endif // MEISEI_ESP
+                0
+            );
 			return;
 		}
 		else socketInfo3D.sin_addr.s_addr = *((unsigned long*)remoteHost->h_addr);
@@ -8373,7 +8527,14 @@ void getServerList3D(){
 
 	WSAAsyncSelect(mySocket3D, form1, SC_SUPRARECV3D, FD_WRITE | FD_CONNECT | FD_READ | FD_CLOSE);
     x = connect(mySocket3D, (struct sockaddr *) &socketInfo3D, sizeof(socketInfo3D));
-	SetWindowText(form1, "Sending GET Request...If a list doesn't arrive within a few seconds, the host is probably down!");
+	SetWindowText(
+        form1,
+    #ifdef MEISEI_ESP
+        "Enviando solicitud GET... Si no llega una lista en unos segundos, ¡probablemente el host no funciona!"
+    #else
+        "Sending GET Request...If a list doesn't arrive within a few seconds, the host is probably down!"
+    #endif // MEISEI_ESP
+    );
 
 }
 
@@ -8393,7 +8554,15 @@ void getWaitingGames(){
 		remoteHost = gethostbyname(anti3DServerList.host);
 		if (remoteHost == NULL) {
 			closesocket(mySocketWaiting);
-			MessageBox(form1, "Could not resolve Server List!  Server may be down", "Error Resolving Address!", 0);
+			MessageBox(
+                form1,
+            #ifdef MEISEI_ESP
+                "¡No se pudo resolver la lista de servidores! El servidor puede estar inactivo", "¡Error al resolver la dirección!",
+            #else
+                "Could not resolve Server List!  Server may be down", "Error Resolving Address!",
+            #endif // MEISEI_ESP
+                0
+            );
 			return;
 		}
 		else socketInfoWaiting.sin_addr.s_addr = *((unsigned long*)remoteHost->h_addr);
@@ -8404,7 +8573,14 @@ void getWaitingGames(){
 
 	WSAAsyncSelect(mySocketWaiting, form1, SC_SUPRARECVWAITING, FD_WRITE | FD_CONNECT | FD_READ | FD_CLOSE);
     x = connect(mySocketWaiting, (struct sockaddr *) &socketInfoWaiting, sizeof(socketInfoWaiting));
-	SetWindowText(form1, "Sending GET Request...If a list doesn't arrive within a few seconds, the host is probably down!");
+	SetWindowText(
+        form1,
+    #ifdef MEISEI_ESP
+        "Enviando solicitud GET... Si no llega una lista en unos segundos, ¡probablemente el host no funciona!"
+    #else
+        "Sending GET Request...If a list doesn't arrive within a few seconds, the host is probably down!"
+    #endif // MEISEI_ESP
+    );
 }
 
 void getServerListK(){
@@ -8424,7 +8600,15 @@ void getServerListK(){
 		remoteHost = gethostbyname(kailleraServerList.host);
 		if (remoteHost == NULL) {
 			closesocket(mySocketWaiting);
-			MessageBox(form1, "Could not resolve Server List!  Server may be down", "Error Resolving Address!", 0);
+			MessageBox(
+                form1,
+            #ifdef MEISEI_ESP
+                "¡No se pudo resolver la lista de servidores! El servidor puede estar inactivo", "¡Error al resolver la dirección!",
+            #else
+                "Could not resolve Server List!  Server may be down", "Error Resolving Address!",
+            #endif // MEISEI_ESP
+                0
+            );
 			return;
 		}
 		else socketInfoK.sin_addr.s_addr = *((unsigned long*)remoteHost->h_addr);
@@ -8435,7 +8619,14 @@ void getServerListK(){
 
 	WSAAsyncSelect(mySocketK, form1, SC_SUPRARECVK, FD_WRITE | FD_CONNECT | FD_READ | FD_CLOSE);
     x = connect(mySocketK, (struct sockaddr *) &socketInfoK, sizeof(socketInfoK));
-	SetWindowText(form1, "Sending GET Request...If a list doesn't arrive within a few seconds, the host is probably down!");
+	SetWindowText(
+        form1,
+    #ifdef MEISEI_ESP
+        "Enviando solicitud GET... Si no llega una lista en unos segundos, ¡probablemente el host no funciona!"
+    #else
+        "Sending GET Request...If a list doesn't arrive within a few seconds, the host is probably down!"
+    #endif // MEISEI_ESP
+    );
 }
 
 

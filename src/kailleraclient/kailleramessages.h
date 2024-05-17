@@ -492,16 +492,38 @@ struct Packets myPackets[MAX_PACKETS];
 //Information
 int xPos = 0;
 int yPos = 0;
+#ifdef MEISEI_ESP
+char myServer[1024] = "No en un Servidor\0";
+char username[1024] = "¡Por favor, ingrese un nombre de usuario!\0";
+#else
 char myServer[1024] = "Not in a Server\0";
 char username[1024] = "Please enter a username!\0";
+#endif // MEISEI_ESP
 char emulator[128];
 char serverIP[1024] = "127.0.0.1:27888\0";
 unsigned long myPing;
 //################
 char myVersion[16]  = "SCCE v0.91.3\0";
 char cVersion[25]   = "SupraclientCE v0.91.3\0";
-char initText[1024] = "SupraclientCE [C Edition]\r\nVersion: 0.91.3 Friday May 10, 2024\r\nSpecial Thanks to: Trac, Moosehead, & r@z\r\nOther Testers: Morphus56K, Paramount, Agenda Suicide, & okaygo\r\nAuthor: SupraFast - Daniel Strusser\r\nEmail: Dynomite1234@aol.com\r\n\r\n#To get started, click on the button below that says [Servers]\n\0";
+#ifdef MEISEI_ESP
+char initText[1024] = "SupraclientCE [C Edición]\r\n"
+                      "Versión: 0.91.3 viernes 10 de Mayo de 2024\r\n"
+                      "Agradecimiento Especial a: Trac, Moosehead, & r@z\r\n"
+                      "Otros Probadores: Morphus56K, Paramount, Agenda Suicide, & okaygo\r\n"
+                      "Autor: SupraFast - Daniel Strusser\r\n"
+                      "Email: Dynomite1234@aol.com\r\n\r\n"
+                      "#Para comenzar, haga clic en el botón de abajo que dice [Servidores]\n\0";
+char quit[1024]     = "Estoy usando Supraclient CE v0.91.3\0";
+#else
+char initText[1024] = "SupraclientCE [C Edition]\r\n"
+                      "Version: 0.91.3 Friday May 10, 2024\r\n"
+                      "Special Thanks to: Trac, Moosehead, & r@z\r\n"
+                      "Other Testers: Morphus56K, Paramount, Agenda Suicide, & okaygo\r\n"
+                      "Author: SupraFast - Daniel Strusser\r\n"
+                      "Email: Dynomite1234@aol.com\r\n\r\n"
+                      "#To get started, click on the button below that says [Servers]\n\0";
 char quit[1024]     = "I'm using Supraclient CE v0.91.3\0";
+#endif // MEISEI_ESP
 //################
 bool chatroom;
 
