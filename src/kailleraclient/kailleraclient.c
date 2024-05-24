@@ -77,8 +77,10 @@ DLLEXP kailleraInit() {
 	joinDblValue = 1;
 	emulinkerSFValue = 0;
 	fakeP2PValue = 0;
-	//wsprintf(p2pPort, "%i", 7159);
-	//strcpy(p2pServer, "127.0.0.1");
+#ifdef KAILLERA_P2P
+	wsprintf( p2pPort, "%i", 7159 );
+	strcpy( p2pServer, "127.0.0.1" );
+#endif // KAILLERA_P2P
 
 	//Open File
     config = fopen( "supraclient.ini", "r" );
@@ -142,8 +144,10 @@ DLLEXP kailleraInit() {
             else if (strncmp(temp, "Userlist_Column_Order=0", 23) == 0) userlistSwitch = false;
             else if (strncmp(temp, "Userlist_Column_Order=1", 23) == 0) userlistSwitch = true;
         //P2P
-            //else if(strncmp(temp, "P2P_Server=", 11) == 0) strcpy(p2pServer, &temp[11]);
-            //else if(strncmp(temp, "P2P_Port=", 9) == 0) strcpy(p2pPort, &temp[9]);
+        #ifdef KAILLERA_P2P
+            else if(strncmp(temp, "P2P_Server=", 11) == 0) strcpy(p2pServer, &temp[11]);
+            else if(strncmp(temp, "P2P_Port=",    9) == 0) strcpy(p2pPort, &temp[9]);
+        #endif
         //chkUseCache
 			else if (strncmp(temp, "Cache=0", 7) == 0) useCacheValue = 0;
             else if (strncmp(temp, "Cache=1", 7) == 0) useCacheValue = 1;
@@ -552,7 +556,6 @@ DLLEXP kailleraSetInfos(kailleraInfos *infosp) {
 	AppendMenu(gameUserlistSubMenu, MF_STRING, 0xFFF5, "User ID");
 	AppendMenu(gameUserlistSubMenu, MF_STRING, 0xFFF6, "Username");
 
-
 	//txtChatroom Menu
 	txtChatroomMenu = CreatePopupMenu();
 	txtChatroomSubMenu = CreatePopupMenu();
@@ -780,7 +783,6 @@ DLLEXP kailleraSetInfos(kailleraInfos *infosp) {
 	AppendMenu(userlistSubMenu, MF_STRING, 0xDDDB, "Ignore");
 	AppendMenu(userlistSubMenu, MF_STRING, 0xDDDA, "Unignore");
 
-
 	AppendMenu(userlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
 	userlistSubMenu = CreatePopupMenu();
 	AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)userlistSubMenu, "Copy");
@@ -814,7 +816,6 @@ DLLEXP kailleraSelectServerDialog(HWND parent) {
 	RegisterClassEx(&wcex);
 	LoadLibrary("Riched32.dll");
 	InitCommonControlsEx(0);
-
 
 	//Create Child Window
 	form1 = CreateWindow("Supraclient", "SupraclientCE https://www.EmuLinker.org", formProperties, xPos, yPos, 800, 600, NULL, NULL, hInstance, NULL);
@@ -1055,7 +1056,6 @@ long CALLBACK SubProcTxtMaxPing(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
 	return TRUE;
 }
 
-
 //maxUsers Subclass
 long CALLBACK SubProcTxtMaxUsers(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam){
 	char data[1024];
@@ -1220,7 +1220,6 @@ long CALLBACK SubProcTxtQuit(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 	return TRUE;
 }
 
-
 //Chatroom Subclass
 long CALLBACK SubProcTxtChatroom(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam){
 	switch(message){
@@ -1235,7 +1234,6 @@ long CALLBACK SubProcTxtChatroom(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 	}
 	return TRUE;
 }
-
 
 //Chat Subclass
 long CALLBACK SubProcTxtChat(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam){
@@ -1420,52 +1418,44 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 						emulinkerSFValue = SendMessage(chkEmulinkerSF, BM_GETCHECK, 0, 0);
 					}
 
-
-					/*
-					else if(hwndCtl == btnP2PServer){
-						/* Open windows connection *
+				#ifdef KAILLERA_P2P
+					else if(hwndCtl == btnP2PServer) {
+						/* Open windows connection */
 						if (WSAStartup(0x0101, &startupInfo) != 0){
-							MessageBox(NULL, "Could not open Windows connection.", "WSAStartup Error", NULL);
+							MessageBox(NULL, "Could not open Windows connection.", "WSAStartup Error", 0 /*NULL*/ );
 						}
-						/* Open a datagram socket *
+						/* Open a datagram socket */
 						p2pSocket = socket(AF_INET, SOCK_DGRAM, 0);
 						if (p2pSocket == INVALID_SOCKET){
-							MessageBox(NULL, "Could not create socket!.", "Socket Error", NULL);
+							MessageBox(NULL, "Could not create socket!.", "Socket Error", 0 /*NULL*/);
 							WSACleanup();
 						}
-						/* Set family and port *
+						/* Set family and port */
 						p2pServerInfo.sin_family = AF_INET;
 						p2pServerInfo.sin_port = htons(7159);
 						p2pServerInfo.sin_addr.s_addr = inet_addr("127.0.0.1");
 
-						/* Bind address to socket *
+						/* Bind address to socket */
 						if (bind(p2pSocket, (struct sockaddr *)&p2pServerInfo, sizeof(struct sockaddr_in)) == -1){
-							MessageBox(NULL, "Could not bind to socket!.", "Bind Error", NULL);
+							MessageBox(NULL, "Could not bind to socket!.", "Bind Error", 0 /*NULL*/ );
 							closesocket(p2pSocket);
 							WSACleanup();
 						}
-
 						p2pClientLength = (int)sizeof(struct sockaddr_in);
 						p2pThread = CreateThread(NULL, 0, p2pLoop, NULL, 0, NULL);
-					}
-					else if(hwndCtl == btnP2PConnect){
+					} else if(hwndCtl == btnP2PConnect) {
 						supraCleanup(4, 0);
-
 						p2pSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-
 						//Length of ServerIP:Port
 						short lenServerIP = (short)GetWindowTextLength(txtP2PServer);
-
 						if(lenServerIP < 1){
-							MessageBox(form1,"Invalid Address Format!", "Address Error!", NULL);
+							MessageBox(form1,"Invalid Address Format!", "Address Error!", 0 /*NULL*/ );
 							return 0;
 						}
-
 						//Get ServerIP:Port
 						GetWindowText(txtP2PServer, ip, lenServerIP + 1);
 						//Find:
 						char* c = strstr(ip, ":");
-
 						if(c != NULL){
 							//Split Port
 							strcpy(temp, c + 1);
@@ -1473,44 +1463,31 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 							ZeroMemory(server, 512);
 							strncpy(server, ip, (lenServerIP - strlen(temp) - 1));
 							i = (u_short)atoi(temp);
-						}
-						else{
+						} else {
 							ZeroMemory(server, 512);
 							GetWindowText(txtP2PServer, server, lenServerIP + 1);
 							i = 7159;
 						}
-
 						p2pServerInfo.sin_family = AF_INET;
 						p2pServerInfo.sin_port = htons(i);
-
 						unsigned long addr;
-
 						if(inet_addr(server) == INADDR_NONE){
 							hp = gethostbyname(server);
 							if(hp == NULL){
 								closesocket(p2pSocket);
-								MessageBox(form1, "Error Resolving!", "Error!", NULL);
+								MessageBox(form1, "Error Resolving!", "Error!", 0 /*NULL*/ );
 								return 0;
 							}
 							p2pServerInfo.sin_addr.s_addr = *((unsigned long*)hp->h_addr);
-						}
-						else{
+						} else {
 							p2pServerInfo.sin_addr.s_addr = inet_addr(myAddress);
 						}
-
-
 						p2pThread = CreateThread(NULL, 0, p2pLoop, NULL, 0, NULL);
-
-						sendto(p2pSocket, "GAME_START",  10, NULL, (sockaddr *) &p2pServerInfo, sizeof(p2pServerInfo));
-
-
-					}
-					else if(hwndCtl == btnP2PStart){
+						sendto(p2pSocket, "GAME_START",  10, 0 /*NULL*/, (struct sockaddr *) &p2pServerInfo, sizeof(p2pServerInfo));
+					} else if(hwndCtl == btnP2PStart){
 
 					}
-					*/
-
-
+                #endif
 					else if(hwndCtl == chkKeepChatLogs){
 						chatLogValue = SendMessage(chkKeepChatLogs, BM_GETCHECK, 0, 0);
 					}
@@ -1597,12 +1574,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 					else if(hwndCtl == btnAway){
 						if(imAway == false)
 							popupAway();
-						else{
+						else {
 							imAway = false;
 							showAway();
 						}
-					}
-					else if(hwndCtl == btnRemoveAway){
+					} else if(hwndCtl == btnRemoveAway){
 						if(SendMessage(lstAway, LVM_GETITEMCOUNT, 0, 0) != 0){
 							iSelect = SendMessage(lstAway, LVM_GETNEXTITEM, -1, LVNI_FOCUSED);
 							if(iSelect > -1){
@@ -1617,11 +1593,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 								SendMessage(lstAway, LVM_DELETEITEM, (WPARAM) iSelect, 0);
 							}
 						}
-					}
-					else if(hwndCtl == btnLogoff){
+					} else if(hwndCtl == btnLogoff){
 						userQuitRequest();
-					}
-					else if(hwndCtl == btnJoin){
+					} else if(hwndCtl == btnJoin){
 						if(swapp == false)
 							joinGameRequest();
 						else{
@@ -1632,26 +1606,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 								strcat(temp, "> ");
 
 								strcat(temp, currentGame);
-							}
-							else{
+							} else{
 								strcpy(temp, "A");
 								strcat(temp, currentGame);
 							}
-
 							strcat(temp, " [");
 							strcat(temp, gEmulator);
 							strcat(temp,"]");
 							i = strlen(temp);
 							temp[0] = '\0';
 							constructPacket(temp, 1 + i, 0x07);
-
 						}
-					}
-					else if (hwndCtl == btnGameLeave) {
+					} else if (hwndCtl == btnGameLeave) {
 						exitGameThread();
 						quitGameRequest();
-					}
-					else if(hwndCtl == btnCreate){
+					} else if(hwndCtl == btnCreate){
 						if(swapp == false){
 							popupMenu(0);
 						}
@@ -1677,15 +1646,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 			}
 			return 0;
 		}
-		case WM_NOTIFY:{
+		case WM_NOTIFY: {
 			NMHDR* pnmh = (NMHDR*)lParam;
 			NMLISTVIEW* pnmlv = (NMLISTVIEW*)lParam;
 			NMITEMACTIVATE* pnmia = (NMITEMACTIVATE*) lParam;
 			ENLINK * tEN = (ENLINK *)pnmh;
 			char tLink[1024];
 			TEXTRANGE g;
-
-			//Tab Control Login Info
+        //Tab Control Login Info
 			if((pnmh->hwndFrom == tTab) && (pnmh->code == TCN_SELCHANGE )){
 				i = TabCtrl_GetCurSel(tTab);
 
@@ -1696,22 +1664,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 				else if(i == 4) showOptions(4);
 				return 0;
 			}
-
-			//Tab Control Server List
+        //Tab Control Server List
 			if((pnmh->hwndFrom == sTab) && (pnmh->code == TCN_SELCHANGE )){
 				i = TabCtrl_GetCurSel(sTab);
-
 				if     (i == 0) showServerlistK();
 				else if(i == 1) showServerlist3D();
 				else if(i == 2) showRecentlist();
 				else if(i == 3) showFavoritelist();
 				else if(i == 4) showWaitinglist();
-
 				lastTabServer = SendMessage(sTab, TCM_GETCURSEL, 0, 0);
 				return 0;
 			}
-
-			//Chatroom Link Support
+        //Chatroom Link Support
             if((pnmh->hwndFrom == txtChatroom) && (pnmh->code == EN_LINK)){
 				if(tEN->msg == WM_LBUTTONDOWN){
 					g.chrg = tEN->chrg;
@@ -1722,7 +1686,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 					return 0;
 				}
 			}
-			//Game Chatroom Link Support
+        //Game Chatroom Link Support
             else if((pnmh->hwndFrom == txtGameChatroom) && (pnmh->code == EN_LINK)){
 				if(tEN->msg == WM_LBUTTONDOWN){
 					g.chrg = tEN->chrg;
@@ -1733,13 +1697,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 					return 0;
 				}
 			}
-
-			//lstUserlist
+        //lstUserlist
             if((pnmh->hwndFrom == lstUserlist) && (pnmh->code == LVN_ITEMACTIVATE)){
 				//Get Currently Selected item
 				iSelect = SendMessage(lstUserlist, LVM_GETNEXTITEM, -1, LVNI_FOCUSED);
 				if(iSelect < 0) return 0;
-
 				//Get UserID
 				b.mask = LVIF_TEXT;
 				b.iItem = iSelect;
@@ -1747,20 +1709,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 				b.pszText = temp1;
 				b.cchTextMax = 1024;
 				SendMessage(lstUserlist, LVM_GETITEM, 0, (LPARAM) &b);
-
-
 				/*strcpy(temp, userlistCommands[0].commands);
 				strcat(temp, temp1);
 				//Send
 				SendMessage(txtChat, WM_SETTEXT, 0, (LPARAM) temp);
 				globalChatRequest();*/
-
 				EnableWindow(form1, FALSE);
 				createPMWindow();
-
-				if (strlen(fPM) == 0)
-					return 0;
-
+				if (strlen(fPM) == 0) return 0;
 				temp[0] = 'd';
 				strcpy(&temp[1], "/msg ");
 				strcat(temp, temp1);
@@ -1768,9 +1724,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 				strcat(temp, fPM);
 				i = strlen(temp) + 1;
 				temp[0] = '\0';
-
 				constructPacket(temp, i, 0x07);
-
                 return 0;
             }
             else if((pnmh->hwndFrom == lstUserlist) && (pnmh->code == NM_RCLICK)){
@@ -1810,8 +1764,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
                     }
                 }
             }
-
-			//lstGameUserlist
+        //lstGameUserlist
             if((pnmh->hwndFrom == lstGameUserlist) && (pnmh->code == LVN_ITEMACTIVATE) && imOwner) {
                 //kickRequest();
                 return 0;
@@ -1820,8 +1773,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
                 popupMenu(4);
                 return 0;
             }
-
-			//lstGamelist
+        //lstGamelist
             if((pnmh->hwndFrom == lstGamelist) && (pnmh->code == LVN_ITEMACTIVATE)){
 				if(myGameID == -1 && SendMessage(chkJoinDbl, BM_GETCHECK, 0, 0) == BST_CHECKED)
 					joinGameRequest();
@@ -1866,17 +1818,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
                     }
                 }
             }
-
-			//lstServerListK
+        //lstServerListK
             if((pnmh->hwndFrom == lstServerListK) && (pnmh->code == LVN_ITEMACTIVATE)){
 				userQuitRequest();
-				//Get Currently Selected item
+            //Get Currently Selected item
 				iSelect = SendMessage(lstServerListK, LVM_GETNEXTITEM, -1, LVNI_FOCUSED);
-				//Get IP Address
+            //Get IP Address
 				b.mask = LVIF_TEXT;
 				b.iItem = iSelect;
 				b.cchTextMax = 1024;
-
 				b.iSubItem = 0;
 				b.pszText = server;
 				SendMessage(lstServerListK, LVM_GETITEM, 0, (LPARAM) &b);
@@ -1886,16 +1836,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 				b.iSubItem = 3;
 				b.pszText = location;
 				SendMessage(lstServerListK, LVM_GETITEM, 0, (LPARAM) &b);
-
-				//Display
+            //Display
 				SendMessage(txtServerIP, WM_SETTEXT, 0, (LPARAM) ip);
-
 				loginToServer();
-
-				//Display
+            //Display
 				strcpy(myServer, server);
 				SetWindowText(form1, server);
-
 				recentlistAdditem(server, ip, location);
                 return 0;
             }
@@ -1940,14 +1886,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
                     }
                 }
             }
-
-			//lstServerList3D
+        //lstServerList3D
             if((pnmh->hwndFrom == lstServerList3D) && (pnmh->code == LVN_ITEMACTIVATE)){
 				userQuitRequest();
-				//Get Currently Selected item
+            //Get Currently Selected item
 				iSelect = SendMessage(lstServerList3D, LVM_GETNEXTITEM, -1, LVNI_FOCUSED);
-
-				//Get IP Address
+            //Get IP Address
 				b.mask = LVIF_TEXT;
 				b.iItem = iSelect;
 				b.iSubItem = 1;
@@ -1960,16 +1904,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 				b.iSubItem = 3;
 				b.pszText = location;
 				SendMessage(lstServerList3D, LVM_GETITEM, 0, (LPARAM) &b);
-
-				//Display
+            //Display
 				SendMessage(txtServerIP, WM_SETTEXT, 0, (LPARAM) ip);
-
 				loginToServer();
-
-				//Display
+            //Display
 				strcpy(myServer, server);
 				SetWindowText(form1, server);
-
 				recentlistAdditem(server, ip, location);
                 return 0;
             }
@@ -2012,14 +1952,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
                     }
                 }
             }
-
-			//lstWaitingList
+        //lstWaitingList
             if((pnmh->hwndFrom == lstWaitingList) && (pnmh->code == LVN_ITEMACTIVATE)){
 				userQuitRequest();
-				//Get Currently Selected item
+            //Get Currently Selected item
 				iSelect = SendMessage(lstWaitingList, LVM_GETNEXTITEM, -1, LVNI_FOCUSED);
-
-				//Get IP Address
+            //Get IP Address
 				b.mask = LVIF_TEXT;
 				b.iItem = iSelect;
 				b.iSubItem = 4;
@@ -2032,16 +1970,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 				b.iSubItem = 5;
 				b.pszText = location;
 				SendMessage(lstWaitingList, LVM_GETITEM, 0, (LPARAM) &b);
-
-				//Display
+            //Display
 				SendMessage(txtServerIP, WM_SETTEXT, 0, (LPARAM) ip);
-
 				loginToServer();
-
-				//Display
+            //Display
 				strcpy(myServer, server);
 				SetWindowText(form1, server);
-
 				recentlistAdditem(server, ip, location);
                 return 0;
             }
@@ -2082,16 +2016,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
                     }
                 }
             }
-
-			//lstFavoriteList
+        //lstFavoriteList
             if((pnmh->hwndFrom == lstFavoriteList) && (pnmh->code == LVN_ITEMACTIVATE)){
 				userQuitRequest();
 				i = SendMessage(lstFavoriteList, LVM_GETNEXTITEM, -1, LVNI_FOCUSED);
-
 				b.mask = LVIF_TEXT;
 				b.iItem = i;
 				b.cchTextMax = 1024;
-
 				b.iSubItem = 1;
 				b.pszText = server;
 				SendMessage(lstFavoriteList, LVM_GETITEM, 0, (LPARAM) &b);
@@ -2104,20 +2035,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 				b.iSubItem = 3;
 				b.pszText = comments;
 				SendMessage(lstFavoriteList, LVM_GETITEM, 0, (LPARAM) &b);
-
-				//Display
+            //Display
 				SendMessage(txtServerIP, WM_SETTEXT, 0, (LPARAM) ip);
-
 				SendMessage(lstFavoriteList, LVM_DELETEITEM, (WPARAM) i, 0);
-
 				favoritelistAdditem(server, ip, location, comments);
-
 				loginToServer();
-
-				//Display
+            //Display
 				strcpy(myServer, server);
 				SetWindowText(form1, server);
-
 				recentlistAdditem(server, ip, location);
             }
             else if((pnmh->hwndFrom == lstFavoriteList) && (pnmh->code == NM_RCLICK)){
@@ -2159,16 +2084,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
                     }
                 }
             }
-
-			//lstRecentList
+        //lstRecentList
             if((pnmh->hwndFrom == lstRecentList) && (pnmh->code == LVN_ITEMACTIVATE)){
 				userQuitRequest();
 				i = SendMessage(lstRecentList, LVM_GETNEXTITEM, -1, LVNI_FOCUSED);
-
 				b.mask = LVIF_TEXT;
 				b.iItem = i;
 				b.cchTextMax = 1024;
-
 				b.iSubItem = 1;
 				b.pszText = server;
 				SendMessage(lstRecentList, LVM_GETITEM, 0, (LPARAM) &b);
@@ -2178,18 +2100,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 				b.iSubItem = 2;
 				b.pszText = location;
 				SendMessage(lstRecentList, LVM_GETITEM, 0, (LPARAM) &b);
-
-				//Display
+            //Display
 				SendMessage(txtServerIP, WM_SETTEXT, 0, (LPARAM) ip);
-
 				SendMessage(lstRecentList, LVM_DELETEITEM, (WPARAM) i, 0);
-
 				loginToServer();
-
-				//Display
+            //Display
 				strcpy(myServer, server);
 				SetWindowText(form1, server);
-
 				recentlistAdditem(server, ip, location);
             }
             else if((pnmh->hwndFrom == lstRecentList) && (pnmh->code == NM_RCLICK)){
@@ -2232,7 +2149,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
                 }
             }
             return 0;
-
 		}
 		case WM_CLOSE:{
 			DestroyWindow(hWnd);
@@ -2247,7 +2163,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 			}
 			return 0;
 		}
-		//For Waiting Games List
+    //For Waiting Games List
 		case SC_SUPRARECVWAITING:{
 			switch(WSAGETSELECTEVENT(lParam)){
 				case FD_CONNECT:{
@@ -2270,7 +2186,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 			}
 			return 0;
 		}
-		//For Anti3D Server List
+    //For Anti3D Server List
 		case SC_SUPRARECV3D:{
 			switch(WSAGETSELECTEVENT(lParam)){
 				case FD_CONNECT:{
@@ -2292,7 +2208,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 			}
 			return 0;
 		}
-		//For Kaillera Server List
+    //For Kaillera Server List
 		case SC_SUPRARECVK:{
 			switch(WSAGETSELECTEVENT(lParam)){
 				case FD_CONNECT:{
@@ -2451,8 +2367,10 @@ void createInitialWindow(){
 	TabCtrl_InsertItem(tTab, 2, &v);
 	v.pszText = "Extended EmulinkerSF v0.90.0+ Gameroom Options";
 	TabCtrl_InsertItem(tTab, 3, &v);
-	//v.pszText = "P2P Options";
-	//TabCtrl_InsertItem(tTab, 4, &v);
+#ifdef KAILLERA_P2P
+	v.pszText = "P2P Options";
+	TabCtrl_InsertItem(tTab, 4, &v);
+#endif // KAILLERA_P2P
 	//Login Servers
 	sTab = CreateWindowEx(controlStyles, "SysTabControl32", NULL, tabProperties, 5, 5, 780, 470, form1, NULL, hInstance, NULL);
 	SendMessage(sTab, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
@@ -2486,61 +2404,128 @@ void createInitialWindow(){
 
 	txtMaxUsers = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", maxUsersG, textboxProperties, 10, 520, 60, 25, form1, NULL, hInstance, NULL);
 	SendMessage(txtMaxUsers, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
-	lblMaxUsers = CreateWindowEx(controlStyles, "STATIC", "Max Users:", labelProperties, 10, 505, 60, 15, form1, NULL, hInstance, NULL);
+	lblMaxUsers = CreateWindowEx(
+        controlStyles, "STATIC",
+        "Max Users:",
+        labelProperties, 10, 505, 60, 15, form1, NULL, hInstance, NULL
+    );
 	SendMessage(lblMaxUsers, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	if (atoi(maxPingG) < 1 || atoi(maxPingG) > 1000)
 		wsprintf(maxPingG, "%i", 200);
 	txtMaxPing = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", maxPingG, textboxProperties, 75, 520, 60, 25, form1, NULL, hInstance, NULL);
 	SendMessage(txtMaxPing, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
-	lblMaxPing = CreateWindowEx(controlStyles, "STATIC", "Max Ping:", labelProperties, 75, 505, 60, 15, form1, NULL, hInstance, NULL);
+	lblMaxPing = CreateWindowEx(
+        controlStyles, "STATIC",
+        "Max Ping:",
+        labelProperties, 75, 505, 60, 15, form1, NULL, hInstance, NULL
+    );
 	SendMessage(lblMaxPing, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	//Use EmulinkerSF Options
-	chkEmulinkerSF = CreateWindowEx(controlStyles, "BUTTON", "Use Extended Options?", checkProperties, 325, 535, 140, 25, form1, NULL, hInstance, NULL);
+	chkEmulinkerSF = CreateWindowEx(
+        controlStyles, "BUTTON",
+        "Use Extended Options?",
+        checkProperties, 325, 535, 140, 25, form1, NULL, hInstance, NULL
+    );
 	SendMessage(chkEmulinkerSF, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	SendMessage(chkEmulinkerSF, BM_SETCHECK, emulinkerSFValue, 0);
 	//Fake P2P Options
-	chkFakeP2P = CreateWindowEx(controlStyles, "BUTTON", "Use Fake P2P?", checkProperties, 325, 505, 100, 25, form1, NULL, hInstance, NULL);
+	chkFakeP2P = CreateWindowEx(
+        controlStyles, "BUTTON",
+        "Use Fake P2P?",
+        checkProperties, 325, 505, 100, 25, form1, NULL, hInstance, NULL
+    );
 	SendMessage(chkFakeP2P, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	SendMessage(chkFakeP2P, BM_SETCHECK, fakeP2PValue, 0);
 	//Emulator Restriction
-	chkEmuRes = CreateWindowEx(controlStyles, "BUTTON", "Restrict Emulator?", checkProperties, 150, 505, 105, 25, form1, NULL, hInstance, NULL);
+	chkEmuRes = CreateWindowEx(
+        controlStyles, "BUTTON",
+        "Restrict Emulator?",
+        checkProperties, 150, 505, 105, 25, form1, NULL, hInstance, NULL
+    );
 	SendMessage(chkEmuRes, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	SendMessage(chkEmuRes, BM_SETCHECK, emuResValue, 0);
 	//Connection Restriction
-	chkConnRes = CreateWindowEx(controlStyles, "BUTTON", "Restrict Connection Type?", checkProperties, 150, 535, 145, 25, form1, NULL, hInstance, NULL);
+	chkConnRes = CreateWindowEx(
+        controlStyles, "BUTTON",
+        "Restrict Connection Type?",
+        checkProperties, 150, 535, 145, 25, form1, NULL, hInstance, NULL
+    );
 	SendMessage(chkConnRes, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	SendMessage(chkConnRes, BM_SETCHECK, connResValue, 0);
 	//Version
-	btnVersion = CreateWindowEx(controlStyles, "BUTTON", "Server Version", buttonProperties, 500, 530, 80, 25, form1, NULL, hInstance, NULL);
+	btnVersion = CreateWindowEx(
+        controlStyles, "BUTTON",
+        "Server Version",
+        buttonProperties, 500, 530, 80, 25, form1, NULL, hInstance, NULL
+    );
 	SendMessage(btnVersion, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 
-
 	//P2P
-	/*txtP2PServer = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", p2pServer, textboxProperties, 10, 520, 210,25, form1, NULL, hInstance, NULL);
+#ifdef KAILLERA_P2P
+	txtP2PServer = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", p2pServer, textboxProperties, 10, 520, 210,25, form1, NULL, hInstance, NULL);
 	SendMessage(txtP2PServer, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
-	lblP2PServer = CreateWindowEx(controlStyles, "STATIC", "Server IP:", labelProperties, 10, 505, 210, 15, form1, NULL, hInstance, NULL);
+	lblP2PServer = CreateWindowEx(
+        controlStyles, "STATIC",
+    #ifdef MEISEI_ESP
+        "Servidor IP:",
+    #else
+        "Server IP:",
+    #endif
+        labelProperties, 10, 505, 210, 15, form1, NULL, hInstance, NULL
+    );
 	SendMessage(lblP2PServer, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
-	//P2P Port Textbox
+//P2P Port Textbox
 	txtP2PPort = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", p2pPort, textboxProperties, 225, 520, 60,25, form1, NULL, hInstance, NULL);
 	SendMessage(txtP2PPort, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	lblP2PPort = CreateWindowEx(controlStyles, "STATIC", "Port#:", labelProperties, 225, 505, 60, 15, form1, NULL, hInstance, NULL);
 	SendMessage(lblP2PPort, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
-	//Login Button
-	btnP2PStart = CreateWindowEx(controlStyles, "BUTTON", "Start", buttonProperties, 500, 530, 60,25, form1, NULL, hInstance, NULL);
+//Login Button
+	btnP2PStart = CreateWindowEx(
+        controlStyles, "BUTTON",
+    #ifdef MEISEI_ESP
+        "Entrar",
+    #else
+        "Start",
+    #endif // MEISEI_ESP
+        buttonProperties, 500, 530, 60,25, form1, NULL, hInstance, NULL
+    );
 	SendMessage(btnP2PStart, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	//Connect
-	btnP2PConnect = CreateWindowEx(controlStyles, "BUTTON", "Connect to Server", buttonProperties,290, 520, 100, 25, form1, NULL, hInstance, NULL);
+	btnP2PConnect = CreateWindowEx(
+        controlStyles, "BUTTON",
+    #ifdef MEISEI_ESP
+        "Conectar Servidor",
+    #else
+        "Connect to Server",
+    #endif // MEISEI_ESP
+        buttonProperties,290, 520, 100, 25, form1, NULL, hInstance, NULL
+    );
 	SendMessage(btnP2PConnect, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
-	//Server
-	btnP2PServer = CreateWindowEx(controlStyles, "BUTTON", "Start as Server", buttonProperties, 395, 520, 100, 25, form1, NULL, hInstance, NULL);
-	SendMessage(btnP2PServer, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));*/
-
-
+//Server
+	btnP2PServer = CreateWindowEx(
+        controlStyles, "BUTTON",
+    #ifdef MEISEI_ESP
+        "Iniciar Servidor",
+    #else
+        "Start as Server",
+    #endif // MEISEI_ESP
+        buttonProperties, 395, 520, 100, 25, form1, NULL, hInstance, NULL
+    );
+	SendMessage(btnP2PServer, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
+#endif // KAILLERA_P2P
 
 //Quit Textbox
 	txtQuit = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", quit, textboxProperties, 245, 530, 205, 25, form1, NULL, hInstance, NULL);
 	SendMessage(txtQuit, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
-	lblQuit = CreateWindowEx(controlStyles, "STATIC", "Quit msg:", labelProperties, 196, 535, 46, 15, form1, NULL, hInstance, NULL);
+	lblQuit = CreateWindowEx(
+        controlStyles, "STATIC",
+    #ifdef MEISEI_ESP
+        "¡Adiós!:",
+    #else
+        "Quit msg:",
+    #endif // MEISEI_ESP
+        labelProperties, 196, 535, 46, 15, form1, NULL, hInstance, NULL
+    );
 	SendMessage(lblQuit, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 
 //Stats Label
@@ -2556,7 +2541,15 @@ void createInitialWindow(){
 //Username Textbox
 	txtUsername = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", username, textboxProperties, 40, 530, 150, 25, form1, NULL, hInstance, NULL);
 	SendMessage(txtUsername, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
-	lblUsername = CreateWindowEx(controlStyles, "STATIC", "Nick:", labelProperties, 11, 535, 26, 15, form1, NULL, hInstance, NULL);
+	lblUsername = CreateWindowEx(
+        controlStyles, "STATIC",
+    #ifdef MEISEI_ESP
+        "Mote:",
+    #else
+        "Nick:",
+    #endif // MEISEI_ESP
+        labelProperties, 11, 535, 26, 15, form1, NULL, hInstance, NULL
+    );
 	SendMessage(lblUsername, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 
 //Show Chatroom
@@ -2615,63 +2608,169 @@ void createInitialWindow(){
 #endif // MEISEI_ESP
 	SendMessage(cmbConnectionType, CB_SETCURSEL, connectionType - 1, 0);
 
-	lblConnectionType = CreateWindowEx(controlStyles, "STATIC", "Type:", labelProperties, 462, 538, 30, 15, form1, NULL, hInstance, NULL);
+	lblConnectionType = CreateWindowEx(
+        controlStyles, "STATIC",
+    #ifdef MEISEI_ESP
+        "Tipo:",
+    #else
+        "Type:",
+    #endif // MEISEI_ESP
+        labelProperties, 462, 538, 30, 15, form1, NULL, hInstance, NULL
+    );
 	SendMessage(lblConnectionType, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 
 //Chatroom Options
-	chkJoinChat = CreateWindowEx(controlStyles, "BUTTON", "Show Join/Left Notifications?", checkProperties, 10, 505, 150, 25, form1, NULL, hInstance, NULL);
+	chkJoinChat = CreateWindowEx(
+        controlStyles, "BUTTON",
+    #ifdef MEISEI_ESP
+        "¿Ver Notificaciones Unido/Izq?",
+        checkProperties, 10, 505, 165, 25, form1, NULL, hInstance, NULL
+    #else
+        "Show Join/Left Notifications?",
+        checkProperties, 10, 505, 150, 25, form1, NULL, hInstance, NULL
+    #endif // MEISEI_ESP
+    );
 	SendMessage(chkJoinChat, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	SendMessage(chkJoinChat, BM_SETCHECK, joinChatValue, 0);
 
-	chkCreate = CreateWindowEx(controlStyles, "BUTTON", "Show Create/Close Notifications?", checkProperties, 10, 535, 180, 25, form1, NULL, hInstance, NULL);
+	chkCreate = CreateWindowEx(
+        controlStyles, "BUTTON",
+    #ifdef MEISEI_ESP
+        "¿Ver Notificaciones Creado/Cerrado?",
+        checkProperties, 10, 535, 195, 25, form1, NULL, hInstance, NULL
+    #else
+        "Show Create/Close Notifications?",
+        checkProperties, 10, 535, 180, 25, form1, NULL, hInstance, NULL
+    #endif // MEISEI_ESP
+    );
 	SendMessage(chkCreate, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	SendMessage(chkCreate, BM_SETCHECK, createValue, 0);
 
-	chkKeepChatLogs = CreateWindowEx(controlStyles, "BUTTON", "Keep Logs?", checkProperties, 350, 505, 100, 25, form1, NULL, hInstance, NULL);
+	chkKeepChatLogs = CreateWindowEx(
+        controlStyles, "BUTTON",
+    #ifdef MEISEI_ESP
+        "¿Mantener Registros?",
+        checkProperties, 350, 505, 120, 25, form1, NULL, hInstance, NULL
+    #else
+        "Keep Logs?",
+        checkProperties, 350, 505, 100, 25, form1, NULL, hInstance, NULL
+    #endif // MEISEI_ESP
+    );
 	SendMessage(chkKeepChatLogs, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	SendMessage(chkKeepChatLogs, BM_SETCHECK, chatLogValue, 0);
 
-	chkShowError = CreateWindowEx(controlStyles, "BUTTON", "Show Rom/Emulator Errors?", checkProperties, 180, 505, 155, 25, form1, NULL, hInstance, NULL);
+	chkShowError = CreateWindowEx(
+        controlStyles, "BUTTON",
+    #ifdef MEISEI_ESP
+        "¿Ver Errores Rom/Emulador?",
+    #else
+        "Show Rom/Emulator Errors?",
+    #endif // MEISEI_ESP
+        checkProperties, 180, 505, 155, 25, form1, NULL, hInstance, NULL
+    );
 	SendMessage(chkShowError, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	SendMessage(chkShowError, BM_SETCHECK, errorValue, 0);
 
-	chkDrop = CreateWindowEx(controlStyles, "BUTTON", "Show Dropped Packet Alerts?", checkProperties, 400, 535, 165, 25, form1, NULL, hInstance, NULL);
+	chkDrop = CreateWindowEx(
+        controlStyles, "BUTTON",
+    #ifdef MEISEI_ESP
+        "¿Ver Alertas Paquetes Dejados?",
+        checkProperties, 400, 535, 170, 25, form1, NULL, hInstance, NULL
+    #else
+        "Show Dropped Packet Alerts?",
+        checkProperties, 400, 535, 165, 25, form1, NULL, hInstance, NULL
+    #endif // MEISEI_ESP
+    );
 	SendMessage(chkDrop, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	SendMessage(chkDrop, BM_SETCHECK, dropValue, 0);
 
-	chkJoinDbl = CreateWindowEx(controlStyles, "BUTTON", "Allow double click to join game?", checkProperties, 210, 535, 170, 25, form1, NULL, hInstance, NULL);
+	chkJoinDbl = CreateWindowEx(
+        controlStyles, "BUTTON",
+    #ifdef MEISEI_ESP
+        "¿Doble clic para unirse al juego?",
+    #else
+        "Allow double click to join game?",
+    #endif // MEISEI_ESP
+        checkProperties, 210, 535, 170, 25, form1, NULL, hInstance, NULL
+    );
 	SendMessage(chkJoinDbl, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	SendMessage(chkJoinDbl, BM_SETCHECK, joinDblValue, 0);
 
 //Gameroom Options
-	chkJoinChatGame = CreateWindowEx(controlStyles, "BUTTON", "Show Join/Left Notifications?", checkProperties, 10, 505, 170, 25, form1, NULL, hInstance, NULL);
+	chkJoinChatGame = CreateWindowEx(
+        controlStyles, "BUTTON",
+    #ifdef MEISEI_ESP
+        "¿Notificaciones Unirse/Izq.?",
+    #else
+        "Show Join/Left Notifications?",
+    #endif // MEISEI_ESP
+        checkProperties, 10, 505, 170, 25, form1, NULL, hInstance, NULL
+    );
 	SendMessage(chkJoinChatGame, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	SendMessage(chkJoinChatGame, BM_SETCHECK, joinChatGameValue, 0);
 
-
-	chkBeep = CreateWindowEx(controlStyles, "BUTTON", "Beep when User Joins?", checkProperties, 10, 535, 170, 25, form1, NULL, hInstance, NULL);
+	chkBeep = CreateWindowEx(
+        controlStyles, "BUTTON",
+    #ifdef MEISEI_ESP
+        "¿Pita al unirse un Usuario?",
+    #else
+        "Beep when User Joins?",
+    #endif // MEISEI_ESP
+        checkProperties, 10, 535, 170, 25, form1, NULL, hInstance, NULL
+    );
 	SendMessage(chkBeep, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	SendMessage(chkBeep, BM_SETCHECK, beepValue, 0);
 
-	chkUseScreenChat = CreateWindowEx(controlStyles, "BUTTON", "Use Screen Chat?", checkProperties, 180, 535, 150, 25, form1, NULL, hInstance, NULL);
+	chkUseScreenChat = CreateWindowEx(
+        controlStyles, "BUTTON",
+    #ifdef MEISEI_ESP
+        "¿Usar chat en pantalla?",
+    #else
+        "Use Screen Chat?",
+    #endif // MEISEI_ESP
+        checkProperties, 180, 535, 150, 25, form1, NULL, hInstance, NULL
+    );
 	SendMessage(chkUseScreenChat, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	SendMessage(chkUseScreenChat, BM_SETCHECK, useScreenChatValue, 0);
 
-	chkKeepGameChatLogs = CreateWindowEx(controlStyles, "BUTTON", "Keep Gameroom Logs?", checkProperties, 180, 505, 140, 25, form1, NULL, hInstance, NULL);
+	chkKeepGameChatLogs = CreateWindowEx(
+        controlStyles, "BUTTON",
+    #ifdef MEISEI_ESP
+        "¿Mantener registros?",
+        checkProperties, 180, 505, 150, 25, form1, NULL, hInstance, NULL
+    #else
+        "Keep Gameroom Logs?",
+        checkProperties, 180, 505, 140, 25, form1, NULL, hInstance, NULL
+    #endif // MEISEI_ESP
+    );
 	SendMessage(chkKeepGameChatLogs, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	SendMessage(chkKeepGameChatLogs, BM_SETCHECK, gameChatLogValue, 0);
 
-	chkBlink = CreateWindowEx(controlStyles, "BUTTON", "Blink when User Joins?", checkProperties, 330, 505, 140, 25, form1, NULL, hInstance, NULL);
+	chkBlink = CreateWindowEx(
+        controlStyles, "BUTTON",
+    #ifdef MEISEI_ESP
+        "¿Avisa al unirse Usuario?",
+    #else
+        "Blink when User Joins?",
+    #endif // MEISEI_ESP
+        checkProperties, 330, 505, 140, 25, form1, NULL, hInstance, NULL
+    );
 	SendMessage(chkBlink, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	SendMessage(chkBlink, BM_SETCHECK, blinkValue, 0);
 
-	chkUseCache = CreateWindowEx(controlStyles, "BUTTON", "Use Cache? [Experiment for best Performance]", checkProperties, 330, 535, 260, 25, form1, NULL, hInstance, NULL);
+	chkUseCache = CreateWindowEx(
+        controlStyles, "BUTTON",
+    #ifdef MEISEI_ESP
+        "¿Usar caché? [Para obtener el mejor Rendimiento]",
+    #else
+        "Use Cache? [Experiment for best Performance]",
+    #endif // MEISEI_ESP
+        checkProperties, 330, 535, 260, 25, form1, NULL, hInstance, NULL
+    );
 	SendMessage(chkUseCache, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	SendMessage(chkUseCache, BM_SETCHECK, useCacheValue, 0);
 
-
 	int i;
-
 //Recent
 	for (i = recentCount; i >= 0; i--) {
 		if (/*strlen(recentServers[i].server) > 0 && */strlen(recentServers[i].ip) > 0/* && strlen(recentServers[i].location) > 0*/)
@@ -2687,10 +2786,8 @@ void createInitialWindow(){
 	showOptions(1);
 	displayAndAutoScrollRichEdit(txtChatroom, initText, RGB(205, 133, 0));
 
-	if (showChatroomFirst == true)
-		showChatroom(true);
-	else
-		showChatroom(false);
+	if (showChatroomFirst == true)  showChatroom(true);
+	else                            showChatroom(false);
 
 	EditProcTxtMaxUsers = (WNDPROC)GetWindowLongPtr(txtMaxUsers, GWLP_WNDPROC);
 	SetWindowLongPtr(txtMaxUsers, GWLP_WNDPROC, (DWORD_PTR)SubProcTxtMaxUsers);
@@ -2718,14 +2815,26 @@ void popupAway(){
 //Get Window Position
 	GetWindowRect(form1, &b);
 
-
 //Make List
 	awayMenu = CreatePopupMenu();
-	AppendMenu(awayMenu, MF_STRING | MF_POPUP, 0xFFFF, "Create/Remove Away Messages");
+	AppendMenu(
+        awayMenu, MF_STRING | MF_POPUP, 0xFFFF,
+    #ifdef MEISEI_ESP
+        "Crear/Eliminar Mensajes Afuera"
+    #else
+        "Create/Remove Away Messages"
+    #endif // MEISEI_ESP
+    );
 	AppendMenu(awayMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
 
+#ifdef MEISEI_ESP
+	strcpy(awayMessages[0].subject, "Mensaje Afuera Predeterminado");
+	strcpy(awayMessages[0].message, "Actualmente estoy lejos de mi computadora.");
+#else
 	strcpy(awayMessages[0].subject, "Default Away Message");
 	strcpy(awayMessages[0].message, "I'm currently away from my computer.");
+#endif // MEISEI_ESP
+
 	awayMessages[0].save = true;
 	for(i = 0; i <= awayMessageCount; i++){
 		if(awayMessages[i].save == true)
@@ -2755,7 +2864,14 @@ void showAway(){
 	char temp[2048];
 
 	if(imAway == true){
-		SetWindowText(btnAway, "I'm Back");
+		SetWindowText(
+            btnAway,
+        #ifdef MEISEI_ESP
+            "Estoy de Vuelta"
+        #else
+            "I'm Back"
+        #endif // MEISEI_ESP
+        );
 		strcpy(temp, "[");
 		strcat(temp, awayMessages[awayValue].subject);
 		strcat(temp, "] ");
@@ -2764,7 +2880,14 @@ void showAway(){
 		strcpy( temp, "Status: Away" );
 		kailleraChatSend( temp );
 	} else{
-		SetWindowText( btnAway, "Away" );
+		SetWindowText(
+            btnAway,
+        #ifdef MEISEI_ESP
+            "Fuera"
+        #else
+            "Away"
+        #endif // MEISEI_ESP
+        );
 		strcpy( temp, "Status: Returned" );
 		kailleraChatSend( temp );
 		SetWindowText( txtGameChat, "" );
@@ -2773,7 +2896,17 @@ void showAway(){
 
 void updateAway(){
 	if(awayMessageCount == (AWAY_MESSAGE_MAX - 1)){
-		MessageBox(frmAway, "You have reached the maximum# of away messages allowed!", "Max Away Messages!", 0);
+		MessageBox(
+            frmAway,
+        #ifdef MEISEI_ESP
+            "¡Has alcanzado el número máximo de mensajes afuera permitidos!",
+            "¡Máximo de mensajes afuera!",
+        #else
+            "You have reached the maximum# of away messages allowed!",
+            "Max Away Messages!",
+        #endif // MEISEI_ESP
+            0
+        );
 		return;
 	}
 
@@ -2821,8 +2954,7 @@ void createEditFavoritesWindow(){
 	char strComments [1024];
 
 	iSelect = SendMessage(lstFavoriteList, LVM_GETNEXTITEM, -1, LVNI_FOCUSED);
-	if(iSelect < 0)
-		return;
+	if(iSelect < 0) return;
 
 	//IP
 	q.mask = LVIF_TEXT;
@@ -2853,11 +2985,18 @@ void createEditFavoritesWindow(){
 	q.cchTextMax = 1024;
 	SendMessage(lstFavoriteList, LVM_GETITEM, 0, (LPARAM) &q);
 
-
 	//Get Window Position
 	GetWindowRect(form1, &b);
 
-	frmEditFavorites = CreateWindow("Supraclient", "Edit Favorite Entry", formOtherProperties, b.left + 110, b.top + 200, 330, 150, form1, NULL, hInstance, NULL);
+	frmEditFavorites = CreateWindow(
+        "Supraclient",
+    #ifdef MEISEI_ESP
+        "Editar Entrada Favorita",
+    #else
+        "Edit Favorite Entry",
+    #endif // MEISEI_ESP
+        formOtherProperties, b.left + 110, b.top + 200, 330, 150, form1, NULL, hInstance, NULL
+    );
 	//IP
 	txtEIP = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", strIP, textboxProperties, 5, 10, 250, 25, frmEditFavorites, NULL, hInstance, NULL);
 	SendMessage(txtEIP, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
@@ -2919,14 +3058,21 @@ void createEditFavoritesWindow(){
 	DestroyWindow(frmEditFavorites);
 }
 
-
 void createCommentsWindow(){
 	RECT b;
 
 	//Get Window Position
 	GetWindowRect(form1, &b);
 
-	frmComments = CreateWindow("Supraclient", "Any Comments?", formOtherProperties, b.left + 110, b.top + 200, 330, 80, form1, NULL, hInstance, NULL);
+	frmComments = CreateWindow(
+        "Supraclient",
+    #ifdef MEISEI_ESP
+        "¿Algún comentario?",
+    #else
+        "Any Comments?",
+    #endif // MEISEI_ESP
+        formOtherProperties, b.left + 110, b.top + 200, 330, 80, form1, NULL, hInstance, NULL
+    );
 	//Subject
 	txtComments = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", NULL, textboxProperties, 5, 10, 250, 25, frmComments, NULL, hInstance, NULL);
 	SendMessage(txtComments, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
@@ -2943,14 +3089,21 @@ void createCommentsWindow(){
 	}
 }
 
-
 void createPMWindow(){
 	RECT b;
 
 	//Get Window Position
 	GetWindowRect(form1, &b);
 
-	frmPM = CreateWindow("Supraclient", "Enter a message:", formOtherProperties, b.left + 110, b.top + 200, 330, 80, form1, NULL, hInstance, NULL);
+	frmPM = CreateWindow(
+        "Supraclient",
+    #ifdef MEISEI_ESP
+        "Ingrese un mensaje:",
+    #else
+        "Enter a message:",
+    #endif // MEISEI_ESP
+        formOtherProperties, b.left + 110, b.top + 200, 330, 80, form1, NULL, hInstance, NULL
+    );
 	//Subject
 	txtPM = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", NULL, textboxProperties, 5, 10, 250, 25, frmPM, NULL, hInstance, NULL);
 	SendMessage(txtPM, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
@@ -2968,7 +3121,6 @@ void createPMWindow(){
 	}
 }
 
-
 void createAwayWindow(){
 	int i;
 	RECT b;
@@ -2979,24 +3131,60 @@ void createAwayWindow(){
 
 	frmAway = CreateWindow(
         "Supraclient",
+    #ifdef MEISEI_ESP
+        "Crear Mensaje Afuera",
+    #else
         "Create Away Message",
+    #endif // MEISEI_ESP
         formOtherProperties, b.left + 110, b.top + 80, 440, 340, form1, NULL, hInstance, NULL
     );
 
 //Subject
-	txtAwayMessageSubject = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", "Enter Subject", textboxProperties, 5, 10, 250, 25, frmAway, NULL, hInstance, NULL);
+	txtAwayMessageSubject = CreateWindowEx(
+        WS_EX_CLIENTEDGE, "EDIT",
+    #ifdef MEISEI_ESP
+        "Ingresar Asunto",
+    #else
+        "Enter Subject",
+    #endif // MEISEI_ESP
+        textboxProperties, 5, 10, 250, 25, frmAway, NULL, hInstance, NULL
+    );
 	SendMessage(txtAwayMessageSubject, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 
 //Message
-	txtAwayMessage = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", "Enter Message", textboxProperties, 5, 40, 250, 25, frmAway, NULL, hInstance, NULL);
+	txtAwayMessage = CreateWindowEx(
+        WS_EX_CLIENTEDGE, "EDIT",
+    #ifdef MEISEI_ESP
+        "Ingresar Mensaje",
+    #else
+        "Enter Message",
+    #endif // MEISEI_ESP
+        textboxProperties, 5, 40, 250, 25, frmAway, NULL, hInstance, NULL
+    );
 	SendMessage(txtAwayMessage, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 
 //Create New
-	btnCreateAway = CreateWindowEx(controlStyles, "BUTTON", "Create", buttonProperties, 260, 40, 60, 25, frmAway, NULL, hInstance, NULL);
+	btnCreateAway = CreateWindowEx(
+        controlStyles, "BUTTON",
+    #ifdef MEISEI_ESP
+        "Crear",
+    #else
+        "Create",
+    #endif // MEISEI_ESP
+        buttonProperties, 260, 40, 60, 25, frmAway, NULL, hInstance, NULL
+    );
 	SendMessage(btnCreateAway, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 
 //Remove
-	btnRemoveAway = CreateWindowEx(controlStyles, "BUTTON", "Remove", buttonProperties, 325, 40, 60, 25, frmAway, NULL, hInstance, NULL);
+	btnRemoveAway = CreateWindowEx(
+        controlStyles, "BUTTON",
+    #ifdef MEISEI_ESP
+        "Eliminar",
+    #else
+        "Remove",
+    #endif // MEISEI_ESP
+        buttonProperties, 325, 40, 60, 25, frmAway, NULL, hInstance, NULL
+    );
 	SendMessage(btnRemoveAway, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 
 //Create Away List
@@ -3023,7 +3211,6 @@ void createAwayWindow(){
 	}
 }
 
-
 void parseWaitingGames(){
 	char game[1024];
 	char emulator[1024];
@@ -3040,8 +3227,7 @@ void parseWaitingGames(){
 	char* s;
 	long total;
 
-	if(waiting == false)
-		return;
+	if(waiting == false) return;
 
 	total = bytesRecvWaiting;
 
@@ -3066,7 +3252,6 @@ void parseWaitingGames(){
 		waiting = false;
 	}
 	total = i;
-
 
 	//Parse
 	for(i = 0; i < total; i++){
@@ -3145,7 +3330,11 @@ void parseWaitingGames(){
 	numWaiting = SendMessage(lstWaitingList, LVM_GETITEMCOUNT, 0, 0);
 	wsprintf(
         strWaiting,
+    #ifdef MEISEI_ESP
+        "%i Total de Juegos en Espera",
+    #else
         "%i Waiting Games Total",
+    #endif // MEISEI_ESP
         numWaiting
     );
 	SetWindowText(form1, strWaiting);
@@ -3255,7 +3444,11 @@ void parseServerList3D(){
 	numOfServers = SendMessage(lstServerList3D, LVM_GETITEMCOUNT, 0, 0);
 	wsprintf(
         strServers,
+    #ifdef MEISEI_ESP
+        "%i Total de Servidores EmuLinker",
+    #else
         "%i EmuLinker Servers Total",
+    #endif // MEISEI_ESP
         numOfServers
     );
 	SetWindowText(form1, strServers);
@@ -3292,7 +3485,6 @@ void parseServerListK(){
 		s = &myBuffServerListK[q];
 		total = total - q;
 	}
-
 
 	//Find First NULL.  Anything before this is the Waiting Games List
 	i = 0;
@@ -3370,7 +3562,11 @@ void parseServerListK(){
 	numOfServers = SendMessage(lstServerListK, LVM_GETITEMCOUNT, 0, 0);
 	wsprintf(
         strServers,
+    #ifdef MEISEI_ESP
+        "%i Total de Servidores Kaillera",
+    #else
         "%i Kaillera Servers Total",
+    #endif // MEISEI_ESP
         numOfServers
     );
 	SetWindowText(form1, strServers);
@@ -3401,11 +3597,26 @@ DWORD WINAPI pingKailleraServers(LPVOID lpParam){
 		bool sError = false;
 
 		if(lastTabServer == 0 && pinging3D == true){
-			sprintf(str, "Pinging Kaillera Server %i of %i", i + 1, total);
+			sprintf(
+                str,
+            #ifdef MEISEI_ESP
+                "Haciendo ping al servidor Kaillera %i de %i",
+            #else
+                "Pinging Kaillera Server %i of %i",
+            #endif // MEISEI_ESP
+                i + 1, total
+            );
 			SetWindowText(form1, str);
-		}
-		else if(pinging3D == false){
-			sprintf(str, "Pinging Kaillera Server %i of %i", i + 1, total);
+		} else if(pinging3D == false) {
+			sprintf(
+                str,
+            #ifdef MEISEI_ESP
+                "Haciendo ping al servidor Kaillera %i de %i",
+            #else
+                "Pinging Kaillera Server %i of %i",
+            #endif // MEISEI_ESP
+                i + 1, total
+            );
 			SetWindowText(form1, str);
 		}
 
@@ -3430,8 +3641,7 @@ DWORD WINAPI pingKailleraServers(LPVOID lpParam){
 			ZeroMemory(strIP, 1024);
 			strncpy(strIP, strAddress, (lenAddress - strlen(strPort) - 1));
 			port = (u_short)atoi(strPort);
-		}
-		else{
+		} else {
 			ZeroMemory(strIP, 1024);
 			strcpy(strIP, strAddress);
 			port = 27888;
@@ -3442,7 +3652,7 @@ DWORD WINAPI pingKailleraServers(LPVOID lpParam){
 		socketInfoK.sin_family = AF_INET;
 		socketInfoK.sin_port = htons(port);
 
-		if(strlen(strAddress) < 1){
+		if(strlen(strAddress) < 1) {
 			closesocket(mySocketK);
 			b.iItem = i;
 			b.iSubItem = 2;
@@ -3452,7 +3662,7 @@ DWORD WINAPI pingKailleraServers(LPVOID lpParam){
 		}
 
 		if(sError == false){
-			if(inet_addr(strIP) == INADDR_NONE){
+			if(inet_addr(strIP) == INADDR_NONE) {
 				hp = gethostbyname(strIP);
 				if(hp == NULL){
 					closesocket(mySocketK);
@@ -3462,8 +3672,7 @@ DWORD WINAPI pingKailleraServers(LPVOID lpParam){
 					SendMessage(lstServerListK, LVM_SETITEMTEXT, (WPARAM)i, (LPARAM)&b);
 					sError = true;
 				} else socketInfoK.sin_addr = *(struct in_addr*)(hp->h_addr_list[0]);
-			}
-			else{
+			} else {
 				socketInfoK.sin_addr.s_addr = inet_addr(strIP);
 			}
 		}
@@ -3509,7 +3718,14 @@ DWORD WINAPI pingKailleraServers(LPVOID lpParam){
 	lstServerlistKColumn = 4;
 	kailleraSwitch = true;
 
-	SetWindowText(form1, "Kaillera Pinging Finished!");
+	SetWindowText(
+        form1,
+    #ifdef MEISEI_ESP
+        "Kaillera Pinging terminado!"
+    #else
+        "Kaillera Pinging Finished!"
+    #endif // MEISEI_ESP
+    );
 	exitPingKThread();
 	closesocket(mySocketK);
 	return 0;
@@ -3542,7 +3758,11 @@ DWORD WINAPI ping3DServers(LPVOID lpParam){
 		if(lastTabServer == 1 && pingingK == true){
 			sprintf(
                 str,
+            #ifdef MEISEI_ESP
+                "Haciendo ping al servidor EmuLinker %i de %i",
+            #else
                 "Pinging EmuLinker Server %i of %i",
+            #endif // MEISEI_ESP
                 i + 1,
                 total
             );
@@ -3551,7 +3771,11 @@ DWORD WINAPI ping3DServers(LPVOID lpParam){
 		else if(pingingK == false){
 			sprintf(
                 str,
+            #ifdef MEISEI_ESP
+                "Haciendo ping al Servidor EmuLinker %i de %i",
+            #else
                 "Pinging EmuLinker Server %i of %i",
+            #endif // MEISEI_ESP
                 i + 1,
                 total
             );
@@ -3659,15 +3883,16 @@ DWORD WINAPI ping3DServers(LPVOID lpParam){
 
 	SetWindowText(
         form1,
+    #ifdef MEISEI_ESP
+        "¡El ping de EmuLinker finalizó!"
+    #else
         "EmuLinker Pinging Finished!"
+    #endif // MEISEI_ESP
     );
 	exitPing3DThread();
 	closesocket(mySocket3D);
 	return 0;
 }
-
-
-
 
 void gameInit(){
     unsigned long i;
@@ -3703,8 +3928,7 @@ void gameInit(){
 		useCache = false;
 
 	//Tweak for Spectating Mode
-	if(totalPlayers == 0)
-		return;
+	if(totalPlayers == 0) return;
 
 	EnableWindow(chkUseCache, FALSE);
 
@@ -3725,7 +3949,6 @@ void gameInit(){
 	else
 		SetWindowPos(mainHwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 
-
     i = GetTickCount();
 	w = 0;
     while(gamePlaying == false){
@@ -3734,8 +3957,13 @@ void gameInit(){
         if(gameCount == 0 || sizeOfEinput == -1){
 			MessageBox(
                 form1,
+            #ifdef MEISEI_ESP
+                "Nunca recibí señal de listo. ¡Juego Terminado!",
+                "gameInit()",
+            #else
                 "Never received ready signal. Game Ended!",
                 "gameInit()",
+            #endif // MESISEI_ESP
                 0
             );
 			sizeOfEinput = -1;
@@ -3760,7 +3988,6 @@ void gameInit(){
 		Sleep(1);
     }
 }
-
 
 void createChatroom(){
 	LVCOLUMN LvCol;
@@ -3791,30 +4018,90 @@ void createChatroom(){
 	btnGameChat = CreateWindowEx(controlStyles, "BUTTON", "Chat", buttonProperties, 360, 450, 60, 25, form1, NULL, hInstance, NULL);
 	SendMessage(btnGameChat, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	//Lagstat Button
-	btnLagStat = CreateWindowEx(controlStyles, "BUTTON", "Lag Stat", buttonProperties, 425, 450, 60, 25, form1, NULL, hInstance, NULL);
+	btnLagStat = CreateWindowEx(
+        controlStyles, "BUTTON",
+    #ifdef MEISEI_ESP
+        "Estado Lag",
+    #else
+        "Lag Stat",
+    #endif // MEISEI_ESP
+        buttonProperties, 425, 450, 60, 25, form1, NULL, hInstance, NULL
+    );
 	SendMessage(btnLagStat, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 
 	//Game Start Button
-	btnGameStart = CreateWindowEx(controlStyles, "BUTTON", "Start", buttonProperties, 490, 300, 50, 25, form1, NULL, hInstance, NULL);
+	btnGameStart = CreateWindowEx(
+        controlStyles, "BUTTON",
+    #ifdef MEISEI_ESP
+        "Comenzar",
+    #else
+        "Start",
+    #endif // MEISEI_ESP
+        buttonProperties, 490, 300, 50, 25, form1, NULL, hInstance, NULL
+    );
 	SendMessage(btnGameStart, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	//Game Kick Button
-	btnGameKick = CreateWindowEx(controlStyles, "BUTTON", "Kick", buttonProperties, 550, 300, 50, 25, form1, NULL, hInstance, NULL);
+	btnGameKick = CreateWindowEx(
+        controlStyles, "BUTTON",
+    #ifdef MEISEI_ESP
+        "Patada",
+    #else
+        "Kick",
+    #endif // MEISEI_ESP
+        buttonProperties, 550, 300, 50, 25, form1, NULL, hInstance, NULL
+    );
 	SendMessage(btnGameKick, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	//Game Drop Button
-	btnDrop = CreateWindowEx(controlStyles, "BUTTON", "Drop", buttonProperties, 610, 300, 50, 25, form1, NULL, hInstance, NULL);
+	btnDrop = CreateWindowEx(
+        controlStyles, "BUTTON",
+    #ifdef MEISEI_ESP
+        "Caer",
+    #else
+        "Drop",
+    #endif
+        buttonProperties, 610, 300, 50, 25, form1, NULL, hInstance, NULL
+    );
 	SendMessage(btnDrop, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	//Game Away Button
-	btnAway = CreateWindowEx(controlStyles, "BUTTON", "Away", buttonProperties, 670, 300, 50, 25, form1, NULL, hInstance, NULL);
+	btnAway = CreateWindowEx(
+        controlStyles, "BUTTON",
+    #ifdef MEISEI_ESP
+        "Fuera",
+    #else
+        "Away",
+    #endif // MEISEI_ESP
+        buttonProperties, 670, 300, 50, 25, form1, NULL, hInstance, NULL
+    );
 	SendMessage(btnAway, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	//Game Leave Button
-	btnGameLeave = CreateWindowEx(controlStyles, "BUTTON", "Leave", buttonProperties, 730, 300, 50, 25, form1, NULL, hInstance, NULL);
+	btnGameLeave = CreateWindowEx(
+        controlStyles, "BUTTON",
+    #ifdef MEISEI_ESP
+        "Dejar",
+    #else
+        "Leave",
+    #endif // MEISEI_ESP
+        buttonProperties, 730, 300, 50, 25, form1, NULL, hInstance, NULL
+    );
 	SendMessage(btnGameLeave, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 
 	//Game Name Textbox
-	txtGame = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", "Not in Game!", buttonProperties | ES_READONLY | WS_BORDER, 5, 300, 480, 25, form1, NULL, hInstance, NULL);
+	txtGame = CreateWindowEx(
+         WS_EX_CLIENTEDGE, "EDIT",
+    #ifdef MEISEI_ESP
+        "¡No en Juego!",
+    #else
+        "Not in Game!",
+    #endif // MEISEI_ESP
+         buttonProperties | ES_READONLY | WS_BORDER, 5, 300, 480, 25, form1, NULL, hInstance, NULL
+    );
 	SendMessage(txtGame, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	//Create GameUserlist
-	lstGameUserlist = CreateWindowEx(WS_EX_CLIENTEDGE, "SysListView32", NULL, listviewProperties, 490, 330, 295, 145, form1, NULL, hInstance, NULL);
+	lstGameUserlist = CreateWindowEx(
+        WS_EX_CLIENTEDGE,
+        "SysListView32",
+        NULL, listviewProperties, 490, 330, 295, 145, form1, NULL, hInstance, NULL
+    );
 	SendMessage(lstGameUserlist, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	memset(&LvCol, 0, sizeof(LvCol));
 	LvCol.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
@@ -3832,7 +4119,11 @@ void createChatroom(){
 	SendMessage(lstGameUserlist, LVM_INSERTCOLUMN, 3, (LPARAM)&LvCol);
 	SendMessage(lstGameUserlist, LVM_SETEXTENDEDLISTVIEWSTYLE, 0, (LPARAM)listviewStyles);
 	//Create Userlist
-	lstUserlist = CreateWindowEx(WS_EX_CLIENTEDGE, "SysListView32", NULL, listviewProperties, 490, 5, 295, 290, form1, NULL, hInstance, NULL);
+	lstUserlist = CreateWindowEx(
+        WS_EX_CLIENTEDGE,
+        "SysListView32",
+        NULL, listviewProperties, 490, 5, 295, 290, form1, NULL, hInstance, NULL
+    );
 	SendMessage(lstUserlist, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	memset(&LvCol, 0, sizeof(LvCol));
 	LvCol.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
@@ -3853,7 +4144,11 @@ void createChatroom(){
 	SendMessage(lstUserlist, LVM_INSERTCOLUMN, 4, (LPARAM)&LvCol);
 	SendMessage(lstUserlist, LVM_SETEXTENDEDLISTVIEWSTYLE, 0, (LPARAM)listviewStyles);
 	//Create Gamelist
-	lstGamelist = CreateWindowEx(WS_EX_CLIENTEDGE, "SysListView32", NULL, listviewProperties, 5, 300, 780, 175, form1, NULL, hInstance, NULL);
+	lstGamelist = CreateWindowEx(
+        WS_EX_CLIENTEDGE,
+        "SysListView32",
+        NULL, listviewProperties, 5, 300, 780, 175, form1, NULL, hInstance, NULL
+    );
 	SendMessage(lstGamelist, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	memset(&LvCol, 0, sizeof(LvCol));
 	LvCol.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
@@ -3889,14 +4184,22 @@ void createChatroom(){
 	//Create Button
 	btnCreate = CreateWindowEx(
         controlStyles, "BUTTON",
+    #ifdef MEISEI_ESP
+        "Crear",
+    #else
         "Create",
+    #endif // MEISEI_ESP
         buttonProperties, 360, 270, 60, 25, form1, NULL, hInstance, NULL
     );
 	SendMessage(btnCreate, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	//Join Button
 	btnJoin = CreateWindowEx(
         controlStyles, "BUTTON",
+    #ifdef MEISEI_ESP
+        "Unirse",
+    #else
         "Join",
+    #endif // MEISEI_ESP
         buttonProperties, 425, 270, 60, 25, form1, NULL, hInstance, NULL
     );
 	SendMessage(btnJoin, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
@@ -3911,18 +4214,18 @@ void createChatroom(){
 }
 
 void fixLastGameToPlay(){
-	if(strcmp(lastGameToPlay1, "LastGameToPlay1") == 0){
+	if(strcmp(lastGameToPlay1, "LastGameToPlay1") == 0) {
 		strcpy(lastGameToPlay1, currentGame);
 		ModifyMenu(gameMenu, (UINT)0xFFFD, MF_BYCOMMAND, (UINT)0xFFFD, (LPCSTR)lastGameToPlay1);
 	}
-	else if(strcmp(lastGameToPlay2, "LastGameToPlay2") == 0){
+	else if(strcmp(lastGameToPlay2, "LastGameToPlay2") == 0) {
 		if(strcmp(lastGameToPlay1, currentGame) == 0) return;
 		strcpy(lastGameToPlay2, lastGameToPlay1);
 		strcpy(lastGameToPlay1, currentGame);
 		ModifyMenu(gameMenu, (UINT)0xFFFD, MF_BYCOMMAND, (UINT)0xFFFD, (LPCSTR)lastGameToPlay1);
 		ModifyMenu(gameMenu, (UINT)0xFFFE, MF_BYCOMMAND, (UINT)0xFFFE, (LPCSTR)lastGameToPlay2);
 	}
-	else if(strcmp(lastGameToPlay3, "LastGameToPlay3") == 0){
+	else if(strcmp(lastGameToPlay3, "LastGameToPlay3") == 0) {
 		if     (strcmp(lastGameToPlay1, currentGame) == 0) return;
 		else if(strcmp(lastGameToPlay2, currentGame) == 0) return;
 		strcpy(lastGameToPlay3, lastGameToPlay2);
@@ -3933,7 +4236,7 @@ void fixLastGameToPlay(){
 		ModifyMenu(gameMenu, (UINT)0xFFFF, MF_BYCOMMAND, (UINT)0xFFFF, (LPCSTR)lastGameToPlay3);
 	} else {
 		if(strcmp(lastGameToPlay1, currentGame) == 0) return;
-		else if(strcmp(lastGameToPlay2, currentGame) == 0){
+		else if(strcmp(lastGameToPlay2, currentGame) == 0) {
 			strcpy(lastGameToPlay2, lastGameToPlay1);
 			strcpy(lastGameToPlay1, currentGame);
 		} else {
@@ -4060,7 +4363,7 @@ void popupMenu(char num){
 			return;
 		}
 		//Unignore
-		else if(i == 0xDDDA){
+		else if(i == 0xDDDA) {
 			temp[0] = 'd';
 			strcpy(&temp[1], "/unignore ");
 			strcat(temp, ID);
@@ -4070,12 +4373,12 @@ void popupMenu(char num){
 			return;
 		}
 		//COPY User ID
-		else if(i == 0xFFFD){
+		else if(i == 0xFFFD) {
 			copyToClipboard(ID);
 			return;
 		}
 		//COPY Username
-		else if(i == 0xFFFE){
+		else if(i == 0xFFFE) {
 			//Get UserID
 			q.mask = LVIF_TEXT;
 			q.iItem = iSelect;
@@ -4087,7 +4390,7 @@ void popupMenu(char num){
 			return;
 		}
 		//Find Whitespace.  For SILENCE, BAN, TEMP ADMIN, TEMP ELEVATED
-		else{
+		else {
 			strcpy(temp, userlistCommands[i].commands);
 			strcat(temp, ID);
 			wsprintf(str, " %i", userlistCommands[i].time);
@@ -4112,8 +4415,7 @@ void popupMenu(char num){
 
 		//Get Currently Selected item
 		iSelect = SendMessage(lstGamelist, LVM_GETNEXTITEM, -1, LVNI_FOCUSED);
-		if(iSelect < 0)
-			return;
+		if(iSelect < 0) return;
 
 		//Get Game ID
 		q.mask = LVIF_TEXT;
@@ -4264,22 +4566,19 @@ void popupMenu(char num){
 		i = TrackPopupMenu(serverlistMenu, TPM_RETURNCMD, c.x, c.y, 0, form1, NULL);
 
 		//Error Check
-		if(i == 0)
-			return;
+		if(i == 0) return;
 
 		if(SendMessage(sTab, TCM_GETCURSEL, 0, 0) == 0){
 			tempS = lstServerListK;
 			iSelect = SendMessage(tempS, LVM_GETNEXTITEM, -1, LVNI_FOCUSED);
 
-		}
-		else{
+		} else{
 			tempS = lstServerList3D;
 			iSelect = SendMessage(tempS, LVM_GETNEXTITEM, -1, LVNI_FOCUSED);
 		}
 
 		if(SendMessage(tempS, LVM_GETITEMCOUNT, 0, 0) == 0){
-			if(i != 0xFFEF)
-				return;
+			if(i != 0xFFEF) return;
 		}
 
 		//Add to Favorites
@@ -4321,7 +4620,11 @@ void popupMenu(char num){
 					exitPingKThread();
 					SetWindowText(
                         form1,
+                    #ifdef MEISEI_ESP
+                        "Haciendo ping a los servidores de Kaillera..."
+                    #else
                         "Pinging Kaillera Servers..."
+                    #endif // MEISEI_ESP
                     );
 					kailleraPingThread = CreateThread(NULL, 0, pingKailleraServers, NULL, 0, NULL);
 				}
@@ -4331,7 +4634,11 @@ void popupMenu(char num){
 					exitPing3DThread();
 					SetWindowText(
                         form1,
+                    #ifdef MEISEI_ESP
+                        "Haciendo ping a los servidores EmuLinker..."
+                    #else
                         "Pinging EmuLinker Servers..."
+                    #endif // MEISEI_ESP
                     );
 					ping3DThread = CreateThread(NULL, 0, ping3DServers, NULL, 0, NULL);
 				}
@@ -4343,14 +4650,22 @@ void popupMenu(char num){
 				exitPingKThread();
 				SetWindowText(
                     form1,
+                #ifdef MEISEI_ESP
+                    "¡El ping de Kaillera se detuvo!"
+                #else
                     "Kaillera Pinging Stopped!"
+                #endif // MEISEI_ESP
                 );
 			}
 			else{
 				exitPing3DThread();
 				SetWindowText(
                     form1,
+                #ifdef MEISEI_ESP
+                    "¡Se detuvo el ping de EmuLinker!"
+                #else
                     "EmuLinker Pinging Stopped!"
+                #endif // MEISEI_ESP
                 );
 			}
 		}
@@ -4945,47 +5260,45 @@ int saveConfig(){
 		return 1;
 	}
 
-	// config << "[SupraclientCPPE Config File]" << "\n\n";
     fputs( "[SupraclientCE Config File]", config );
     fputc( '\n', config ); fputc( '\n', config );
 
 	//Server
 	GetWindowText(txtServerIP, temp, GetWindowTextLength(txtServerIP) + 1);
-	// config << "ServerIP=" << temp << "\n";
     fputs( "ServerIP=", config ); fputs( temp, config ); fputc( '\n', config );
 
 	//Nick
 	GetWindowText(txtUsername, temp, GetWindowTextLength(txtUsername) + 1);
-	// config << "Nick=" << temp << "\n";
     fputs( "Nick=", config ); fputs( temp, config ); fputc( '\n', config );
 
 	//Connection
 	GetWindowText(cmbConnectionType, temp, GetWindowTextLength(cmbConnectionType) + 1);
 	if(strcmp(temp,"LAN") == 0) {
-		// config << "Connection=1" << "\n";
 		fputs( "Connection=1", config ); fputc( '\n', config );
-	}
-	else if(strcmp(temp,"Excellent") == 0) {
-		// config << "Connection=2" << "\n";
+#ifdef MEISEI_ESP
+	} else if(strcmp(temp,"Excelente") == 0) {
 		fputs( "Connection=2", config ); fputc( '\n', config );
-	}
-	else if(strcmp(temp,"Good") == 0) {
-		// config << "Connection=3" << "\n";
+	} else if(strcmp(temp,"Buena") == 0) {
         fputs( "Connection=3", config ); fputc( '\n', config );
-    }
-	else if(strcmp(temp,"Average") == 0) {
-		// config << "Connection=4" << "\n";
+    } else if(strcmp(temp,"Normal") == 0) {
 		fputs( "Connection=4", config ); fputc( '\n', config );
-	}
-	else if(strcmp(temp,"Low") == 0) {
-		// config << "Connection=5" << "\n";
+	} else if(strcmp(temp,"Baja") == 0) {
 		fputs( "Connection=5", config ); fputc( '\n', config );
-	}
-	else if(strcmp(temp,"Bad") == 0) {
-		// config << "Connection=6" << "\n";
+	} else if(strcmp(temp,"Mala") == 0) {
 		fputs( "Connection=6", config ); fputc( '\n', config );
-	}
-	else {
+#else
+	} else if(strcmp(temp,"Excellent") == 0) {
+		fputs( "Connection=2", config ); fputc( '\n', config );
+	} else if(strcmp(temp,"Good") == 0) {
+        fputs( "Connection=3", config ); fputc( '\n', config );
+    } else if(strcmp(temp,"Average") == 0) {
+		fputs( "Connection=4", config ); fputc( '\n', config );
+	} else if(strcmp(temp,"Low") == 0) {
+		fputs( "Connection=5", config ); fputc( '\n', config );
+	} else if(strcmp(temp,"Bad") == 0) {
+		fputs( "Connection=6", config ); fputc( '\n', config );
+#endif // MEISEI_ESP
+	} else {
 		// config << "Connection=3" << "\n";
 		fputs( "Connection=3", config ); fputc( '\n', config );
 	}
@@ -5084,12 +5397,16 @@ int saveConfig(){
 	// config << "Join_Error=" << v << "\n";
     itoa( v, temp, 10 ); fputs( "Join_Error=", config ); fputs( temp, config ); fputc( '\n', config );
 
-	//P2P Server
-	/*GetWindowText(txtP2PServer, p2pServer, GetWindowTextLength(txtP2PServer) + 1);
-	config << "P2P_Server=" << p2pServer << "\n";
+#ifdef KAILLERA_P2P
+    //P2P Server
+	GetWindowText(txtP2PServer, p2pServer, GetWindowTextLength(txtP2PServer) + 1);
+	// config << "P2P_Server=" << p2pServer << "\n";
+	fputs( "P2P_Server=", config ); fputs( p2pServer, config );  fputc( '\n', config );
 	//P2P Port
 	GetWindowText(txtP2PPort, p2pPort, GetWindowTextLength(txtP2PPort) + 1);
-	config << "P2P_Port=" << p2pPort << "\n";*/
+	// config << "P2P_Port=" << p2pPort << "\n";
+	fputs( "P2P_Port=", config ); fputs( p2pPort, config );  fputc( '\n', config );
+#endif // KAILLERA_P2P
 
 	//EmuSF_Emulator
 	v = SendMessage(chkEmuRes, BM_GETCHECK, 0, 0);
@@ -5234,7 +5551,6 @@ int saveConfig(){
 	return 0;
 }
 
-
 void displayGameChatroomAsServer(char *msg){
 	char temp[2048];
 
@@ -5247,7 +5563,6 @@ void displayGameChatroomAsServer(char *msg){
 	//Display
 	displayAndAutoScrollRichEdit(txtGameChatroom, temp, RGB(34, 139, 34));
 }
-
 
 void loginToServer(){
 	char serverIP[1024];
@@ -5262,7 +5577,17 @@ void loginToServer(){
 	short lenServerIP = (short)GetWindowTextLength(txtServerIP);
 
 	if(lenServerIP < 1){
-		MessageBox(form1,"Invalid Address Format!", "Address Error!", 0);
+		MessageBox(
+            form1,
+        #ifdef MEISEI_ESP
+            "Formato de Dirección no válido!",
+            "¡Error de Dirección!",
+        #else
+            "Invalid Address Format!",
+            "Address Error!",
+        #endif // MEISEI_ESP
+            0
+        );
 		displayChatroomAsServer( "Invalid Address Format!  ex). 127.0.0.1:27888" );
 		return;
 	}
@@ -5317,27 +5642,21 @@ void loginToServer(){
 	sendto(mySocket, entryMsg,  10, 0, (struct sockaddr *) &socketInfo, sizeof(socketInfo));
 }
 
-
 void DoEvents(){
 	MSG msg;
     long sts;
-    do{
+    do {
 		if( sts = PeekMessage(&msg, (HWND) NULL, 0, 0, PM_REMOVE) ){
     		TranslateMessage(&msg);
     		DispatchMessage(&msg);
     	}
-    }while (sts);
+    } while (sts);
 }
-
-
 
 DWORD WINAPI callGameCallback(LPVOID lpParam){
-
 	int i = kInfo.gameCallback(currentGame, myPlayerNumber, totalPlayers);
-
 	return 0;
 }
-
 
 DWORD WINAPI continuousLoop(LPVOID lpParam){
 	for(; ;){
@@ -5348,59 +5667,43 @@ DWORD WINAPI continuousLoop(LPVOID lpParam){
 	return 0;
 }
 
-
-/*DWORD WINAPI p2pLoop(LPVOID lpParam){
+#ifdef KAILLERA_P2P
+DWORD WINAPI p2pLoop(LPVOID lpParam){
 	char temp[5000];
 	int rBytes;
-
 	for( ; ; ){
-		/* Receive bytes from client *
+		/* Receive bytes from client */
 		rBytes = recvfrom(p2pSocket, temp, 5000, 0, (struct sockaddr *)&p2pClientInfo, &p2pClientLength);
-
-		if(rBytes > 0){
+		if(rBytes > 0) {
 			if(strncmp(temp, "GAME_DATA", 9)){
 				p2pGameData(&temp[9], rBytes - 9);
-			}
-			else if(strncmp(temp, "GAME_CHAT", 9)){
+			} else if(strncmp(temp, "GAME_CHAT", 9)){
 				p2pGameChat(&temp[9], rBytes - 9);
-			}
-			else if(strncmp(temp, "GAME_READY", 10)){
+			} else if(strncmp(temp, "GAME_READY", 10)){
 				p2pGameReady(&temp[9], rBytes - 10);
-			}
-			else if(strncmp(temp, "GAME_START", 10)){
+			} else if(strncmp(temp, "GAME_START", 10)){
 				p2pGameStart(&temp[9], rBytes - 10);
-				MessageBox(NULL,"Start",NULL,NULL);
-			}
-			else if(strncmp(temp, "GAME_DROP", 9)){
+				MessageBox(NULL,"Start",0,0);
+			} else if(strncmp(temp, "GAME_DROP", 9)){
 				p2pGameDrop(&temp[9], rBytes - 9);
 				return 0;
 			}
 		}
 	}
-
 	return 0;
 }
 
-void p2pGameReady(char *data, int dLen){
+void p2pGameReady(char *data, int dLen){ }
 
-}
+void p2pGameData(char *data, int dLen){ }
 
-void p2pGameData(char *data, int dLen){
+void p2pGameChat(char *data, int dLen){ }
 
-}
+void p2pGameStart(char *data, int dLen){ }
 
-void p2pGameChat(char *data, int dLen){
+void p2pGameDrop(char *data, int dLen){ }
 
-}
-
-void p2pGameStart(char *data, int dLen){
-
-}
-
-void p2pGameDrop(char *data, int dLen){
-
-}*/
-
+#endif // KAILLERA_P2P
 
 DWORD WINAPI recvLoop(LPVOID lpParam){
     char str[1024];
@@ -5437,38 +5740,68 @@ DWORD WINAPI recvLoop(LPVOID lpParam){
 				short lenConnectionType = (short)GetWindowTextLength(cmbConnectionType);
 				char temp[16];
 
-				GetWindowText(cmbConnectionType, temp, lenConnectionType + 1);
-
-				if(strcmp(temp,"LAN") == 0)
-					connectionType = lan;
-				else if(strcmp(temp,"Excellent") == 0)
-					connectionType = excellent;
-				else if(strcmp(temp,"Good") == 0)
-					connectionType = good;
-				else if(strcmp(temp,"Average") == 0)
-					connectionType = average;
-				else if(strcmp(temp,"Low") == 0)
-					connectionType = low;
-				else if(strcmp(temp,"Bad") == 0)
-					connectionType = bad;
-				else
-					connectionType = good;
+				GetWindowText( cmbConnectionType, temp, lenConnectionType + 1 );
+				if     (strcmp(temp,"LAN")       == 0) connectionType = lan;
+            #ifdef MEISEI_ESP
+				else if(strcmp(temp,"Excelente") == 0) connectionType = excellent;
+				else if(strcmp(temp,"Buena")     == 0) connectionType = good;
+				else if(strcmp(temp,"Normal")    == 0) connectionType = average;
+				else if(strcmp(temp,"Baja")      == 0) connectionType = low;
+				else if(strcmp(temp,"Mala")      == 0) connectionType = bad;
+            #else
+				else if(strcmp(temp,"Excellent") == 0) connectionType = excellent;
+				else if(strcmp(temp,"Good")      == 0) connectionType = good;
+				else if(strcmp(temp,"Average")   == 0) connectionType = average;
+				else if(strcmp(temp,"Low")       == 0) connectionType = low;
+				else if(strcmp(temp,"Bad")       == 0) connectionType = bad;
+            #endif
+				else                                   connectionType = good;
 
 				GetWindowText(txtUsername, username, lenUsername + 1);
 
 				if( lenUsername > 0 ) {
 					userLoginInformation(lenUsername, lenEmulator);
 				} else {
-					MessageBox(form1,"Please supply a username!", "Error UserLoginInformation",0);
+					MessageBox(
+                        form1,
+                    #ifdef MEISEI_ESP
+                        "¡Por favor, ingrese un nombre de usuario!",
+                        "Error de información de Inicio de Sesión de Usuario",
+                    #else
+                        "Please supply a username!",
+                        "Error UserLoginInformation",
+                    #endif // MEISEI_ESP
+                        0
+                    );
 				}
 
 			} else if(strncmp(&myBuff[myBuffCount].myBuff[0], "TOO",3) == 0){
 				displayChatroomAsServer( "Server is Full!" );
-				MessageBox(form1,"Server is full!","Login Error!",0);
+				MessageBox(
+                    form1,
+                #ifdef MEISEI_ESP
+                    "¡El Servidor está lleno!",
+                    "¡Error de Inicio de Sesión!",
+                #else
+                    "Server is full!",
+                    "Login Error!",
+                #endif // MEISEI_ESP
+                    0
+                );
 				supraCleanup(0, 0);
 			} else if(strncmp(&myBuff[myBuffCount].myBuff[0], "VER",3) == 0){
 				displayChatroomAsServer( "Invalid Version!" );
-				MessageBox(form1,"Invalid Version!","Login Error!",0);
+				MessageBox(
+                    form1,
+                #ifdef MEISEI_ESP
+                    "¡Versión Inválida!",
+                    "¡Error de Inicio Sesión!",
+                #else
+                    "Invalid Version!",
+                    "Login Error!",
+                #endif // MEISEI_ESP
+                    0
+                );
 				supraCleanup(0, 0);
 			}
 			//else{
@@ -5480,7 +5813,6 @@ DWORD WINAPI recvLoop(LPVOID lpParam){
 	}
 	return 0;
 }
-
 
 void parseData(int slot, unsigned char msgType){
     short i;
@@ -5496,14 +5828,14 @@ void parseData(int slot, unsigned char msgType){
 	if(msgNum > serversLastMessage)
 		msgNumCount = msgNum - serversLastMessage;
 	//Check for Out of Order Messages
-	else if(msgNum <= serversLastMessage){
+	else if(msgNum <= serversLastMessage) {
 		//Max is 65535 or 0xFFFF...reset. 20 Message backup should be enough.
-		if(serversLastMessage >= 65515){
+		if(serversLastMessage >= 65515) {
 			//Determine how many Messages are needed
 			msgNumCount = msgNum - (65536 - serversLastMessage);
 		}
 		//Out of Order Message
-		else{
+		else {
 			return;
 			//We probably should check to see if we needed this packet.
 		}
@@ -5515,7 +5847,7 @@ void parseData(int slot, unsigned char msgType){
 		gotoMessageType(6, msgType, slot);
 	}
 	//Recover
-	else{
+	else {
 		numOfMessages = *(unsigned char *) &myBuff[slot].myBuff[0];
 		//Can't Recover some Messages =(
         if(msgNumCount > numOfMessages){
@@ -5524,7 +5856,6 @@ void parseData(int slot, unsigned char msgType){
 			}
 			msgNumCount = numOfMessages;
 		}
-
 		serversLastMessage = msgNum;
 
 		//Recover needed Messages
@@ -5549,10 +5880,8 @@ void parseData(int slot, unsigned char msgType){
     }
 }
 
-
-
 /*
-void parseData(){
+void parseData() {
     char i;
     unsigned long w;
     unsigned short temp;
@@ -5620,8 +5949,6 @@ void parseData(){
 }
 */
 
-
-
 void constructPacket(char *data, unsigned short lenData, char msgType){
     int i;
 	int j;
@@ -5651,8 +5978,7 @@ void constructPacket(char *data, unsigned short lenData, char msgType){
 				mySize = 4 + *(unsigned short*)& myPackets[i - 1].packet[2];
 				memcpy(&myPackets[i].packet, &myPackets[i - 1].packet, mySize);
 				normalPacketSize += mySize;
-			}
-			else {
+			} else {
 				//Message Number
 				myPackets[i].packet[0] = msgCount & 255;
 				myPackets[i].packet[1] = (msgCount >> 8) & 255;
@@ -5667,8 +5993,6 @@ void constructPacket(char *data, unsigned short lenData, char msgType){
 				normalPacketSize += lenData + 4 + 1;
 			}
 		}
-
-
 		//Prepare Packet to Send
 		j = 1;
 		for (i = 0; i < globalPacket[0]; i++) {
@@ -5676,21 +6000,14 @@ void constructPacket(char *data, unsigned short lenData, char msgType){
 			memcpy(&globalPacket[j], &myPackets[i].packet, mySize);
 			j += mySize;
 		}
-
 		sendto(mySocket, globalPacket, normalPacketSize, 0, (struct sockaddr*)& socketInfo, sizeof(socketInfo));
-
 		//Reset
-		if (msgCount == 65535)
-			msgCount = -1;
-
+		if (msgCount == 65535) msgCount = -1;
 	} else sendto(mySocket, globalPacket, normalPacketSize, 0, (struct sockaddr*)& socketInfo, sizeof(socketInfo));
 
 }
 
-
-
-void gotoMessageType(unsigned short position, char msgType, int slot){
-
+void gotoMessageType(unsigned short position, char msgType, int slot) {
 	//Moved Game Functions Up here for speed.
 	//0x12 - Game Data
     if(msgType == 0x12)
@@ -5698,8 +6015,6 @@ void gotoMessageType(unsigned short position, char msgType, int slot){
     //0x13 - Game Cache
     else if(msgType == 0x13)
         gameCacheRecv(position, slot);
-
-
     //0x01 - User Quit Notification
     else if(msgType == 0x01)
         userQuitNotification(position, slot);
@@ -5753,7 +6068,6 @@ void gotoMessageType(unsigned short position, char msgType, int slot){
         serverInformationMessage(position, slot);
 }
 
-
 void exitGameThread(){
 	if (startedGame) {
 		startedGame = false;
@@ -5794,7 +6108,6 @@ void exitPing3DThread() {
 	}
 }
 
-
 bool supraCleanup(char type, HWND h){
 	//Complete
 	if(type == 0){
@@ -5812,9 +6125,9 @@ bool supraCleanup(char type, HWND h){
 		globalPacketSize = 0;
 		//Reset Message Count
 		msgCount = -1;
-		sendMax = false;
+		sendMax  = false;
 		gameroom = false;
-		iQuit = false;
+		iQuit    = false;
 		serversLastMessage = -1;
 		//showGameroom(false);
 		showChatroom(false);
@@ -5836,7 +6149,14 @@ bool supraCleanup(char type, HWND h){
 	else if(type == 1){
 		exitGameThread();
 		myGameID = -1;
-		SendMessage(txtGame, WM_SETTEXT, 0, (LPARAM) "Not in Game!");
+		SendMessage(
+            txtGame, WM_SETTEXT, 0,
+        #ifdef MEISEI_ESP
+            (LPARAM) "¡No en el Juego!"
+        #else
+            (LPARAM) "Not in Game!"
+        #endif // MEISEI_ESP
+        );
 		SendMessage(lstGameUserlist, LVM_DELETEALLITEMS, 0, 0);
 		SendMessage(txtGameChatroom, WM_SETTEXT, 0, (LPARAM) NULL);
 		SendMessage(txtGameChat, WM_SETTEXT, 0, (LPARAM) NULL);
@@ -5900,12 +6220,14 @@ bool supraCleanup(char type, HWND h){
 			return false;
 		}
 	}
+#ifdef KAILLERA_P2P
 	//P2P
-	/*else if(type == 4){
+	else if(type == 4) {
 		closesocket(p2pSocket);
 		TerminateThread(p2pThread, 0);
 		CloseHandle(p2pThread);
-	}*/
+	}
+#endif // KAILLERA_P2P
 	return false;
 }
 
@@ -6001,12 +6323,11 @@ void userlistAdditem(char *nick, char *ping, char *connection, char *userID, cha
 	ListView_SortItemsEx(lstUserlist, lstUserlistCompareFunc, 0);
 }
 
-
 void userlistAdditemAll(){
 	int w;
 	LVITEM LvItem;
 
-	for(w = 0; w < tempUserCount; w++){
+	for(w = 0; w < tempUserCount; w++) {
 		memset(&LvItem,0,sizeof(LvItem)); // Zero struct's Members
 		//  Setting properties Of members:
 		LvItem.mask = LVIF_TEXT;   // Text Style
@@ -6047,8 +6368,7 @@ int CALLBACK lstRecentlistCompareFunc(LPARAM i1, LPARAM i2, LPARAM){
     if(lstRecentlistColumn > -1 && lstRecentlistColumn < 4){
 		if(recentSwitch == false){
 			return _tcscmp(strToLower(tsz1), strToLower(tsz2));
-		}
-		else{
+		} else {
 			return _tcscmp(strToLower(tsz2), strToLower(tsz1));
 		}
     }
@@ -6096,8 +6416,6 @@ void recentlistAdditem(char *server, char *ip, char *location){
 		SendMessage(lstRecentList, LVM_DELETEITEM, (WPARAM) pos, 0);
 	}
 
-
-
 	LvItem.iSubItem = 0;
 	LvItem.pszText = ip;
 	SendMessage(lstRecentList,LVM_INSERTITEM,0,(LPARAM)&LvItem); // Enter text to SubItems
@@ -6124,8 +6442,7 @@ int CALLBACK lstWaitinglistCompareFunc(LPARAM i1, LPARAM i2, LPARAM){
     if(lstWaitinglistColumn > -1 && lstWaitinglistColumn < 7){
 		if(waitingSwitch == false){
 			return _tcscmp(strToLower(tsz1), strToLower(tsz2));
-		}
-		else{
+		} else {
 			return _tcscmp(strToLower(tsz2), strToLower(tsz1));
 		}
     }
@@ -6136,11 +6453,11 @@ void waitinglistAdditem(char *game, char *emulator, char *username, char *server
 	LVITEM LvItem;
 	memset(&LvItem,0,sizeof(LvItem)); // Zero struct's Members
 	//  Setting properties Of members:
-	LvItem.mask = LVIF_TEXT;   // Text Style
-	LvItem.cchTextMax = 1024; // Max size of test
-	LvItem.iItem = 0;          // choose item
-	LvItem.iSubItem = 0;       // Put in first coluom
-	LvItem.pszText = game; // Text to display (can be from a char variable) (Items)
+	LvItem.mask = LVIF_TEXT;    // Text Style
+	LvItem.cchTextMax = 1024;   // Max size of test
+	LvItem.iItem = 0;           // choose item
+	LvItem.iSubItem = 0;        // Put in first coluom
+	LvItem.pszText = game;      // Text to display (can be from a char variable) (Items)
 	SendMessage(lstWaitingList,LVM_INSERTITEM,0,(LPARAM)&LvItem); // Send info to the Listview
 	LvItem.iSubItem = 1;
 	LvItem.pszText = emulator;
@@ -6164,7 +6481,6 @@ void waitinglistAdditem(char *game, char *emulator, char *username, char *server
 	ListView_SortItemsEx(lstWaitingList, lstWaitinglistCompareFunc, 0);
 }
 
-
 int CALLBACK lstFavoritelistCompareFunc(LPARAM i1, LPARAM i2, LPARAM){
     TCHAR tsz1[1024];
     TCHAR tsz2[1024];
@@ -6178,8 +6494,7 @@ int CALLBACK lstFavoritelistCompareFunc(LPARAM i1, LPARAM i2, LPARAM){
     if(lstFavoritelistColumn > -1 && lstFavoritelistColumn < 4){
 		if(favoriteSwitch == false){
 			return _tcscmp(strToLower(tsz1), strToLower(tsz2));
-		}
-		else{
+		} else {
 			return _tcscmp(strToLower(tsz2), strToLower(tsz1));
 		}
     }
@@ -6195,7 +6510,6 @@ void favoritelistAdditem(char *server, char *ip, char *location, char *comments)
 
 	if(pos > -1)
 		SendMessage(lstFavoriteList, LVM_DELETEITEM, (WPARAM) pos, 0);
-
 
 	LVITEM LvItem;
 	memset(&LvItem,0,sizeof(LvItem)); // Zero struct's Members
@@ -6219,7 +6533,6 @@ void favoritelistAdditem(char *server, char *ip, char *location, char *comments)
 
 	ListView_SortItemsEx(lstFavoriteList, lstFavoritelistCompareFunc, 0);
 }
-
 
 void gameUserlistAdditem(char nick[], char ping[], char connection[], char userID[]){
 	LVITEM LvItem2;
@@ -6339,11 +6652,14 @@ void showRecentlist(){
 	if(num < 1){
 		SetWindowText(form1, "SupraclientCE https://www.EmuLinker.org");
 	} else {
-		wsprintf(str, "%i Recent Servers", num);
+    #ifdef MEISEI_ESP
+		wsprintf(str, "%i Servidores Recientes", num);
+    #else
+    	wsprintf(str, "%i Recent Servers", num);
+    #endif // MEISEI_ESP
 		SetWindowText(form1, str);
 	}
 }
-
 
 void showWaitinglist(){
 	chatroom = false;
@@ -6379,11 +6695,14 @@ void showWaitinglist(){
 	if(num < 2){
 		SetWindowText(form1, "SupraclientCE https://www.EmuLinker.org");
 	} else {
-		wsprintf(str, "%i Waiting Games", num);
+    #ifdef MEISEI_ESP
+		wsprintf(str, "%i Juegos en Espera", num);
+    #else
+    	wsprintf(str, "%i Waiting Games", num);
+    #endif // MEISEI_ESP
 		SetWindowText(form1, str);
 	}
 }
-
 
 void showFavoritelist(){
 	chatroom = false;
@@ -6419,7 +6738,11 @@ void showFavoritelist(){
 	if(num < 1){
 		SetWindowText(form1, "SupraclientCE https://www.EmuLinker.org");
 	} else {
-		wsprintf(str, "%i Favorite Servers", num);
+    #ifdef MEISEI_ESP
+		wsprintf(str, "%i Servidores Favoritos", num);
+    #else
+    	wsprintf(str, "%i Favorite Servers", num);
+    #endif // MEISEI_ESP
 		SetWindowText(form1, str);
 	}
 }
@@ -6458,7 +6781,11 @@ void showServerlistK(){
 	if(num < 2){
 		SetWindowText(form1, "SupraclientCE https://www.EmuLinker.org");
 	} else {
+    #ifdef MEISEI_ESP
+        wsprintf(str, "%i Servidores Kaillera", num);
+    #else
 		wsprintf(str, "%i Kaillera Servers", num);
+    #endif // MEISEI_ESP
 		SetWindowText(form1, str);
 	}
 }
@@ -6497,11 +6824,14 @@ void showServerlist3D(){
 	if(num < 2){
 		SetWindowText(form1, "SupraclientCE https://www.EmuLinker.org");
 	} else {
+    #ifdef MEISEI_ESP
+        wsprintf(str, "%i Servidores EmuLinker", num);
+    #else
         wsprintf(str, "%i EmuLinker Servers", num);
+    #endif
 		SetWindowText(form1, str);
     }
 }
-
 
 void showChatroom(bool show){
 	if(show == true) {
@@ -6586,9 +6916,13 @@ void showGameroom(bool show){
 		ShowWindow(txtGame, SW_SHOW);
 		ShowWindow(btnAway, SW_SHOW);
 		ShowWindow(btnLagStat, SW_SHOW);
-
+    #ifdef MEISEI_ESP
+		SetWindowText(btnCreate, "Intercambia");
+		SetWindowText(btnJoin,    "Añadir"    );
+    #else
 		SetWindowText(btnCreate, "Swap");
-		SetWindowText(btnJoin, "Ad");
+		SetWindowText(btnJoin,    "Ad" );
+    #endif // MEISEI_ESP
 		gameroom = true;
 		swapp = true;
 	} else {
@@ -6604,9 +6938,14 @@ void showGameroom(bool show){
 		ShowWindow(btnAway, SW_HIDE);
 		ShowWindow(txtGame, SW_HIDE);
 		ShowWindow(btnLagStat, SW_HIDE);
-		if(myGameID == -1){
-			SetWindowText(btnCreate, "Create");
-			SetWindowText(btnJoin, "Join");
+		if(myGameID == -1) {
+        #ifdef MEISEI_ESP
+			SetWindowText(btnCreate, "Crear"  );
+			SetWindowText(btnJoin,   "Unirse" );
+        #else
+			SetWindowText(btnCreate, "Create" );
+			SetWindowText(btnJoin,   "Join"   );
+        #endif // MEISEI_ESP
 			swapp = false;
 		}
 		gameroom = false;
@@ -6673,7 +7012,6 @@ void userQuitNotification(unsigned short position, int slot){
 	//Log
 	saveChatroomLog(temp);
 }
-
 
 //0x01 - User Quit Request
 void userQuitRequest(){
@@ -6769,20 +7107,15 @@ void userJoined(unsigned short position, int slot){
 //0x03 - User Login Information
 void userLoginInformation(short lenUsername, short lenEmulator){
 	char dataToBeSent[1024];
-
-	//Get/Set Username
+//Get/Set Username
 	GetWindowText(txtUsername, dataToBeSent, lenUsername + 1);
 	GetWindowText(txtUsername, username, lenUsername + 1);
-
-	//Get Emulator
+//Get Emulator
 	strcpy(&dataToBeSent[lenUsername + 1], emulator);
-
-	//Get Connection Type
+//Get Connection Type
 	dataToBeSent[lenUsername + 1 + lenEmulator + 1] = connectionType;
-
     constructPacket(dataToBeSent, (lenUsername + 1 + lenEmulator + 1 + 1), 0x03);
 }
-
 
 //0x04 - Server Status
 void serverStatus(unsigned short position, int slot){
@@ -6948,7 +7281,7 @@ void serverToClientAck(){
 	//clientToServerAck();
 }
 
-/*
+#ifdef KAILLERA_P2P
 //0x05 - Client to Server ACK
 void clientToServerAck(){
 	char ack[17];
@@ -6977,7 +7310,7 @@ void clientToServerAck(){
 	//Sleep(10);
     constructPacket(ack, 17, 0x06);
 }
-*/
+#endif // KAILLERA_P2P
 
 //0x07 - Global Chat Notification
 void globalChatNotification(unsigned short position, int slot){
@@ -7023,13 +7356,10 @@ void showOptions(char show){
 		ShowWindow(txtQuit, SW_HIDE);
 		ShowWindow(lblConnectionType, SW_HIDE);
 		ShowWindow(cmbConnectionType, SW_HIDE);
-
-		//ShowWindow(lblStats, SW_HIDE);
+		// ShowWindow(lblStats, SW_HIDE);              // <-
 		ShowWindow(btnLogoff, SW_SHOW);
 		ShowWindow(btnLogin, SW_SHOW);
-
 		ShowWindow(btnChatroom, SW_SHOW);
-
 		ShowWindow(chkBeep, SW_HIDE);
 		ShowWindow(chkJoinChatGame, SW_HIDE);
 		ShowWindow(chkUseCache, SW_HIDE);
@@ -7042,7 +7372,6 @@ void showOptions(char show){
 		ShowWindow(chkJoinChat, SW_SHOW);
 		ShowWindow(chkCreate, SW_SHOW);
 		ShowWindow(chkJoinDbl, SW_SHOW);
-
 		ShowWindow(txtMaxUsers, SW_HIDE);
 		ShowWindow(lblMaxUsers, SW_HIDE);
 		ShowWindow(txtMaxPing, SW_HIDE);
@@ -7052,14 +7381,15 @@ void showOptions(char show){
 		ShowWindow(chkEmuRes, SW_HIDE);
 		ShowWindow(chkConnRes, SW_HIDE);
 		ShowWindow(btnVersion, SW_HIDE);
-
-		/*ShowWindow(lblP2PServer, SW_HIDE);
+    #ifdef KAILLERA_P2P
+		ShowWindow(lblP2PServer, SW_HIDE);
 		ShowWindow(txtP2PServer, SW_HIDE);
 		ShowWindow(lblP2PPort, SW_HIDE);
 		ShowWindow(txtP2PPort, SW_HIDE);
 		ShowWindow(btnP2PStart, SW_HIDE);
 		ShowWindow(btnP2PServer, SW_HIDE);
-		ShowWindow(btnP2PConnect, SW_HIDE);*/
+		ShowWindow(btnP2PConnect, SW_HIDE);
+    #endif // KAILLERA_P2P
 	}
 //Login Info
 	else if(show == 1){
@@ -7071,11 +7401,9 @@ void showOptions(char show){
 		ShowWindow(txtQuit, SW_SHOW);
 		ShowWindow(lblConnectionType, SW_SHOW);
 		ShowWindow(cmbConnectionType, SW_SHOW);
-
 		ShowWindow(lblStats, SW_SHOW);
 		ShowWindow(btnLogoff, SW_SHOW);
 		ShowWindow(btnLogin, SW_SHOW);
-
 		ShowWindow(btnChatroom, SW_SHOW);
 		ShowWindow(chkKeepGameChatLogs, SW_HIDE);
 		ShowWindow(chkShowError, SW_HIDE);
@@ -7089,7 +7417,6 @@ void showOptions(char show){
 		ShowWindow(chkUseScreenChat, SW_HIDE);
 		ShowWindow(chkCreate, SW_HIDE);
 		ShowWindow(chkJoinDbl, SW_HIDE);
-
 		ShowWindow(txtMaxUsers, SW_HIDE);
 		ShowWindow(lblMaxUsers, SW_HIDE);
 		ShowWindow(txtMaxPing, SW_HIDE);
@@ -7099,14 +7426,15 @@ void showOptions(char show){
 		ShowWindow(chkEmuRes, SW_HIDE);
 		ShowWindow(chkConnRes, SW_HIDE);
 		ShowWindow(btnVersion, SW_HIDE);
-
-		/*ShowWindow(lblP2PServer, SW_HIDE);
+    #ifdef KAILLERA_P2P
+		ShowWindow(lblP2PServer, SW_HIDE);
 		ShowWindow(txtP2PServer, SW_HIDE);
 		ShowWindow(lblP2PPort, SW_HIDE);
 		ShowWindow(txtP2PPort, SW_HIDE);
 		ShowWindow(btnP2PStart, SW_HIDE);
 		ShowWindow(btnP2PServer, SW_HIDE);
-		ShowWindow(btnP2PConnect, SW_HIDE);*/
+		ShowWindow(btnP2PConnect, SW_HIDE);
+    #endif // KAILLERA_P2P
 	}
 //Gameroom Options
 	else if(show == 2){
@@ -7125,18 +7453,15 @@ void showOptions(char show){
 		ShowWindow(chkKeepChatLogs, SW_HIDE);
 		ShowWindow(chkUseCache, SW_SHOW);
 		ShowWindow(chkBlink, SW_SHOW);
-
-		//ShowWindow(lblStats, SW_HIDE);
+		// ShowWindow(lblStats, SW_HIDE);          // <-
 		ShowWindow(btnLogoff, SW_SHOW);
 		ShowWindow(btnLogin, SW_SHOW);
-
 		ShowWindow(chkBeep, SW_SHOW);
 		ShowWindow(chkJoinChatGame, SW_SHOW);
 		ShowWindow(chkUseScreenChat, SW_SHOW);
 		ShowWindow(chkJoinChat, SW_HIDE);
 		ShowWindow(chkCreate, SW_HIDE);
 		ShowWindow(chkJoinDbl, SW_HIDE);
-
 		ShowWindow(txtMaxUsers, SW_HIDE);
 		ShowWindow(lblMaxUsers, SW_HIDE);
 		ShowWindow(txtMaxPing, SW_HIDE);
@@ -7146,14 +7471,15 @@ void showOptions(char show){
 		ShowWindow(chkEmuRes, SW_HIDE);
 		ShowWindow(chkConnRes, SW_HIDE);
 		ShowWindow(btnVersion, SW_HIDE);
-
-		/*ShowWindow(lblP2PServer, SW_HIDE);
+    #ifdef KAILLERA_P2P
+		ShowWindow(lblP2PServer, SW_HIDE);
 		ShowWindow(txtP2PServer, SW_HIDE);
 		ShowWindow(lblP2PPort, SW_HIDE);
 		ShowWindow(txtP2PPort, SW_HIDE);
 		ShowWindow(btnP2PStart, SW_HIDE);
 		ShowWindow(btnP2PServer, SW_HIDE);
-		ShowWindow(btnP2PConnect, SW_HIDE);*/
+		ShowWindow(btnP2PConnect, SW_HIDE);
+    #endif // KAILLERA_P2P
 	}
 //Emulinker Options
 	else if(show == 3){
@@ -7172,18 +7498,15 @@ void showOptions(char show){
 		ShowWindow(chkKeepChatLogs, SW_HIDE);
 		ShowWindow(chkUseCache, SW_HIDE);
 		ShowWindow(chkBlink, SW_HIDE);
-
-		//ShowWindow(lblStats, SW_HIDE);
+		// ShowWindow(lblStats, SW_HIDE);       // <-
 		ShowWindow(btnLogoff, SW_SHOW);
 		ShowWindow(btnLogin, SW_SHOW);
-
 		ShowWindow(chkBeep, SW_HIDE);
 		ShowWindow(chkJoinChatGame, SW_HIDE);
 		ShowWindow(chkUseScreenChat, SW_HIDE);
 		ShowWindow(chkJoinChat, SW_HIDE);
 		ShowWindow(chkCreate, SW_HIDE);
 		ShowWindow(chkJoinDbl, SW_HIDE);
-
 		ShowWindow(txtMaxUsers, SW_SHOW);
 		ShowWindow(lblMaxUsers, SW_SHOW);
 		ShowWindow(txtMaxPing, SW_SHOW);
@@ -7193,17 +7516,25 @@ void showOptions(char show){
 		ShowWindow(chkEmuRes, SW_SHOW);
 		ShowWindow(chkConnRes, SW_SHOW);
 		ShowWindow(btnVersion, SW_SHOW);
-
-		/*ShowWindow(lblP2PServer, SW_HIDE);
+    #ifdef KAILLERA_P2P
+		ShowWindow(lblP2PServer, SW_HIDE);
 		ShowWindow(txtP2PServer, SW_HIDE);
 		ShowWindow(lblP2PPort, SW_HIDE);
 		ShowWindow(txtP2PPort, SW_HIDE);
 		ShowWindow(btnP2PStart, SW_HIDE);
 		ShowWindow(btnP2PServer, SW_HIDE);
-		ShowWindow(btnP2PConnect, SW_HIDE);*/
+		ShowWindow(btnP2PConnect, SW_HIDE);
+    #endif // KAILLERA_P2P
 	}
+#ifdef KAILLERA_P2P
 	//P2P Options
-	/*else if(show == 4){
+	else if(show == 4) {
+
+        ShowWindow(lblServerIP, SW_HIDE);
+        ShowWindow(lblUsername, SW_HIDE);
+        ShowWindow(lblQuit, SW_HIDE);
+        ShowWindow(lblConnectionType, SW_HIDE);
+
 		ShowWindow(txtServerIP, SW_HIDE);
 		ShowWindow(txtUsername, SW_HIDE);
 		ShowWindow(txtQuit, SW_HIDE);
@@ -7215,18 +7546,15 @@ void showOptions(char show){
 		ShowWindow(chkKeepChatLogs, SW_HIDE);
 		ShowWindow(chkUseCache, SW_HIDE);
 		ShowWindow(chkBlink, SW_HIDE);
-
-		//ShowWindow(lblStats, SW_HIDE);
+		// ShowWindow(lblStats, SW_HIDE);  // <-
 		ShowWindow(btnLogoff, SW_HIDE);
 		ShowWindow(btnLogin, SW_HIDE);
-
 		ShowWindow(chkBeep, SW_HIDE);
 		ShowWindow(chkJoinChatGame, SW_HIDE);
 		ShowWindow(chkUseScreenChat, SW_HIDE);
 		ShowWindow(chkJoinChat, SW_HIDE);
 		ShowWindow(chkCreate, SW_HIDE);
 		ShowWindow(chkJoinDbl, SW_HIDE);
-
 		ShowWindow(txtMaxUsers, SW_HIDE);
 		ShowWindow(lblMaxUsers, SW_HIDE);
 		ShowWindow(txtMaxPing, SW_HIDE);
@@ -7236,7 +7564,6 @@ void showOptions(char show){
 		ShowWindow(chkEmuRes, SW_HIDE);
 		ShowWindow(chkConnRes, SW_HIDE);
 		ShowWindow(btnVersion, SW_HIDE);
-
 		ShowWindow(lblP2PServer, SW_SHOW);
 		ShowWindow(txtP2PServer, SW_SHOW);
 		ShowWindow(lblP2PPort, SW_SHOW);
@@ -7244,8 +7571,8 @@ void showOptions(char show){
 		ShowWindow(btnP2PStart, SW_SHOW);
 		ShowWindow(btnP2PServer, SW_SHOW);
 		ShowWindow(btnP2PConnect, SW_SHOW);
-	}*/
-
+	}
+#endif // KAILLERA_P2P
 }
 
 void displayAndAutoScrollRichEdit(HWND rEdit, char *temp, COLORREF rgbColor){
@@ -7268,7 +7595,6 @@ void displayAndAutoScrollRichEdit(HWND rEdit, char *temp, COLORREF rgbColor){
 	d.dwEffects = 0;
 	d.dwMask = CFM_COLOR;
 	SendMessage(rEdit, EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM) &d);
-
 
 	GetScrollRange(rEdit,	SB_VERT, &min, &max);
 	i = GetScrollPos(rEdit, SB_VERT);
@@ -7357,34 +7683,24 @@ void gameChatNotification(unsigned short position, int slot){
 //0x08 - Game Chat Request
 void gameChatRequest(){
 	char dataToBeSent[1024];
-
 	dataToBeSent[0] = '\0';
-
 	int lenChat = SendMessage(txtGameChat, WM_GETTEXT, 255, (LPARAM) &dataToBeSent[1]);
-
-	if(lenChat < 1)
-		return;
-
+	if(lenChat < 1) return;
 	lenChat = lenChat + 1;
-
 	dataToBeSent[lenChat] = '\0';
-
 	//Clear Chat Box
 	SendMessage(txtGameChat, WM_SETTEXT, 0, (LPARAM) "");
-
 	//Away Message
 	if(imAway == true){
 		imAway = false;
 		showAway();
 	}
-
     constructPacket(dataToBeSent, (1 + lenChat), 0x08);
 }
 
 //0x09 - Client Keep Alive
 void clientKeepAlive(){
 	char dataToBeSent[1];
-
 	dataToBeSent[0] = 0;
 	constructPacket(dataToBeSent, 1, 0x09);
 }
@@ -7428,7 +7744,6 @@ void createGameNotification(unsigned short position, int slot){
 	strcat(temp, game);
 	strcat(temp, "\r\n");
 
-
 	//Display
 	if(createValue == BST_CHECKED)
 		displayAndAutoScrollRichEdit(txtChatroom, temp, RGB(153, 51, 0));
@@ -7445,12 +7760,8 @@ void createGameNotification(unsigned short position, int slot){
 void createGameRequest(){
 	char dataToBeSent[1024];
     int gameLength;
-
-	if(myUserID == -1)
-		return;
-
+	if(myUserID == -1) return;
 	dataToBeSent[0] = 0x00;
-
 	//Get Game
 	//strcpy(currentGame, "GodWeapon Good Pings: 69.31.15.190:27888");
 	strcpy(&dataToBeSent[1], currentGame);
@@ -7644,9 +7955,9 @@ void joinGameNotification(unsigned short position, int slot){
 
 			//Max Ping
 			GetWindowText(txtMaxPing, maxPingG, GetWindowTextLength(txtMaxPing) + 1);
-			if(atoi(maxPingG) < 1 || atoi(maxPingG) > 1000){
+			if(atoi(maxPingG) < 1 || atoi(maxPingG) > 1000) {
 				wsprintf(maxPingG, "%i", 200);
-				SetWindowText(txtMaxPing, "200");
+				SetWindowText( txtMaxPing, "200" );
 			}
 			data[0] = 'd';
 			strcpy(&data[1], "/maxping ");
@@ -7760,9 +8071,8 @@ void joinGameRequest(){
 
 		//Do we have this game?
 		for(i = 0; i < totalGames; i++){
-			if(strcmp(gameList[i].game, currentGame) == 0)
-				break;
-			else if(i == (totalGames - 1)){
+			if(strcmp(gameList[i].game, currentGame) == 0) break;
+			else if(i == (totalGames - 1)) {
 				w = MessageBox(
                     form1,
                 #ifdef MEISEI_ESP
@@ -7774,14 +8084,10 @@ void joinGameRequest(){
                 #endif // MEISEI_ESP
                     MB_YESNO
                 );
-				if(w == IDYES)
-					break;
-				else
-					return;
+				if(w == IDYES)  break;
+				else            return;
 			}
-
-			if(i % 100 == 0)
-				DoEvents();
+			if(i % 100 == 0) DoEvents();
 		}
 
 		//Same Emulator?
@@ -7797,8 +8103,7 @@ void joinGameRequest(){
             #endif // MEISEI_ESP
                 MB_YESNO
             );
-			if(w == IDNO)
-				return;
+			if(w == IDNO) return;
 		}
 
 		//Status Playing?
@@ -7814,8 +8119,7 @@ void joinGameRequest(){
             #endif // MEISEI_ESP
                 MB_YESNO
             );
-			if(w == IDNO)
-				return;
+			if(w == IDNO) return;
 		}
 
 	//}
@@ -7900,7 +8204,7 @@ void playerInformation(unsigned short position, int slot){
 }
 
 //0x0E - Update Game Status
-void updateGameStatus(unsigned short position, int slot){
+void updateGameStatus(unsigned short position, int slot) {
 	int gameID;
 	char strMaxUsers[1024];
 	unsigned char status;
@@ -8045,17 +8349,16 @@ void closeGameNotification(unsigned short position, int slot){
 
 //0x11 - Start Game Notification
 void startGameNotification(unsigned short position, int slot){
-	if(startedGame == true)
-		return;
+	if(startedGame == true) return;
 
     frameDelay = *(unsigned short *) &myBuff[slot].myBuff[position + 1];
     myPlayerNumber = myBuff[slot].myBuff[position + 3];
-    totalPlayers = myBuff[slot].myBuff[position + 4];
+    totalPlayers   = myBuff[slot].myBuff[position + 4];
 
-	displayGameChatroomAsServer("The Game has Started!");
+	displayGameChatroomAsServer( "The Game has Started!" );
 
 	//Log
-	saveGameroomLog("<Server> The Game has Started!\r\n");
+	saveGameroomLog( "<Server> The Game has Started!\r\n" );
 
     stage = 0;
     sizeOfEinput = 0;
@@ -8083,7 +8386,6 @@ void startGameRequest(){
 void testNum(long num){
 	char a[1024];
 	wsprintf(a,"%li",num);
-
 	//Display
 	displayAndAutoScrollRichEdit(txtChatroom, a, RGB(34, 139, 34));
 }
@@ -8096,7 +8398,7 @@ void gameDataRecv(unsigned short position, int slot){
     totalInput = *(unsigned short *) &myBuff[slot].myBuff[position + 1];
 
 	//Emulator Values
-    for(i = 0; i < totalInput; i++){
+    for(i = 0; i < totalInput; i++) {
 		eInput[ePos] =  myBuff[slot].myBuff[i + position + 3];
 		ePos = (ePos + 1) % eSize;
     }
@@ -8104,7 +8406,7 @@ void gameDataRecv(unsigned short position, int slot){
 	frameCount += connectionType;
 
 	//FIFO
-	if(inCachePos >= cacheSize){
+	if(inCachePos >= cacheSize) {
 		//Left Shift Array for FIFO
 		for(i = 0; i < cacheSize; i++){
 			memcpy(&inCache[i * inCacheSize], &inCache[((i + 1) * inCacheSize)], totalInput);
@@ -8112,7 +8414,7 @@ void gameDataRecv(unsigned short position, int slot){
 		memcpy(&inCache[lastInCachePos], &myBuff[slot].myBuff[position + 3], totalInput);
     }
 	//Cache Values
-    else{
+    else {
         memcpy(&inCache[inCachePos * inCacheSize], &myBuff[slot].myBuff[position + 3], totalInput);
 		inCachePos++;
 	}
@@ -8126,7 +8428,7 @@ void gameDataSend(){
 	if(useCache == true){
         //Search Cache for Match
 		for(i = 0; i < outCachePos; i++){
-			if(memcmp(&vInput[3], &outCache[i * outCacheSize], sizeOfVinput) == 0){
+			if(memcmp(&vInput[3], &outCache[i * outCacheSize], sizeOfVinput) == 0) {
 				//0x13 - Game Cache Send
 				dataToBeSent[0] = 0x00;
 				dataToBeSent[1] = i;
@@ -8136,7 +8438,7 @@ void gameDataSend(){
         }
 
         //FIFO
-        if(outCachePos >= cacheSize){
+        if(outCachePos >= cacheSize) {
 			for(i = 0; i < cacheSize; i++)
 				memcpy(&outCache[i * outCacheSize], &outCache[(i + 1) * outCacheSize], sizeOfVinput);
 			memcpy(&outCache[lastOutCachePos], &vInput[3], sizeOfVinput);
@@ -8158,18 +8460,15 @@ void gameDataSend(){
 //0x13 - Game Cache Receive
 void gameCacheRecv(unsigned short position, int slot){
     int i;
-
-    for(i = 0; i < totalInput; i++){
+    for(i = 0; i < totalInput; i++) {
         eInput[ePos] = inCache[(*((unsigned char *) &myBuff[slot].myBuff[position + 1]) * inCacheSize) + i];
 		ePos = (ePos + 1) % eSize;
     }
-
 	//Add Frames
 	frameCount += connectionType;
 }
 
-
-/*
+#ifdef KAILLERA_P2P
 //0x13 - Game Cache Send
 void gameCacheSend(char pos){
 	char dataToBeSent[2];
@@ -8179,7 +8478,7 @@ void gameCacheSend(char pos){
 
 	constructPacket(dataToBeSent, 2, 0x13);
 }
-*/
+#endif // KAILLERA_P2P
 
 //0x14 - Drop Game Notification
 void dropGameNotification(unsigned short position, int slot){
@@ -8188,7 +8487,6 @@ void dropGameNotification(unsigned short position, int slot){
 	char temp[2048];
 	short strSize;
 	short i;
-
 
 	i = position;
 	//Nick
@@ -8199,8 +8497,7 @@ void dropGameNotification(unsigned short position, int slot){
 	//Player Number
 	playerNumber = *(unsigned char *) &myBuff[slot].myBuff[i];
 
-	if(kInfo.clientDroppedCallback != NULL)
-		kInfo.clientDroppedCallback(nick, playerNumber);
+	if(kInfo.clientDroppedCallback != NULL) kInfo.clientDroppedCallback(nick, playerNumber);
 
 	//Previous (CRLF)
 	//<Nick> Message (CRLF)
@@ -8215,30 +8512,24 @@ void dropGameNotification(unsigned short position, int slot){
 	saveGameroomLog(temp);
 }
 
-
 //0x14 - Drop Game Request
 void dropGameRequest(){
 	if (startedGame) {
 		char dataToBeSent[2];
-
 		dataToBeSent[0] = '\0';
 		dataToBeSent[1] = 0x00;
 		constructPacket(dataToBeSent, 2, 0x14);
 	}
 }
 
-
 //0x15 - Ready to Play Notification
 void readyToPlayNotificaiton(){
 	gamePlaying = true;
-
 	//Display
 	displayGameChatroomAsServer("All Players are Ready!");
-
 	//Log
 	saveGameroomLog("<Server> All Players are Ready!\r\n");
 }
-
 
 //0x15 - Ready to Play Request
 void readyToPlayRequest(){
@@ -8247,7 +8538,6 @@ void readyToPlayRequest(){
 	dataToBeSent[0] = 0x00;
 	constructPacket(dataToBeSent, 1, 0x15);
 }
-
 
 //0x16 - Connection Rejected Notification
 void connectionRejectedNotification(unsigned short position, int slot){
@@ -8283,7 +8573,6 @@ void connectionRejectedNotification(unsigned short position, int slot){
 	supraCleanup(0, 0);
 }
 
-
 //0x17 - Server Information Message
 void serverInformationMessage(unsigned short position, int slot){
 	char temp[2048];
@@ -8304,13 +8593,12 @@ void serverInformationMessage(unsigned short position, int slot){
 	strncpy(message, &myBuff[slot].myBuff[i], strSize + 1);
 	i = i + strSize + 1;
 
-	if(strncmp(message, "VERSION:", 8) == 0){
+	if(strncmp(message, "VERSION:", 8) == 0) {
 		MessageBox(form1, &message[8], "Server Version", 0);
 		//Log
 		saveChatroomLog(temp);
 		return;
-	}
-	else if(strncmp(message, "sccppevercheck", 8) == 0){
+	} else if(strncmp(message, "sccppevercheck", 8) == 0) {
 		temp[0] = 'd';
 		strcpy(&temp[1], cVersion);
 		j = strlen(temp) + 1;
@@ -8333,13 +8621,9 @@ void serverInformationMessage(unsigned short position, int slot){
 	saveChatroomLog(temp);
 }
 
-
 char* strToLower(TCHAR *str){
 	int dLen = strlen(str);
-
-	for(int i = 0; i < dLen; i++)
-		str[i] = tolower(str[i]);
-
+	for(int i = 0; i < dLen; i++) str[i] = tolower(str[i]);
 	return str;
 }
 
@@ -8367,17 +8651,12 @@ int CALLBACK lstUserlistCompareFunc(LPARAM i1, LPARAM i2, LPARAM){
     if(lstUserlistColumn == 0 || lstUserlistColumn == 2){
 		n1 = _tcstol(tsz1, 0, 10);
 		n2 = _tcstol(tsz2, 0, 10);
-
-		if(userlistSwitch == false)
-			return (n1 - n2);
-		else
-			return (n2 - n1);
-    }
-    else if(lstUserlistColumn == 1 || lstUserlistColumn == 3 || lstUserlistColumn == 4){
+		if(userlistSwitch == false) return (n1 - n2);
+		else                        return (n2 - n1);
+    } else if(lstUserlistColumn == 1 || lstUserlistColumn == 3 || lstUserlistColumn == 4) {
 		if(userlistSwitch == false){
 			return _tcscmp(strToLower(tsz1), strToLower(tsz2));
-		}
-		else{
+		} else {
 			return _tcscmp(strToLower(tsz2), strToLower(tsz1));
 		}
     }
@@ -8398,26 +8677,23 @@ int CALLBACK lstServerlistKCompareFunc(LPARAM i1, LPARAM i2, LPARAM){
     if(lstServerlistKColumn == 0 || lstServerlistKColumn == 1 || lstServerlistKColumn == 3 || lstServerlistKColumn == 6){
 		if(kailleraSwitch == false){
 			return _tcscmp(strToLower(tsz1), strToLower(tsz2));
-		}
-		else{
+		} else {
 			return _tcscmp(strToLower(tsz2), strToLower(tsz1));
 		}
     }
     else if( lstServerlistKColumn == 2 || lstServerlistKColumn == 4 || lstServerlistKColumn == 5){
-		if (strstr(tsz1, ">1s")) n1 = 1000;
+		if      (strstr(tsz1, ">1s")) n1 = 1000;
 		else if (strstr(tsz1, "ERR")) n1 = 1001;
-		else if (strstr(tsz1, "NA")) n1 = 1002;
+		else if (strstr(tsz1, "NA") ) n1 = 1002;
 		else n1 = _tcstol(tsz1, 0, 10);
 
-		if (strstr(tsz2, ">1s")) n2 = 1000;
+		if      (strstr(tsz2, ">1s")) n2 = 1000;
 		else if (strstr(tsz2, "ERR")) n2 = 1001;
-		else if (strstr(tsz2, "NA")) n2 = 1002;
+		else if (strstr(tsz2, "NA") ) n2 = 1002;
 		else n2 = _tcstol(tsz2, 0, 10);
 
-		if(kailleraSwitch == false)
-			return (n1 - n2);
-		else
-			return (n2 - n1);
+		if(kailleraSwitch == false) return (n1 - n2);
+		else                        return (n2 - n1);
     }
     return 0;
 }
@@ -8434,17 +8710,16 @@ int CALLBACK lstServerlist3DCompareFunc(LPARAM i1, LPARAM i2, LPARAM){
     ListView_GetItemText(lstServerList3D, i2, lstServerlist3DColumn, tsz2, 1024);
 
 	if (lstServerlist3DColumn == 0 || lstServerlist3DColumn == 1 || lstServerlist3DColumn == 3 || lstServerlist3DColumn == 6) {
-		if(anti3DSwitch == false){
+		if(anti3DSwitch == false) {
 			return _tcscmp(strToLower(tsz1), strToLower(tsz2));
-		}
-		else{
+		} else {
 			return _tcscmp(strToLower(tsz2), strToLower(tsz1));
 		}
     }
 	else if (lstServerlist3DColumn == 2 || lstServerlist3DColumn == 4 || lstServerlist3DColumn == 5) {
-		if (strstr(tsz1, ">1s")) n1 = 1000;
+		if      (strstr(tsz1, ">1s")) n1 = 1000;
 		else if (strstr(tsz1, "ERR")) n1 = 1001;
-		else if (strstr(tsz1, "NA")) n1 = 1002;
+		else if (strstr(tsz1, "NA") ) n1 = 1002;
 		else n1 = _tcstol(tsz1, 0, 10);
 
 		if (strstr(tsz2, ">1s")) n2 = 1000;
@@ -8452,10 +8727,8 @@ int CALLBACK lstServerlist3DCompareFunc(LPARAM i1, LPARAM i2, LPARAM){
 		else if (strstr(tsz2, "NA")) n2 = 1002;
 		else n2 = _tcstol(tsz2, 0, 10);
 
-		if(anti3DSwitch == false)
-			return (n1 - n2);
-		else
-			return (n2 - n1);
+		if(anti3DSwitch == false)   return (n1 - n2);
+		else                        return (n2 - n1);
     }
     return 0;
 }
@@ -8474,17 +8747,12 @@ int CALLBACK lstGamelistCompareFunc(LPARAM i1, LPARAM i2, LPARAM){
     if(lstGamelistColumn == 0){
 		n1 = _tcstol(tsz1, 0, 10);
 		n2 = _tcstol(tsz2, 0, 10);
-
-		if(gamelistSwitch == false)
-			return (n1 - n2);
-		else
-			return (n2 - n1);
-    }
-    else if(lstGamelistColumn > 0 && lstGamelistColumn < 6){
+		if(gamelistSwitch == false) return (n1 - n2);
+		else                        return (n2 - n1);
+    } else if(lstGamelistColumn > 0 && lstGamelistColumn < 6){
 		if(gamelistSwitch == false){
 			return _tcscmp(strToLower(tsz1), strToLower(tsz2));
-		}
-		else{
+		} else {
 			return _tcscmp(strToLower(tsz2), strToLower(tsz1));
 		}
     }
@@ -8518,10 +8786,8 @@ void getServerList3D(){
                 0
             );
 			return;
-		}
-		else socketInfo3D.sin_addr.s_addr = *((unsigned long*)remoteHost->h_addr);
-	}
-	else {
+		} else socketInfo3D.sin_addr.s_addr = *((unsigned long*)remoteHost->h_addr);
+	} else {
 		socketInfo3D.sin_addr.s_addr = inet_addr(anti3DServerList.host);
 	}
 
@@ -8629,7 +8895,6 @@ void getServerListK(){
     );
 }
 
-
 void saveChatroomLog(char text[]){
 	if(chatLogValue != BST_CHECKED) return;
 
@@ -8676,4 +8941,3 @@ void saveGameroomLog(char text[]){
 
     fclose( file_log );
 }
-

@@ -302,9 +302,9 @@ static char tracerpos[0x10]={0};
 static int tracer_additional_info=TR_ADDINFO;
 static int tracer_prev_int=0;
 #endif /* Z80_TRACER|Z_LOG_SPOP */
+
 static FILE* tracer_fd=NULL;
 static int tracer_on=0;
-
 
 static struct {
 	/* p* = padding for 32-bit alignment */

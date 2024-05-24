@@ -1,6 +1,8 @@
 #ifndef  KAILLERA_MESSAGES_H
 #define  KAILLERA_MESSAGES_H
 
+// #define KAILLERA_P2P
+
 //Prototypes
 //0x01 - User Quit Notification
 void userQuitNotification(unsigned short position, int slot);
@@ -46,7 +48,9 @@ void gameDataRecv(unsigned short position, int slot);
 void gameDataSend();
 //0x13 - Game Cache
 void gameCacheRecv(unsigned short position, int slot);
-//void gameCacheSend(char pos);
+#ifdef KAILLERA_P2P
+void gameCacheSend(char pos);
+#endif // KAILLERA_P2P
 //0x14 - Drop Game Notification
 void dropGameNotification(unsigned short position, int slot);
 void dropGameRequest();
@@ -64,7 +68,6 @@ struct RECENT_SERVERS {
 	char location[1024];
 };
 
-// const int RECENT_MAX = 25;
 #define RECENT_MAX 25
 
 struct RECENT_SERVERS recentServers[RECENT_MAX];
@@ -78,16 +81,17 @@ struct FAVORITE_SERVERS {
 	char comments[1024];
 };
 
-// int const FAVORITE_MAX = 25;
 #define FAVORITE_MAX 25
 struct FAVORITE_SERVERS favoriteServers[FAVORITE_MAX];
 int favoriteCount = -1;
 
-//void p2pGameData(char *data, int dLen);
-//void p2pGameChat(char *data, int dLen);
-//void p2pGameStart(char *data, int dLen);
-//void p2pGameDrop(char *data, int dLen);
-//void p2pGameReady(char *data, int dLen);
+#ifdef KAILLERA_P2P
+void p2pGameData(char *data, int dLen);
+void p2pGameChat(char *data, int dLen);
+void p2pGameStart(char *data, int dLen);
+void p2pGameDrop(char *data, int dLen);
+void p2pGameReady(char *data, int dLen);
+#endif // KAILLERA_P2P
 
 void loginToServer();
 void popupMenu(char num);
@@ -122,8 +126,10 @@ DWORD WINAPI recvLoop(LPVOID lpParam);
 DWORD WINAPI pingKailleraServers(LPVOID lpParam);
 DWORD WINAPI ping3DServers(LPVOID lpParam);
 DWORD WINAPI continuousLoop(LPVOID lpParam);
-//DWORD WINAPI p2pLoop(LPVOID lpParam);
-//HANDLE p2pThread;
+#ifdef KAILLERA_P2P
+DWORD WINAPI p2pLoop(LPVOID lpParam);
+HANDLE p2pThread;
+#endif // KAILLERA_P2P
 int CALLBACK lstUserlistCompareFunc(LPARAM i1, LPARAM i2, LPARAM);
 int CALLBACK lstGamelistCompareFunc(LPARAM i1, LPARAM i2, LPARAM);
 int CALLBACK lstServerlistKCompareFunc(LPARAM i1, LPARAM i2, LPARAM);
@@ -159,7 +165,6 @@ DWORD const textboxProperties = WS_CHILD | WS_BORDER | WS_VISIBLE | WS_TABSTOP |
 DWORD const comboboxProperties = CBS_DROPDOWNLIST | WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_TABSTOP | WS_VISIBLE;
 DWORD const richTextboxProperties = ES_MULTILINE | WS_CHILD | WS_VISIBLE;
 DWORD const listviewProperties = LVS_SHOWSELALWAYS | LVS_REPORT | LVS_SINGLESEL | WS_CHILD | WS_VISIBLE | WS_TABSTOP;
-// DWORD const controlStyles = NULL;
 DWORD const controlStyles = 0;
 DWORD const formStyles = WS_EX_DLGMODALFRAME | WS_EX_WINDOWEDGE ;
 DWORD const listviewStyles = LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES;
@@ -181,17 +186,21 @@ HWND chkDrop;
 int dropValue;
 HWND chkBeep;
 HWND btnDrop;
-//HWND btnP2PServer;
-//HWND btnP2PConnect;
+#ifdef KAILLERA_P2P
+HWND btnP2PServer;
+HWND btnP2PConnect;
+#endif // KAILLERA_P2P
 HWND chkJoinChatGame;
 HWND btnVersion;
-//HWND txtP2PServer;
-//HWND lblP2PServer;
-//char p2pServer[1024];
-//HWND txtP2PPort;
-//HWND lblP2PPort;
-//char p2pPort[1024];
-//HWND btnP2PStart;
+#ifdef KAILLERA_P2P
+HWND txtP2PServer;
+HWND lblP2PServer;
+char p2pServer[1024];
+HWND txtP2PPort;
+HWND lblP2PPort;
+char p2pPort[1024];
+HWND btnP2PStart;
+#endif // KAILLERA_P2P
 HWND chkUseScreenChat;
 HWND chkKeepGameChatLogs;
 HWND chkKeepChatLogs;
@@ -233,7 +242,6 @@ int joinDblValue;
 HWND lstRecentList;
 HWND lstWaitingList;
 HWND lstFavoriteList;
-
 
 struct AWAY_MESSAGES {
 	char subject[1024];
@@ -368,11 +376,13 @@ WSADATA startupInfo;
 int mySocket;
 int mySocketK;
 int mySocket3D;
-//int p2pSocket;
 int mySocketWaiting;
-//sockaddr_in p2pServerInfo;
-//int p2pClientLength;
-//sockaddr_in p2pClientInfo;
+#ifdef KAILLERA_P2P
+int p2pSocket;
+struct sockaddr_in p2pServerInfo;
+int p2pClientLength;
+struct sockaddr_in p2pClientInfo;
+#endif // KAILLERA_P2P
 struct sockaddr_in socketInfo;
 struct sockaddr_in socketInfoK;
 struct sockaddr_in socketInfo3D;
@@ -389,7 +399,6 @@ struct SERVER_LIST kailleraServerList;
 struct SERVER_LIST anti3DServerList;
 //http://master.anti3d.com/raw_server_list2.php
 //http://kaillera.com/raw_server_list2.php?wg=1&version=0.9
-
 
 struct USER_LIST_COMMANDS{
 	char commands[128];
@@ -426,11 +435,6 @@ long bytesRecvServerListK;
 long bytesRecvServerList3D;
 long bytesRecvWaiting;
 //Outbound Data
-/*
-unsigned short const MESSAGE_SIZE = 15;
-unsigned short const MESSAGE_LENGTH = 5000;
-unsigned short const MAX_INCOMING_BUFFER = 15;
-*/
 #define MESSAGE_SIZE        15
 #define MESSAGE_LENGTH      5000
 #define MAX_INCOMING_BUFFER 15
@@ -443,10 +447,14 @@ struct INCOMING_BUFFER myBuff[MAX_INCOMING_BUFFER];
 int myBuffCount = -1;
 
 struct Messages{
-    //char msgData[MESSAGE_LENGTH];
+#ifdef KAILLERA_P2P
+    char msgData[MESSAGE_LENGTH];
+#endif // KAILLERA_P2P
     unsigned char msgType;
     unsigned short msgLen;
-    //unsigned short msgNum;
+#ifdef KAILLERA_P2P
+    unsigned short msgNum;
+#endif // KAILLERA_P2P
 	unsigned long msgPos;
 };
 struct Messages serverMessage[MESSAGE_SIZE];
@@ -494,7 +502,7 @@ int xPos = 0;
 int yPos = 0;
 #ifdef MEISEI_ESP
 char myServer[1024] = "No en un Servidor\0";
-char username[1024] = "¡Por favor, ingrese un nombre de usuario!\0";
+char username[1024] = "¡Por favor, nombre usuario!\0";
 #else
 char myServer[1024] = "Not in a Server\0";
 char username[1024] = "Please enter a username!\0";
@@ -541,7 +549,6 @@ char lastGameToPlay3[1024] = "LastGameToPlay3\0";
 struct Games gameList[65535];
 unsigned short totalGames = 0;
 
-
 void showOptions(char show);
 
 char connectionType = 1;
@@ -574,16 +581,8 @@ bool returnInputSize = false;
 bool storeFirstValues;
 short inCachePos;
 unsigned short eSize = 4096;
+
 // CONST
-/*
-unsigned short const maxPlayers = 8;
-unsigned short const cacheSize = 256;
-unsigned short const bufferSize = 32;
-unsigned short const outCacheSize = bufferSize * (unsigned short)bad;
-unsigned long const inCacheSize = maxPlayers * outCacheSize;
-unsigned long const lastInCachePos = (cacheSize - 1) * inCacheSize;
-unsigned short const lastOutCachePos = (cacheSize - 1) * outCacheSize;
-*/
 #define maxPlayers      8
 #define cacheSize       256
 #define bufferSize      32
