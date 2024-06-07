@@ -541,36 +541,134 @@ DLLEXP kailleraSetInfos(kailleraInfos *infosp) {
 	//Game Userlist Menu
 	gameUserlistMenu = CreatePopupMenu();
 	gameUserlistSubMenu = CreatePopupMenu();
-	AppendMenu(gameUserlistMenu, MF_STRING | MF_POPUP, 0xFFF4, "Kick");
+	AppendMenu(
+        gameUserlistMenu, MF_STRING | MF_POPUP, 0xFFF4,
+    #ifdef MEISEI_ESP
+        "Patada"
+    #else
+        "Kick"
+    #endif // MEISEI_ESP
+    );
 
 	AppendMenu(gameUserlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
 
-	AppendMenu(gameUserlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)gameUserlistSubMenu, "Mute Player");
-	AppendMenu(gameUserlistSubMenu, MF_STRING, 0xDDDD, "Mute");
-	AppendMenu(gameUserlistSubMenu, MF_STRING, 0xDDDC, "Unmute");
+	AppendMenu(
+        gameUserlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)gameUserlistSubMenu,
+    #ifdef MEISEI_ESP
+        "Jugador Mudo"
+    #else
+        "Mute Player"
+    #endif // MEISEI_ESP
+    );
+	AppendMenu(
+        gameUserlistSubMenu, MF_STRING, 0xDDDD,
+    #ifdef MEISEI_ESP
+        "Mudo"
+    #else
+        "Mute"
+    #endif // MEISEI_ESP
+    );
+	AppendMenu(
+        gameUserlistSubMenu, MF_STRING, 0xDDDC,
+    #ifdef MEISEI_ESP
+        "Hablador"
+    #else
+        "Unmute"
+    #endif // MEISEI_ESP
+    );
 
 	AppendMenu(gameUserlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
 
 	gameUserlistSubMenu = CreatePopupMenu();
-	AppendMenu(gameUserlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)gameUserlistSubMenu, "Copy");
-	AppendMenu(gameUserlistSubMenu, MF_STRING, 0xFFF5, "User ID");
-	AppendMenu(gameUserlistSubMenu, MF_STRING, 0xFFF6, "Username");
+	AppendMenu(
+        gameUserlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)gameUserlistSubMenu,
+    #ifdef MEISEI_ESP
+        "Copiar"
+    #else
+        "Copy"
+    #endif // MEISEI_ESP
+    );
+	AppendMenu(
+        gameUserlistSubMenu, MF_STRING, 0xFFF5,
+    #ifdef MEISEI_ESP
+        "ID Usuario"
+    #else
+        "User ID"
+    #endif // MEISEI_ESP
+    );
+	AppendMenu(
+        gameUserlistSubMenu, MF_STRING, 0xFFF6,
+    #ifdef MEISEI_ESP
+        "Nombre Usuario"
+    #else
+        "Username"
+    #endif // MEISEI_ESP
+    );
 
 	//txtChatroom Menu
 	txtChatroomMenu = CreatePopupMenu();
 	txtChatroomSubMenu = CreatePopupMenu();
 	txtChatroomPmSubMenu = CreatePopupMenu();
-	AppendMenu(txtChatroomMenu, MF_STRING | MF_POPUP, 0xDDD6, "Get My IP Address");
+	AppendMenu(
+        txtChatroomMenu, MF_STRING | MF_POPUP, 0xDDD6,
+    #ifdef MEISEI_ESP
+        "Dame mi Dirección IP"
+    #else
+        "Get My IP Address"
+    #endif // MEISEI_ESP
+    );
 	AppendMenu(txtChatroomMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
 
-	AppendMenu(txtChatroomMenu, MF_STRING | MF_POPUP, (UINT_PTR)txtChatroomPmSubMenu, "Private Messages");
-	AppendMenu(txtChatroomPmSubMenu, MF_STRING, 0xDDD4, "Off");
-	AppendMenu(txtChatroomPmSubMenu, MF_STRING, 0xDDD5, "On");
+	AppendMenu(
+        txtChatroomMenu, MF_STRING | MF_POPUP, (UINT_PTR)txtChatroomPmSubMenu,
+    #ifdef MEISEI_ESP
+        "Mensajes Privados"
+    #else
+        "Private Messages"
+    #endif // MEISEI_ESP
+    );
+	AppendMenu(
+        txtChatroomPmSubMenu, MF_STRING, 0xDDD4,
+    #ifdef MEISEI_ESP
+        "Apagado"
+    #else
+        "Off"
+    #endif // MEISEI_ESP
+    );
+	AppendMenu(
+        txtChatroomPmSubMenu, MF_STRING, 0xDDD5,
+    #ifdef MEISEI_ESP
+        "Encendido"
+    #else
+        "On"
+    #endif // MEISEI_ESP
+    );
 	AppendMenu(txtChatroomMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
 
-	AppendMenu(txtChatroomMenu, MF_STRING | MF_POPUP, (UINT_PTR)txtChatroomSubMenu, "Stealth Mode");
-	AppendMenu(txtChatroomSubMenu, MF_STRING, 0xDDD8, "On");
-	AppendMenu(txtChatroomSubMenu, MF_STRING, 0xDDD7, "Off");
+	AppendMenu(
+        txtChatroomMenu, MF_STRING | MF_POPUP, (UINT_PTR)txtChatroomSubMenu,
+    #ifdef MEISEI_ESP
+        "Modo Sigilo"
+    #else
+        "Stealth Mode"
+    #endif // MEISEI_ESP
+    );
+	AppendMenu(
+        txtChatroomSubMenu, MF_STRING, 0xDDD8,
+    #ifdef MEISEI_ESP
+        "Encendido"
+    #else
+        "On"
+    #endif // MEISEI_ESP
+    );
+	AppendMenu(
+        txtChatroomSubMenu, MF_STRING, 0xDDD7,
+    #ifdef MEISEI_ESP
+        "Apagado"
+    #else
+        "Off"
+    #endif // MEISEI_ESP
+    );
 
 	//Userlist Menu
 	userlistMenu = CreatePopupMenu();
@@ -683,20 +781,56 @@ DLLEXP kailleraSetInfos(kailleraInfos *infosp) {
 	strcpy(userlistCommands[51].commands, "/finduser ");
 
 	//Find User
-	AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT)0xCCCC, "Find User");
+	AppendMenu(
+        userlistMenu, MF_STRING | MF_POPUP, (UINT)0xCCCC,
+    #ifdef MEISEI_ESP
+        "Encontrar Usuario"
+    #else
+        "Find User"
+    #endif // MEISEI_ESP
+    );
 
 	AppendMenu(userlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
 
 	//PM
-	AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT)0xB2DD, "Private Message");
+	AppendMenu(
+        userlistMenu, MF_STRING | MF_POPUP, (UINT)0xB2DD,
+    #ifdef MEISEI_ESP
+        "Mensaje Privado"
+    #else
+        "Private Message"
+    #endif // MEISEI_ESP
+    );
 
 	AppendMenu(userlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
 
 	//Kick
-	AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT)0xFFFF, "Kick");
+	AppendMenu(
+        userlistMenu, MF_STRING | MF_POPUP, (UINT)0xFFFF,
+    #ifdef MEISEI_ESP
+        "Patada"
+    #else
+        "Kick"
+    #endif // MEISEI_ESP
+    );
 
 	//Silence
 	userlistSubMenu = CreatePopupMenu();
+#ifdef MEISEI_ESP
+	AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)userlistSubMenu, "Silencio");
+	AppendMenu(userlistSubMenu, MF_STRING, 1, "5 minutos");
+	AppendMenu(userlistSubMenu, MF_STRING, 2, "15 minutos");
+	AppendMenu(userlistSubMenu, MF_STRING, 3, "30 minutos");
+	AppendMenu(userlistSubMenu, MF_STRING, 4, "45 minutos");
+	AppendMenu(userlistSubMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(userlistSubMenu, MF_STRING, 5, "1 hora");
+	AppendMenu(userlistSubMenu, MF_STRING, 6, "3 horas");
+	AppendMenu(userlistSubMenu, MF_STRING, 7, "5 horas");
+	AppendMenu(userlistSubMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(userlistSubMenu, MF_STRING, 8, "1 día");
+	AppendMenu(userlistSubMenu, MF_STRING, 9, "1 semana");
+	AppendMenu(userlistSubMenu, MF_STRING, 10, "Por un largo tiempo...");
+#else
 	AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)userlistSubMenu, "Silence");
 	AppendMenu(userlistSubMenu, MF_STRING, 1, "5 minutes");
 	AppendMenu(userlistSubMenu, MF_STRING, 2, "15 minutes");
@@ -710,10 +844,25 @@ DLLEXP kailleraSetInfos(kailleraInfos *infosp) {
 	AppendMenu(userlistSubMenu, MF_STRING, 8, "1 day");
 	AppendMenu(userlistSubMenu, MF_STRING, 9, "1 week");
 	AppendMenu(userlistSubMenu, MF_STRING, 10, "For a very long time...");
+#endif // MEISEI_ESP
 
 	//Ban
 	userlistSubMenu = CreatePopupMenu();
 	AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)userlistSubMenu, "Ban");
+#ifdef MEISEI_ESP
+	AppendMenu(userlistSubMenu, MF_STRING, 11, "5 minutos");
+	AppendMenu(userlistSubMenu, MF_STRING, 12, "15 minutos");
+	AppendMenu(userlistSubMenu, MF_STRING, 13, "30 minutos");
+	AppendMenu(userlistSubMenu, MF_STRING, 14, "45 minutos");
+	AppendMenu(userlistSubMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(userlistSubMenu, MF_STRING, 15, "1 hora");
+	AppendMenu(userlistSubMenu, MF_STRING, 16, "3 horas");
+	AppendMenu(userlistSubMenu, MF_STRING, 17, "5 horas");
+	AppendMenu(userlistSubMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(userlistSubMenu, MF_STRING, 18, "1 día");
+	AppendMenu(userlistSubMenu, MF_STRING, 19, "1 semana");
+	AppendMenu(userlistSubMenu, MF_STRING, 20, "Por un largo tiempo...");
+#else
 	AppendMenu(userlistSubMenu, MF_STRING, 11, "5 minutes");
 	AppendMenu(userlistSubMenu, MF_STRING, 12, "15 minutes");
 	AppendMenu(userlistSubMenu, MF_STRING, 13, "30 minutes");
@@ -726,11 +875,26 @@ DLLEXP kailleraSetInfos(kailleraInfos *infosp) {
 	AppendMenu(userlistSubMenu, MF_STRING, 18, "1 day");
 	AppendMenu(userlistSubMenu, MF_STRING, 19, "1 week");
 	AppendMenu(userlistSubMenu, MF_STRING, 20, "For a very long time...");
-
+#endif // MEISEI_ESP
 	AppendMenu(userlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
 
 	//Temp Elevated
 	userlistSubMenu = CreatePopupMenu();
+#ifdef MEISEI_ESP
+	AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)userlistSubMenu, "Elevado Temporal");
+	AppendMenu(userlistSubMenu, MF_STRING, 31, "5 minutos");
+	AppendMenu(userlistSubMenu, MF_STRING, 32, "15 minutos");
+	AppendMenu(userlistSubMenu, MF_STRING, 33, "30 minutos");
+	AppendMenu(userlistSubMenu, MF_STRING, 34, "45 minutos");
+	AppendMenu(userlistSubMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(userlistSubMenu, MF_STRING, 35, "1 hora");
+	AppendMenu(userlistSubMenu, MF_STRING, 36, "3 horas");
+	AppendMenu(userlistSubMenu, MF_STRING, 37, "5 horas");
+	AppendMenu(userlistSubMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(userlistSubMenu, MF_STRING, 38, "1 día");
+	AppendMenu(userlistSubMenu, MF_STRING, 39, "1 semana");
+	AppendMenu(userlistSubMenu, MF_STRING, 40, "Por un largo tiempo...");
+#else
 	AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)userlistSubMenu, "Temp Elevated");
 	AppendMenu(userlistSubMenu, MF_STRING, 31, "5 minutes");
 	AppendMenu(userlistSubMenu, MF_STRING, 32, "15 minutes");
@@ -744,9 +908,25 @@ DLLEXP kailleraSetInfos(kailleraInfos *infosp) {
 	AppendMenu(userlistSubMenu, MF_STRING, 38, "1 day");
 	AppendMenu(userlistSubMenu, MF_STRING, 39, "1 week");
 	AppendMenu(userlistSubMenu, MF_STRING, 40, "For a very long time...");
+#endif // MEISEI_ESP
 
 	//Temp Moderator
 	userlistSubMenu = CreatePopupMenu();
+#ifdef MEISEI_ESP
+	AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)userlistSubMenu, "Moderador Temporal");
+	AppendMenu(userlistSubMenu, MF_STRING, 41, "5 minutos");
+	AppendMenu(userlistSubMenu, MF_STRING, 42, "15 minutos");
+	AppendMenu(userlistSubMenu, MF_STRING, 43, "30 minutos");
+	AppendMenu(userlistSubMenu, MF_STRING, 44, "45 minutos");
+	AppendMenu(userlistSubMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(userlistSubMenu, MF_STRING, 45, "1 hora");
+	AppendMenu(userlistSubMenu, MF_STRING, 46, "3 horas");
+	AppendMenu(userlistSubMenu, MF_STRING, 47, "5 horas");
+	AppendMenu(userlistSubMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(userlistSubMenu, MF_STRING, 48, "1 día");
+	AppendMenu(userlistSubMenu, MF_STRING, 49, "1 semana");
+	AppendMenu(userlistSubMenu, MF_STRING, 50, "Por un largo tiempo...");
+#else
 	AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)userlistSubMenu, "Temp Moderator");
 	AppendMenu(userlistSubMenu, MF_STRING, 41, "5 minutes");
 	AppendMenu(userlistSubMenu, MF_STRING, 42, "15 minutes");
@@ -760,9 +940,25 @@ DLLEXP kailleraSetInfos(kailleraInfos *infosp) {
 	AppendMenu(userlistSubMenu, MF_STRING, 48, "1 day");
 	AppendMenu(userlistSubMenu, MF_STRING, 49, "1 week");
 	AppendMenu(userlistSubMenu, MF_STRING, 50, "For a very long time...");
+#endif // MEISEI_ESP
 
 	//Temp Admin
 	userlistSubMenu = CreatePopupMenu();
+#ifdef MEISEI_ESP
+	AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)userlistSubMenu, "Administrador Temporal");
+	AppendMenu(userlistSubMenu, MF_STRING, 21, "5 minutos");
+	AppendMenu(userlistSubMenu, MF_STRING, 22, "15 minutos");
+	AppendMenu(userlistSubMenu, MF_STRING, 23, "30 minutos");
+	AppendMenu(userlistSubMenu, MF_STRING, 24, "45 minutos");
+	AppendMenu(userlistSubMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(userlistSubMenu, MF_STRING, 25, "1 hora");
+	AppendMenu(userlistSubMenu, MF_STRING, 26, "3 horas");
+	AppendMenu(userlistSubMenu, MF_STRING, 27, "5 horas");
+	AppendMenu(userlistSubMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
+	AppendMenu(userlistSubMenu, MF_STRING, 28, "1 día");
+	AppendMenu(userlistSubMenu, MF_STRING, 29, "1 semana");
+	AppendMenu(userlistSubMenu, MF_STRING, 30, "Por un largo tiempo...");
+#else
 	AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)userlistSubMenu, "Temp Admin");
 	AppendMenu(userlistSubMenu, MF_STRING, 21, "5 minutes");
 	AppendMenu(userlistSubMenu, MF_STRING, 22, "15 minutes");
@@ -776,18 +972,30 @@ DLLEXP kailleraSetInfos(kailleraInfos *infosp) {
 	AppendMenu(userlistSubMenu, MF_STRING, 28, "1 day");
 	AppendMenu(userlistSubMenu, MF_STRING, 29, "1 week");
 	AppendMenu(userlistSubMenu, MF_STRING, 30, "For a very long time...");
+#endif // MEISEI_ESP
 
 	AppendMenu(userlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
 	userlistSubMenu = CreatePopupMenu();
+#ifdef MEISEI_ESP
+	AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)userlistSubMenu, "Ignorar Usuario");
+	AppendMenu(userlistSubMenu, MF_STRING, 0xDDDB, "Ignorar");
+	AppendMenu(userlistSubMenu, MF_STRING, 0xDDDA, "Dejar de Ignorar");
+#else
 	AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)userlistSubMenu, "Ignore User");
 	AppendMenu(userlistSubMenu, MF_STRING, 0xDDDB, "Ignore");
 	AppendMenu(userlistSubMenu, MF_STRING, 0xDDDA, "Unignore");
-
+#endif // MEISEI_ESP
 	AppendMenu(userlistMenu, MF_SEPARATOR | MF_POPUP, 0, 0);
 	userlistSubMenu = CreatePopupMenu();
+#ifdef MEISEI_ESP
+	AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)userlistSubMenu, "Copiar");
+	AppendMenu(userlistSubMenu, MF_STRING, 0xFFFD, "ID de Usuario");
+	AppendMenu(userlistSubMenu, MF_STRING, 0xFFFE, "Nombre de Usuario");
+#else
 	AppendMenu(userlistMenu, MF_STRING | MF_POPUP, (UINT_PTR)userlistSubMenu, "Copy");
 	AppendMenu(userlistSubMenu, MF_STRING, 0xFFFD, "User ID");
 	AppendMenu(userlistSubMenu, MF_STRING, 0xFFFE, "Username");
+#endif // MEISEI_ESP
 
     return 0;
 }
@@ -2244,17 +2452,32 @@ void createInitialWindow(){
 	SendMessage(lstFavoriteList, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	memset(&LvCol, 0, sizeof(LvCol));
 	LvCol.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
-
+#ifdef MEISEI_ESP
+    LvCol.pszText = "Dirección IP\0";
+#else
 	LvCol.pszText = "IP Address\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 150;
 	SendMessage(lstFavoriteList, LVM_INSERTCOLUMN, 0, (LPARAM)&LvCol);
+#ifdef MEISEI_ESP
+	LvCol.pszText = "Nombre de Servidor\0";
+#else
 	LvCol.pszText = "Server Name\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 250;
 	SendMessage(lstFavoriteList, LVM_INSERTCOLUMN, 1, (LPARAM)&LvCol);
+#ifdef MEISEI_ESP
+	LvCol.pszText = "Ubicación\0";
+#else
 	LvCol.pszText = "Location\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 140;
 	SendMessage(lstFavoriteList, LVM_INSERTCOLUMN, 2, (LPARAM)&LvCol);
+#ifdef MEISEI_ESP
+	LvCol.pszText = "Comentarios\0";
+#else
 	LvCol.pszText = "Comments\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 205;
 	SendMessage(lstFavoriteList, LVM_INSERTCOLUMN, 3, (LPARAM)&LvCol);
 	SendMessage(lstFavoriteList, LVM_SETEXTENDEDLISTVIEWSTYLE, 0, (LPARAM)listviewStyles);
@@ -2263,25 +2486,53 @@ void createInitialWindow(){
 	SendMessage(lstWaitingList, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	memset(&LvCol, 0, sizeof(LvCol));
 	LvCol.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
+#ifdef MEISEI_ESP
+	LvCol.pszText = "Nombre del Juego\0";
+#else
 	LvCol.pszText = "Game Name\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 250;
 	SendMessage(lstWaitingList, LVM_INSERTCOLUMN, 0, (LPARAM)&LvCol);
+#ifdef MEISEI_ESP
+	LvCol.pszText = "Emulador\0";
+#else
 	LvCol.pszText = "Emulator\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 125;
 	SendMessage(lstWaitingList, LVM_INSERTCOLUMN, 1, (LPARAM)&LvCol);
+#ifdef MEISEI_ESP
+	LvCol.pszText = "Nombre de Usuario\0";
+#else
 	LvCol.pszText = "Username\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 100;
 	SendMessage(lstWaitingList, LVM_INSERTCOLUMN, 2, (LPARAM)&LvCol);
+#ifdef MEISEI_ESP
+	LvCol.pszText = "Nombre Servidor\0";
+#else
 	LvCol.pszText = "Server Name\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 100;
 	SendMessage(lstWaitingList, LVM_INSERTCOLUMN, 3, (LPARAM)&LvCol);
+#ifdef MEISEI_ESP
+    LvCol.pszText = "Dirección IP\0";
+#else
 	LvCol.pszText = "IP Address\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 100;
 	SendMessage(lstWaitingList, LVM_INSERTCOLUMN, 4, (LPARAM)&LvCol);
+#ifdef MEISEI_ESP
+    LvCol.pszText = "Ubicación\0";
+#else
 	LvCol.pszText = "Location\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 100;
 	SendMessage(lstWaitingList, LVM_INSERTCOLUMN, 5, (LPARAM)&LvCol);
+#ifdef MEISEI_ESP
+    LvCol.pszText = "# de Jugadores\0";
+#else
 	LvCol.pszText = "# of Players\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 80;
 	SendMessage(lstWaitingList, LVM_INSERTCOLUMN, 6, (LPARAM)&LvCol);
 	SendMessage(lstWaitingList, LVM_SETEXTENDEDLISTVIEWSTYLE, 0, (LPARAM)listviewStyles);
@@ -2290,13 +2541,25 @@ void createInitialWindow(){
 	SendMessage(lstRecentList, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	memset(&LvCol, 0, sizeof(LvCol));
 	LvCol.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
+#ifdef MEISEI_ESP
+    LvCol.pszText = "Dirección IP\0";
+#else
 	LvCol.pszText = "IP Address\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 150;
 	SendMessage(lstRecentList, LVM_INSERTCOLUMN, 0, (LPARAM)&LvCol);
+#ifdef MEISEI_ESP
+    LvCol.pszText = "Nombre Servidor\0";
+#else
 	LvCol.pszText = "Server Name\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 350;
 	SendMessage(lstRecentList, LVM_INSERTCOLUMN, 1, (LPARAM)&LvCol);
+#ifdef MEISEI_ESP
+    LvCol.pszText = "Ubicación\0";
+#else
 	LvCol.pszText = "Location\0";
+#endif
 	LvCol.cx = 245;
 	SendMessage(lstRecentList, LVM_INSERTCOLUMN, 2, (LPARAM)&LvCol);
 	SendMessage(lstRecentList, LVM_SETEXTENDEDLISTVIEWSTYLE, 0, (LPARAM)listviewStyles);
@@ -2305,25 +2568,49 @@ void createInitialWindow(){
 	SendMessage(lstServerListK, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	memset(&LvCol, 0, sizeof(LvCol));
 	LvCol.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
+#ifdef MEISEI_ESP
+	LvCol.pszText = "Nombre Servidor\0";
+#else
 	LvCol.pszText = "Server Name\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 250;
 	SendMessage(lstServerListK, LVM_INSERTCOLUMN, 0, (LPARAM)&LvCol);
+#ifdef MEISEI_ESP
+	LvCol.pszText = "Dirección IP\0";
+#else
 	LvCol.pszText = "IP Address\0";
+#endif
 	LvCol.cx = 125;
 	SendMessage(lstServerListK, LVM_INSERTCOLUMN, 1, (LPARAM)&LvCol);
 	LvCol.pszText = "Ping\0";
 	LvCol.cx = 75;
 	SendMessage(lstServerListK, LVM_INSERTCOLUMN, 2, (LPARAM)&LvCol);
+#ifdef MEISEI_ESP
+	LvCol.pszText = "Ubicación\0";
+#else
 	LvCol.pszText = "Location\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 100;
 	SendMessage(lstServerListK, LVM_INSERTCOLUMN, 3, (LPARAM)&LvCol);
+#ifdef MEISEI_ESP
+    LvCol.pszText = "Usuarios\0";
+#else
 	LvCol.pszText = "Users\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 65;
 	SendMessage(lstServerListK, LVM_INSERTCOLUMN, 4, (LPARAM)&LvCol);
+#ifdef MEISEI_ESP
+	LvCol.pszText = "Juegos\0";
+#else
 	LvCol.pszText = "Games\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 65;
 	SendMessage(lstServerListK, LVM_INSERTCOLUMN, 5, (LPARAM)&LvCol);
+#ifdef MEISEI_ESP
+	LvCol.pszText = "Versión\0";
+#else
 	LvCol.pszText = "Version\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 65;
 	SendMessage(lstServerListK, LVM_INSERTCOLUMN, 6, (LPARAM)&LvCol);
 	SendMessage(lstServerListK, LVM_SETEXTENDEDLISTVIEWSTYLE, 0, (LPARAM)listviewStyles);
@@ -2332,25 +2619,49 @@ void createInitialWindow(){
 	SendMessage(lstServerList3D, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	memset(&LvCol, 0, sizeof(LvCol));
 	LvCol.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
+#ifdef MEISEI_ESP
+	LvCol.pszText = "Nombre Servidor\0";
+#else
 	LvCol.pszText = "Server Name\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 250;
 	SendMessage(lstServerList3D, LVM_INSERTCOLUMN, 0, (LPARAM)&LvCol);
+#ifdef MEISEI_ESP
+    LvCol.pszText = "Dirección IP\0";
+#else
 	LvCol.pszText = "IP Address\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 125;
 	SendMessage(lstServerList3D, LVM_INSERTCOLUMN, 1, (LPARAM)&LvCol);
 	LvCol.pszText = "Ping\0";
 	LvCol.cx = 75;
 	SendMessage(lstServerList3D, LVM_INSERTCOLUMN, 2, (LPARAM)&LvCol);
+#ifdef MEISEI_ESP
+	LvCol.pszText = "Ubicación\0";
+#else
 	LvCol.pszText = "Location\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 100;
 	SendMessage(lstServerList3D, LVM_INSERTCOLUMN, 3, (LPARAM)&LvCol);
+#ifdef MEISEI_ESP
+	LvCol.pszText = "Usuarios\0";
+#else
 	LvCol.pszText = "Users\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 65;
 	SendMessage(lstServerList3D, LVM_INSERTCOLUMN, 4, (LPARAM)&LvCol);
+#ifdef MEISEI_ESP
+	LvCol.pszText = "Juegos\0";
+#else
 	LvCol.pszText = "Games\0";
+#endif
 	LvCol.cx = 65;
 	SendMessage(lstServerList3D, LVM_INSERTCOLUMN, 5, (LPARAM)&LvCol);
+#ifdef MEISEI_ESP
+    LvCol.pszText = "Versión\0";
+#else
 	LvCol.pszText = "Version\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 65;
 	SendMessage(lstServerList3D, LVM_INSERTCOLUMN, 6, (LPARAM)&LvCol);
 	SendMessage(lstServerList3D, LVM_SETEXTENDEDLISTVIEWSTYLE, 0, (LPARAM)listviewStyles);
@@ -2359,6 +2670,15 @@ void createInitialWindow(){
 	SendMessage(tTab, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	v.mask = TCIF_TEXT | TCIF_IMAGE;
 	v.iImage = -1;
+#ifdef MEISEI_ESP
+	v.pszText = "Información Inicio de Sesión";
+	TabCtrl_InsertItem(tTab, 0, &v);
+	v.pszText = "Opciones Sala de Chat";
+	TabCtrl_InsertItem(tTab, 1, &v);
+	v.pszText = "Opciones Sala de Juegos";
+	TabCtrl_InsertItem(tTab, 2, &v);
+	v.pszText = "Opciones Extendidas Sala de Juegos EmulinkerSF v0.90.0";
+#else
 	v.pszText = "Login Info";
 	TabCtrl_InsertItem(tTab, 0, &v);
 	v.pszText = "Chatroom Options";
@@ -2366,9 +2686,14 @@ void createInitialWindow(){
 	v.pszText = "Gameroom Options";
 	TabCtrl_InsertItem(tTab, 2, &v);
 	v.pszText = "Extended EmulinkerSF v0.90.0+ Gameroom Options";
+#endif // MEISEI_ESP
 	TabCtrl_InsertItem(tTab, 3, &v);
 #ifdef KAILLERA_P2P
+#ifdef MEISEI_ESP
+	v.pszText = "Opciones P2P";
+#else
 	v.pszText = "P2P Options";
+#endif // MEISEI_ESP
 	TabCtrl_InsertItem(tTab, 4, &v);
 #endif // KAILLERA_P2P
 	//Login Servers
@@ -2406,8 +2731,13 @@ void createInitialWindow(){
 	SendMessage(txtMaxUsers, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	lblMaxUsers = CreateWindowEx(
         controlStyles, "STATIC",
+    #ifdef MEISEI_ESP
+        "Usuario Max:",
+        labelProperties, 10, 505, 70, 15, form1, NULL, hInstance, NULL
+    #else
         "Max Users:",
         labelProperties, 10, 505, 60, 15, form1, NULL, hInstance, NULL
+    #endif // MEISEI_ESP
     );
 	SendMessage(lblMaxUsers, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	if (atoi(maxPingG) < 1 || atoi(maxPingG) > 1000)
@@ -2416,22 +2746,36 @@ void createInitialWindow(){
 	SendMessage(txtMaxPing, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	lblMaxPing = CreateWindowEx(
         controlStyles, "STATIC",
+    #ifdef MEISEI_ESP
+        "Ping Max:",
+    #else
         "Max Ping:",
+    #endif // MEISEI_ESP
         labelProperties, 75, 505, 60, 15, form1, NULL, hInstance, NULL
     );
 	SendMessage(lblMaxPing, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	//Use EmulinkerSF Options
 	chkEmulinkerSF = CreateWindowEx(
         controlStyles, "BUTTON",
+    #ifdef MEISEI_ESP
+        "¿Usar Opciones Extendidas?",
+        checkProperties, 325, 535, 160, 25, form1, NULL, hInstance, NULL
+    #else
         "Use Extended Options?",
         checkProperties, 325, 535, 140, 25, form1, NULL, hInstance, NULL
+    #endif // MEISEI_ESP
+
     );
 	SendMessage(chkEmulinkerSF, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	SendMessage(chkEmulinkerSF, BM_SETCHECK, emulinkerSFValue, 0);
 	//Fake P2P Options
 	chkFakeP2P = CreateWindowEx(
         controlStyles, "BUTTON",
+    #ifdef MEISEI_ESP
+        "¿Usar P2P falso?",
+    #else
         "Use Fake P2P?",
+    #endif // MEISEI_ESP
         checkProperties, 325, 505, 100, 25, form1, NULL, hInstance, NULL
     );
 	SendMessage(chkFakeP2P, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
@@ -2439,23 +2783,37 @@ void createInitialWindow(){
 	//Emulator Restriction
 	chkEmuRes = CreateWindowEx(
         controlStyles, "BUTTON",
+    #ifdef MEISEI_ESP
+        "¿Restringir el Emulador?",
+        checkProperties, 150, 505, 135, 25, form1, NULL, hInstance, NULL
+    #else
         "Restrict Emulator?",
         checkProperties, 150, 505, 105, 25, form1, NULL, hInstance, NULL
+    #endif // MEISEI_ESP
     );
 	SendMessage(chkEmuRes, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	SendMessage(chkEmuRes, BM_SETCHECK, emuResValue, 0);
 	//Connection Restriction
 	chkConnRes = CreateWindowEx(
         controlStyles, "BUTTON",
+    #ifdef MEISEI_ESP
+        "¿Restringir Tipo de Conexión?",
+        checkProperties, 150, 535, 160, 25, form1, NULL, hInstance, NULL
+    #else
         "Restrict Connection Type?",
         checkProperties, 150, 535, 145, 25, form1, NULL, hInstance, NULL
+    #endif // MEISEI_ESP
     );
 	SendMessage(chkConnRes, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	SendMessage(chkConnRes, BM_SETCHECK, connResValue, 0);
 	//Version
 	btnVersion = CreateWindowEx(
         controlStyles, "BUTTON",
+    #ifdef MEISEI_ESP
+        "Ver. Servidor",
+    #else
         "Server Version",
+    #endif // MEISEI_ESP
         buttonProperties, 500, 530, 80, 25, form1, NULL, hInstance, NULL
     );
 	SendMessage(btnVersion, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
@@ -2477,7 +2835,17 @@ void createInitialWindow(){
 //P2P Port Textbox
 	txtP2PPort = CreateWindowEx(WS_EX_CLIENTEDGE, "EDIT", p2pPort, textboxProperties, 225, 520, 60,25, form1, NULL, hInstance, NULL);
 	SendMessage(txtP2PPort, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
-	lblP2PPort = CreateWindowEx(controlStyles, "STATIC", "Port#:", labelProperties, 225, 505, 60, 15, form1, NULL, hInstance, NULL);
+	lblP2PPort = CreateWindowEx(
+        controlStyles, "STATIC",
+    #ifdef MEISEI_ESP
+        "Puerto#:",
+        labelProperties, 225, 505, 70, 15,
+    #else
+        "Port#:",
+        labelProperties, 225, 505, 60, 15,
+    #endif // MEISEI_ESP
+        form1, NULL, hInstance, NULL
+    );
 	SendMessage(lblP2PPort, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 //Login Button
 	btnP2PStart = CreateWindowEx(
@@ -4105,16 +4473,28 @@ void createChatroom(){
 	SendMessage(lstGameUserlist, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	memset(&LvCol, 0, sizeof(LvCol));
 	LvCol.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
+#ifdef MEISEI_ESP
+	LvCol.pszText = "ID Usuario\0";
+#else
 	LvCol.pszText = "UserID\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 45;
 	SendMessage(lstGameUserlist, LVM_INSERTCOLUMN, 0, (LPARAM)&LvCol);
+#ifdef MEISEI_ESP
+	LvCol.pszText = "Mote\0";
+#else
 	LvCol.pszText = "Nick\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 135;
 	SendMessage(lstGameUserlist, LVM_INSERTCOLUMN, 1, (LPARAM)&LvCol);
 	LvCol.pszText = "Ping\0";
 	LvCol.cx = 35;
 	SendMessage(lstGameUserlist, LVM_INSERTCOLUMN, 2, (LPARAM)&LvCol);
+#ifdef MEISEI_ESP
+	LvCol.pszText = "Tipo\0";
+#else
 	LvCol.pszText = "Type\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 59;
 	SendMessage(lstGameUserlist, LVM_INSERTCOLUMN, 3, (LPARAM)&LvCol);
 	SendMessage(lstGameUserlist, LVM_SETEXTENDEDLISTVIEWSTYLE, 0, (LPARAM)listviewStyles);
@@ -4127,19 +4507,35 @@ void createChatroom(){
 	SendMessage(lstUserlist, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	memset(&LvCol, 0, sizeof(LvCol));
 	LvCol.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
+#ifdef MEISEI_ESP
+	LvCol.pszText = "ID Usuario\0";
+#else
 	LvCol.pszText = "UserID\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 45;
 	SendMessage(lstUserlist, LVM_INSERTCOLUMN, 0, (LPARAM)&LvCol);
+#ifdef MEISEI_ESP
+	LvCol.pszText = "Mote\0";
+#else
 	LvCol.pszText = "Nick\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 105;
 	SendMessage(lstUserlist, LVM_INSERTCOLUMN, 1, (LPARAM)&LvCol);
 	LvCol.pszText = "Ping\0";
 	LvCol.cx = 35;
 	SendMessage(lstUserlist, LVM_INSERTCOLUMN, 2, (LPARAM)&LvCol);
+#ifdef MEISEI_ESP
+	LvCol.pszText = "Tipo\0";
+#else
 	LvCol.pszText = "Type\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 43;
 	SendMessage(lstUserlist, LVM_INSERTCOLUMN, 3, (LPARAM)&LvCol);
+#ifdef MEISEI_ESP
+    LvCol.pszText = "Estado\0";
+#else
 	LvCol.pszText = "Status\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 46;
 	SendMessage(lstUserlist, LVM_INSERTCOLUMN, 4, (LPARAM)&LvCol);
 	SendMessage(lstUserlist, LVM_SETEXTENDEDLISTVIEWSTYLE, 0, (LPARAM)listviewStyles);
@@ -4152,22 +4548,46 @@ void createChatroom(){
 	SendMessage(lstGamelist, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
 	memset(&LvCol, 0, sizeof(LvCol));
 	LvCol.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
+#ifdef MEISEI_ESP
+	LvCol.pszText = "ID Juego\0";
+#else
 	LvCol.pszText = "GameID\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 55;
 	SendMessage(lstGamelist, LVM_INSERTCOLUMN, 0, (LPARAM)&LvCol);
+#ifdef MEISEI_ESP
+	LvCol.pszText = "Juego\0";
+#else
 	LvCol.pszText = "Game\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 290;
 	SendMessage(lstGamelist, LVM_INSERTCOLUMN, 1, (LPARAM)&LvCol);
+#ifdef MEISEI_ESP
+	LvCol.pszText = "Emulador\0";
+#else
 	LvCol.pszText = "Emulator\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 204;
 	SendMessage(lstGamelist, LVM_INSERTCOLUMN, 2, (LPARAM)&LvCol);
+#ifdef MEISEI_ESP
+	LvCol.pszText = "Dueño\0";
+#else
 	LvCol.pszText = "Owner\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 105;
 	SendMessage(lstGamelist, LVM_INSERTCOLUMN, 3, (LPARAM)&LvCol);
+#ifdef MEISEI_ESP
+	LvCol.pszText = "Estado\0";
+#else
 	LvCol.pszText = "Status\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 55;
 	SendMessage(lstGamelist, LVM_INSERTCOLUMN, 4, (LPARAM)&LvCol);
+#ifdef MEISEI_ESP
+	LvCol.pszText = "#Usuarios\0";
+#else
 	LvCol.pszText = "#Users\0";
+#endif // MEISEI_ESP
 	LvCol.cx = 50;
 	SendMessage(lstGamelist, LVM_INSERTCOLUMN, 5, (LPARAM)&LvCol);
 	SendMessage(lstGamelist, LVM_SETEXTENDEDLISTVIEWSTYLE, 0, (LPARAM)listviewStyles);
@@ -4203,8 +4623,6 @@ void createChatroom(){
         buttonProperties, 425, 270, 60, 25, form1, NULL, hInstance, NULL
     );
 	SendMessage(btnJoin, WM_SETFONT, (WPARAM)hDefaultFont, MAKELPARAM(FALSE, 0));
-
-
 	//SubClass txtChat
 	EditProcTxtChat = (WNDPROC)GetWindowLongPtr(txtChat, GWLP_WNDPROC);
 	SetWindowLongPtr(txtChat, GWLP_WNDPROC, (DWORD_PTR)SubProcTxtChat);
